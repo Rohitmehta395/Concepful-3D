@@ -37,3 +37,9 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
+
+/* Lines 578-581: Authoritative prototype focus-visible ring */
+:focus-visible {
+  outline: 2px solid var(--pro);
+  outline-offset: 2px;
+}

@@ -8,15 +8,27 @@
 
 ## Context
 
-In Phase 3 Part 3.2, header styling was initially ported into a local CSS Module (`src/components/shell/Header.module.css`) and imported into `Header.tsx`. Two critical issues occurred:
+In Phase 3 Part 3.2, header styling was initially ported into a local CSS Module (`src/components/shell/Header.module.css`) and imported into `Header.tsx`. Two critical issues were observed in the production build:
 
-1. **Turbopack Loader Conflict with CSS Modules:**
-   In `next.config.ts`, Turbopack was configured with `loaders: ["@tailwindcss/turbopack"]` matching `"*.css"`. When `Header.module.css` was imported, Turbopack ran the Tailwind preprocessor over the file rather than generating scoped CSS Module class maps. As a result, the default import `styles` was an empty object, causing class references like `styles.logo` to evaluate to `undefined` in the JSX output (`class="undefined undefined logo glass"`).
+1. **Unmapped Class Names:**
+   In the prerendered HTML output of the CSS-module build, class name references like `styles.logo` and `styles.glass` evaluated to `undefined`, rendering:
 
-2. **LightningCSS Minification of `backdrop-filter`:**
-   When CSS declared `backdrop-filter: blur(12px) saturate(1.1);` followed by `-webkit-backdrop-filter: blur(12px) saturate(1.1);`, the LightningCSS minifier treated standard `backdrop-filter` as superseded by the vendor prefix and omitted standard `backdrop-filter` from the final chunk. Consequently, in Chromium, `window.getComputedStyle(el).backdropFilter` computed to `'none'`.
+   ```html
+   <header><a class="undefined undefined" href="#intro">...</a></header>
+   ```
 
-3. **Global Class Naming in Original Prototype:**
+   The class names were not mapped to scoped CSS Module hashes.
+
+2. **Omission of Unprefixed `backdrop-filter` in Compiled CSS:**
+   When the source CSS declared `backdrop-filter: blur(12px) saturate(1.1);` followed by `-webkit-backdrop-filter: blur(12px) saturate(1.1);`, the compiled production chunk omitted standard `backdrop-filter` entirely, emitting only:
+
+   ```css
+   .glass{-webkit-backdrop-filter:blur(12px)saturate(1.1);...}
+   ```
+
+   Consequently, Chromium computed `backdropFilter` as `'none'`.
+
+3. **Global Class Architecture in Original Prototype:**
    The original authoritative prototype (`reference/Concepful_Mech_Builder.html`) uses global, semantic class names (`.top`, `.logo`, `.glass`, `.navl`, `.fu`, `.mk`, `.wm`) that are shared across header, cards, and modal components.
 
 ---
@@ -34,7 +46,7 @@ We adopt a **Global Component CSS Architecture** for ported prototype styles:
 4. **Tailwind Utilities for New/Supplemental Code:**
    New utility enhancements (such as responsive layout adjustments or layout spacers) use standard Tailwind v4 utility classes.
 5. **Vendor Prefix Ordering for `backdrop-filter`:**
-   To guarantee both declarations are emitted into compiled chunks, vendor prefixes must be declared _before_ standard properties:
+   Declaring `-webkit-backdrop-filter` prior to `backdrop-filter` ensures minification preserves both declarations in the compiled chunk:
    ```css
    .glass {
      background: var(--glass);
@@ -46,25 +58,50 @@ We adopt a **Global Component CSS Architecture** for ported prototype styles:
 
 ---
 
-## Compiled Output Verification
+## Empirical Reproduction & Build Verification (Option A)
 
-### Compiled `.glass` Rule in Current Production Build
+To verify the CSS-module failure mode empirically, a clean build was run in a temporary worktree based on commit `d7435be` with `Header.module.css` imported into `Header.tsx`:
 
-From `.next/static/chunks/1vgfrxio1yytr.css` (current build output):
+1. **Prerendered HTML Output:**
 
-```css
-.glass {
-  background: var(--glass);
-  border: 1px solid var(--line);
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  backdrop-filter: blur(12px) saturate(1.1);
-}
-```
+   ```html
+   <header>
+     <a class="undefined undefined" href="#intro"><span>Logo</span></a>
+   </header>
+   ```
 
-### Previous Failing CSS-Module Build Output
+   _Result:_ Class names were not mapped (`undefined`).
 
-In the initial CSS-module attempt with standard `backdrop-filter` placed after `-webkit-backdrop-filter`:
-The compiled chunk emitted only `-webkit-backdrop-filter:blur(12px)saturate(1.1)` without `backdrop-filter`, causing Chromium's computed `backdropFilter` property to return `'none'`. (The exact ephemeral chunk has been replaced by the working build, but the reproduction was logged in Task 832).
+2. **Compiled CSS Chunk Output (`.next/static/chunks/*.css`):**
+
+   ```css
+   .top {
+     z-index: 10;
+     position: fixed;
+     top: 12px;
+   }
+   .glass {
+     -webkit-backdrop-filter: blur(12px) saturate(1.1);
+     background: #141628d6;
+     border: 1px solid #ffffff14;
+   }
+   .logo {
+     display: flex;
+   }
+   ```
+
+   _Result:_ The compiled `.glass` rule emitted global class selectors rather than scoped module hashes, and omitted standard `backdrop-filter`.
+
+3. **Current Global Component CSS Build Output (`.next/static/chunks/1vgfrxio1yytr.css`):**
+   ```css
+   .glass {
+     background: var(--glass);
+     border: 1px solid var(--line);
+     -webkit-backdrop-filter: blur(12px) saturate(1.1);
+     backdrop-filter: blur(12px) saturate(1.1);
+   }
+   ```
+   _Result:_ Both declarations are preserved and active. Chromium computes `backdropFilter: "blur(12px) saturate(1.1)"`.
 
 ---
 

@@ -96,19 +96,21 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.2: Static Header
 
-- **Status:** **committed (371acb0), verification 3.2c in progress**
+- **Status:** **approved pending 3.2d review**
 - **Deliverables:**
   - `src/components/shell/Logo.tsx`: Cel-shaded mecha crest SVG (`.mk`) and vector wordmark SVG (`.wm`) converted to valid JSX, marked with `aria-hidden="true"` and `focusable="false"`. Zero element IDs (no collision risk).
   - `src/components/shell/Header.tsx`: Fixed `<header id="top">` landmark housing `<a className="logo glass" href="#intro" aria-label="Concepful">` and `<nav className="navl glass" aria-label="Primary">` with `NAV_LINKS` and `NAV_CTA`. Zero hardcoded hrefs.
-  - `src/styles/header.css` & `src/app/globals.css`: Global component CSS (ADR 0004); glass backdrop filter (`-webkit-backdrop-filter` declared before `backdrop-filter` to prevent LightningCSS de-duplication), safe-area gutter positioning (`--gl`, `--gr`, `--st`), retro 3D tactile button shadow (`--redLo`), hover/active translations, media query (<=900px) hiding non-CTA links, reduced-motion bypass, and WCAG-compliant `--red` focus rings.
+  - `src/styles/header.css` & `src/app/globals.css`: Global component CSS (ADR 0004); glass backdrop filter (`-webkit-backdrop-filter` declared before `backdrop-filter` to prevent LightningCSS de-duplication), safe-area gutter positioning (`--gl`, `--gr`, `--st`), retro 3D tactile button shadow (`--redLo`), hover/active translations, media query (<=900px) hiding non-CTA links, reduced-motion bypass, verified line-by-line citations matching prototype cascade.
+  - `src/styles/base.css`: Added global prototype focus ring `:focus-visible { outline: 2px solid var(--pro); outline-offset: 2px; }` (line 578).
+  - `src/components/shell/SkipLink.tsx`: Aligned focus styles with global `--pro` focus token (`focus:border-pro focus:outline-pro`).
   - `src/content/story.ts`: Exported `BRAND` (`href: "#intro"`, `label: "Concepful"`).
   - `src/app/layout.tsx`: Mounted `<Header />` directly following `<SkipLink />`.
 - **Verification:**
   - **Backdrop filter & Ancestors:** Both original and new app render `backdropFilter: blur(12px) saturate(1.1)` on `.logo` and `.navl` with identical background `rgba(20, 22, 40, 0.84)` across 1280px and 390px.
-  - **Faux-Bold & Fonts:** Resolved font data: `.wm` is SVG vector mark (no text node). `.navl a` renders Inter 600. `.navl a.fu` renders Russo One 600 (inherits `font-weight: 600` from `.navl a`, identical to original prototype). Neither page declares `font-synthesis` in CSS.
-  - **Hover & Focus States:** Tested with Playwright at 1280px. Hover translation (`translateY(-1px)`), background color shifts, and focus visible outlines verified against source CSS.
+  - **Faux-Bold & Fonts:** Resolved font data: `.wm` is SVG vector mark (no text node). `.navl a` renders Inter 600. `.navl a.fu` renders Russo One 600 (inherits `font-weight: 600` from `.navl a`, identical to original prototype). Both Inter and Russo One confirmed loaded from network via Google Fonts CDN (status 200).
+  - **Hover & Focus States:** Tested with Playwright at 1280px and 390px. Global `:focus-visible` renders `rgb(255, 127, 166)` (`--pro`) with `2px solid` and `2px offset` across skip link, logo, nav links, and CTA.
   - **Client JavaScript Proof:** 0 bytes raw difference, 0 bytes gzip difference (568,669 raw / 174,719 gzip) across identical chunk hashes.
-  - **Pixel Diff & Controls:** 0.000% difference at tolerance 10; 0.025% (22 subpixel edges) at tolerance 0. Controls injected on new page produced expected failures: font-weight 400 diff = 1.025% (tol 10) / 1.257% (tol 0); glass alpha 0.5 diff = 21.272% (tol 0).
+  - **Pixel Diff:** Exact tolerance 0 diff is 22 pixels (0.025%) at 1280px (isolated via `elementFromPoint` to nav link text anti-aliasing) and 0 pixels (0.000%) at 390px. Tolerance 10 diff is 0.000% across all viewports. Controls confirmed failure modes.
 
 ---
 
