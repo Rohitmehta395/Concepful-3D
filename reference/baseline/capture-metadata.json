@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-10-29T18:33:47.186Z",
+  "browser": "Google Chrome 155.0.8059.85 (via Playwright 1.64.1)",
+  "webglDetails": {
+    "contextType": "webgl2",
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "shadingLanguageVersion": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)"
+  },
+  "frameMetrics": {
+    "measurementMethod": "requestAnimationFrame delta tracking in headless browser (animation-frame callback intervals)",
+    "note": "Callback intervals measure script execution and rAF pacing in headless Chromium, not physical monitor refresh rate or hardware display FPS. estimatedReciprocalFps is purely a mathematical reciprocal estimate (1000 / avgCallbackIntervalMs).",
+    "storyMode": {
+      "sampleFrames": 180,
+      "avgCallbackIntervalMs": 7.1,
+      "estimatedReciprocalFps": 140.9,
+      "minCallbackIntervalMs": 6.6,
+      "maxCallbackIntervalMs": 14.1,
+      "p95CallbackIntervalMs": 7.1
+    },
+    "configuratorMode": {
+      "sampleFrames": 120,
+      "avgCallbackIntervalMs": 6.94,
+      "estimatedReciprocalFps": 144,
+      "minCallbackIntervalMs": 6.7,
+      "maxCallbackIntervalMs": 7.3
+    }
+  },
+  "networkAudit": {
+    "requests": [
+      {
+        "url": "file:///D:/Projects/Pete/Concepful-3D/reference/Concepful_Mech_Builder.html",
+        "method": "GET"
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Russo+One&display=swap",
+        "method": "GET"
+      },
+      {
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+        "method": "GET"
+      },
+      {
+        "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+        "method": "GET"
+      },
+      {
+        "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+        "method": "GET"
+      },
+      {
+        "url": "https://fonts.gstatic.com/s/russoone/v18/Z9XUDmZRWg6M1LvRYsHOz8mJ.woff2",
+        "method": "GET"
+      }
+    ],
+    "failed": []
+  },
+  "consoleLogs": []
+}

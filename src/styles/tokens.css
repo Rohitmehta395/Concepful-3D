@@ -1,0 +1,224 @@
+/**
+ * Concepful Mech Builder — Design Tokens
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * All values extracted directly from the authoritative standalone prototype.
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+:root {
+  /* ==========================================================================
+     Colors: Active Core Backgrounds & Text
+     Direct source values from the active :root cascade (lines 1658-1679).
+     ========================================================================== */
+  /* Line 1660: Active background ink (overrides draft line 52 #4f5a68) */
+  --bg: #141624;
+  /* Line 1661: Active navy */
+  --navy: #141624;
+  /* Line 1666: Active foreground text (overrides draft line 57 #f2efe8) */
+  --fg: #ffffff;
+  /* Line 1667: Active muted text (overrides draft line 58 #a7a9b2) */
+  --muted: #afb1cb;
+  /* Line 1668: Active dim text & subtle elements (overrides draft line 59 #6b6e7a) */
+  --dim: #72759a;
+  /* Line 1672: Active bone color in CSS cascade (overrides draft line 62 #ece6d6) */
+  --bone: #ffffff;
+
+  /* ==========================================================================
+     Colors: Active Brand Accents
+     Direct source values from the active :root cascade (lines 1658-1679).
+     ========================================================================== */
+  /* Line 1669: Active brand red-magenta / melon (overrides draft line 60 #e2404f) */
+  --red: #ee004e;
+  /* Line 1670: Active red soft glow / focus backdrop (overrides draft line 61) */
+  --red-soft: rgba(238, 0, 78, 0.16);
+  /* Line 1671: Direct prototype variable name for 3D tactile button shadow facet */
+  --redLo: #8f0030;
+  /* Kebab-case semantic alias for --redLo */
+  --red-lo: #8f0030;
+  /* Semantic alias for --red matching brand design documentation */
+  --brand-red: #ee004e;
+
+  /* ==========================================================================
+     Colors: Active Department & Character Roles (MMO Spec Roles)
+     Direct source values from lines 1658-1679.
+     ========================================================================== */
+  /* Line 1675: Strategy role / Blue-Periwinkle (overrides draft line 63 #6e8fcc) */
+  --str: #8c93e6;
+  /* Line 1676: Design role / Brand Red (overrides draft line 64 #e2404f) */
+  --des: #ee004e;
+  /* Line 1673: Production role / Pink (overrides draft line 65 #f2b33a) */
+  --pro: #ff7fa6;
+  /* Line 1674: Sun / Gold accent (also line 65) */
+  --sun: #f2b33a;
+  /* Line 1677: Operations role / Teal (also line 66) */
+  --ops: #55c2b8;
+  /* Line 1678: Success / Online green status (overrides draft line 67 #4cc58a) */
+  --ok: #5fd39b;
+
+  /* ==========================================================================
+     Colors: Active Glass HUD Surfaces & Boundaries
+     Direct source values from lines 1658-1679.
+     ========================================================================== */
+  /* Line 1662: Dark glass panel surface (overrides draft line 53 rgba(16, 18, 24, 0.82)) */
+  --glass: rgba(20, 22, 40, 0.84);
+  /* Line 1663: Elevated card glass surface (overrides draft line 54 rgba(30, 33, 42, 0.88)) */
+  --glass2: rgba(40, 43, 76, 0.62);
+  /* Line 1664: Subtle boundary line (overrides draft line 55 rgba(255, 255, 255, 0.09)) */
+  --line: rgba(255, 255, 255, 0.08);
+  /* Line 1665: Medium boundary line (overrides draft line 56 rgba(255, 255, 255, 0.18)) */
+  --line2: rgba(255, 255, 255, 0.2);
+
+  /* ==========================================================================
+     Historical / Draft CSS Colors (Lines 51-67, overridden by Lines 1658-1679)
+     Preserved for documentation and asset provenance.
+     ========================================================================== */
+  --bg-draft: #4f5a68; /* Line 52: Early slate sky background */
+  --fg-draft: #f2efe8; /* Line 57: Warm off-white */
+  --muted-draft: #a7a9b2; /* Line 58: Cool slate gray */
+  --dim-draft: #6b6e7a; /* Line 59: Slate dim */
+  --bone-draft: #ece6d6; /* Line 62: Weathered bone armor (also 2D canvas sprite bone C.bone line 2777) */
+  --red-draft: #e2404f; /* Line 60: Early coral red */
+  --red-soft-draft: rgba(226, 64, 79, 0.14); /* Line 61 */
+  --str-draft: #6e8fcc; /* Line 63 */
+  --pro-draft: #f2b33a; /* Line 65 */
+  --ok-draft: #4cc58a; /* Line 67 */
+
+  /* ==========================================================================
+     Derived WebGL Scene & 2D Canvas Palette (JS constants HX & C, not CSS variables)
+     These values drive Three.js materials and 2D canvas rendering in the prototype.
+     ========================================================================== */
+  --scene-bone: #ffffff; /* Line 7395: HX.bone 0xffffff */
+  --scene-bone2: #c9cadd; /* Line 7396: HX.bone2 0xc9cadd (secondary bone highlight) */
+  --scene-gunmetal: #3e4270; /* Line 7397: HX.gun 0x3e4270 */
+  --scene-dark: #1c1e36; /* Line 7398: HX.dark 0x1c1e36 */
+  --scene-glass: #2a3060; /* Line 7403: HX.glass 0x2a3060 */
+  --scene-chrome: #cdd0e4; /* Line 7404: HX.chrome 0xcdd0e4 */
+  --scene-holo: #b8c2ff; /* Line 7405: HX.holo 0xb8c2ff */
+  --scene-cloud: #f1f1f8; /* Line 7407: HX.cloud 0xf1f1f8 */
+  --canvas-bone-lo: #a9a090; /* Line 2778: C.boneLo shade in 2D canvas */
+  --canvas-gun: #56545d; /* Line 2779: C.gun hydraulics in 2D canvas */
+
+  /* ==========================================================================
+     Typography: Font Families (Lines 68-70, persistent in :root)
+     Public design tokens from source prototype, resolving to the theme stacks.
+     ========================================================================== */
+  --display: var(--font-display); /* Line 68 */
+  --body: var(--font-body); /* Line 69 */
+  --mono: var(--font-mono); /* Line 70 */
+
+  /* ==========================================================================
+     Typography: Letter Spacing / Tracking (Direct values from prototype CSS)
+     ========================================================================== */
+  --tracking-tight: 0.02em; /* Lines 630, 773, 810, 1610 (stat labels, tabs) */
+  --tracking-normal: 0.04em; /* Line 908 (specs text) */
+  --tracking-medium: 0.05em; /* Lines 701, 1626 (buttons) */
+  --tracking-wide: 0.06em; /* Lines 257, 337, 670, 879, 1222, 1552, 1753 (badges, uppercase labels) */
+  --tracking-wider: 0.08em; /* Lines 316, 817, 1009, 1031, 1297, 1501 (headers, subheads) */
+  --tracking-widest: 0.1em; /* Lines 920, 1251, 1405, 1512, 1653 (telemetry tags) */
+  --tracking-caps: 0.14em; /* Lines 186, 737, 1188 (sci-fi wide uppercase titles) */
+
+  /* ==========================================================================
+     Glass Backdrop Filters (Direct values from prototype CSS)
+     ========================================================================== */
+  --glass-blur: blur(12px); /* Line 436 (.hud-pill, .bar) */
+  --glass-blur-saturate: blur(12px) saturate(1.1); /* Lines 171, 609 (.topbar, .card) */
+
+  /* ==========================================================================
+     Borders & Radii (Direct values from prototype CSS)
+     ========================================================================== */
+  --radius-xs: 3px; /* Line 1318 (.chip) */
+  --radius-sm: 6px; /* Lines 380, 520, 689 (.btn, .input) */
+  --radius-md: 10px; /* Lines 440, 725 (.hud-box, .panel-inner) */
+  --radius-lg: 14px; /* Line 640 (.top-inner) */
+  --radius-xl: 18px; /* Lines 230, 1345 (.panel, .modal-box) */
+  --radius-full: 999px; /* Lines 103, 111, 442 (.badge-round, .pill) */
+
+  /* ==========================================================================
+     Shadows: 3D Retro Tactile Drops & Inset Rings (Direct values from prototype CSS)
+     ========================================================================== */
+  --shadow-btn: 0 3px 0 var(--redLo); /* Line 1689 (.fu primary button) */
+  --shadow-btn-active: 0 1px 0 var(--redLo); /* Line 1692 (.fu:active) */
+  --shadow-text-headline: 3px 3px 0 var(--redLo); /* Line 1682 (.big, .title) */
+  --shadow-text-contrast: 3px 3px 0 #141624; /* Line 1686 (.big span, .title span) */
+  --shadow-focus-ring: inset 0 0 0 1px var(--red); /* Line 805 */
+
+  /* ==========================================================================
+     Z-Index Layer Hierarchy (Direct source CSS declarations)
+     Canvas elements (#gl, #cv) have no explicit z-index in source CSS (lines 582-596)
+     and sit at natural DOM order beneath all positioned HUD layers.
+     ========================================================================== */
+  --z-curtain: 4; /* Line 481: .curtain (scene fade overlay) */
+  --z-wmark: 5; /* Line 1743: .wmark (watermark badge) */
+  --z-story: 6; /* Line 148: .story (narrative scroll chapters) */
+  --z-boxart: 7; /* Line 1268: .boxart (hero title lockup) */
+  --z-card: 8; /* Line 1176: .card (right character tech-spec card) */
+  --z-panel: 9; /* Line 717: .panel (left loadout configurator) */
+  --z-top: 10; /* Line 615: .top (header navigation) */
+  --z-modal: 20; /* Line 1340: .modal (modal dialog overlay) */
+
+  /* ==========================================================================
+     Mobile Safe Area Insets (Lines 71-74: viewport-fit=cover support)
+     The prototype defines these in :root to support notch and home indicator spacing.
+     There is no abstract spacing scale (e.g. 4px, 8px, 16px) defined in :root.
+     ========================================================================== */
+  --gl: max(16px, env(safe-area-inset-left, 0px)); /* Line 71: gutter left */
+  --gr: max(16px, env(safe-area-inset-right, 0px)); /* Line 72: gutter right */
+  --st: env(safe-area-inset-top, 0px); /* Line 73: safe top */
+  --sb: env(safe-area-inset-bottom, 0px); /* Line 74: safe bottom */
+
+  /* ==========================================================================
+     Responsive Breakpoint Thresholds
+     Documented CSS variables corresponding to prototype max-width media queries.
+     Not exposed as standard min-width Tailwind breakpoints to avoid semantic inversion.
+     ========================================================================== */
+  --breakpoint-mobile-max: 900px; /* Lines 485, 1453, 1772: @media (max-width: 900px) */
+  --breakpoint-tablet-max: 1023px; /* Line 1448: @media (max-width: 1023px) */
+}
+
+/* ==========================================================================
+   Tailwind CSS v4 Theme Token Bindings
+   Exposes active utility colors, typography, and radii to the Tailwind engine.
+   ========================================================================== */
+@theme {
+  /* Colors */
+  --color-bg: var(--bg);
+  --color-navy: var(--navy);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-dim: var(--dim);
+  --color-bone: var(--bone);
+
+  --color-red: var(--red);
+  --color-brand-red: var(--brand-red);
+  --color-red-soft: var(--red-soft);
+  --color-red-lo: var(--red-lo);
+  --color-sun: var(--sun);
+
+  --color-str: var(--str);
+  --color-des: var(--des);
+  --color-pro: var(--pro);
+  --color-ops: var(--ops);
+  --color-ok: var(--ok);
+
+  --color-glass: var(--glass);
+  --color-glass2: var(--glass2);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+
+  /* Fonts (wired directly to next/font CSS variables with source fallbacks) */
+  --font-display:
+    var(--font-russo-one), "Russo One", "Arial Black", system-ui, sans-serif;
+  --font-body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Radii */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+}
