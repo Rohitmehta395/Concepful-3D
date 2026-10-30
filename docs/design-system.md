@@ -135,13 +135,13 @@ In [`src/styles/tokens.css`](file:///d:/Projects/Pete/Concepful-3D/src/styles/to
 }
 ```
 
-In `:root`, the public prototype tokens (lines 68–70) resolve cleanly through the theme stacks without circularity:
+In `:root`, the public prototype tokens (lines 68–70) match their exact source prototype values:
 
 ```css
 :root {
-  --display: var(--font-display); /* Line 68 */
-  --body: var(--font-body); /* Line 69 */
-  --mono: var(--font-mono); /* Line 70 */
+  --display: "Russo One", "Arial Black", system-ui, sans-serif; /* Line 68 */
+  --body: "Inter", system-ui, -apple-system, sans-serif; /* Line 69 */
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace; /* Line 70 */
 }
 ```
 
