@@ -65,6 +65,12 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Environment Variables
+
+| Variable               | Description                                                                                                                                 | Default  |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
+| `NEXT_PUBLIC_SITE_URL` | Base URL used to resolve absolute OpenGraph and metadata URLs (e.g. `https://concepful.com`). When unset, `metadataBase` remains undefined. | _(none)_ |
+
 ### Production Build
 
 ```bash

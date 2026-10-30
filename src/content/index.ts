@@ -14,3 +14,4 @@ export * from "./roles";
 export * from "./roster";
 export * from "./callouts";
 export * from "./story";
+export * from "./a11y";

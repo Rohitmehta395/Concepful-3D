@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Russo_One } from "next/font/google";
+import { SkipLink } from "@/components/shell/SkipLink";
+import { STORY_SECTIONS } from "@/content";
 import "./globals.css";
 
 const russoOne = Russo_One({
@@ -23,8 +25,29 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+// Original line 2198: "© 2026 Concepful · Creative Department-as-a-Service"
+const [copyrightPrefix, tagline] = STORY_SECTIONS.footer.lines[0].split(" · ");
+const brand = copyrightPrefix?.split(" ")[2] ?? "Concepful";
+const siteTitle = `${brand} · ${tagline}`;
+const siteDescription = STORY_SECTIONS.hero.description;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#141624",
+};
+
 export const metadata: Metadata = {
-  title: "Concepful",
+  title: siteTitle,
+  description: siteDescription,
+  ...(process.env.NEXT_PUBLIC_SITE_URL
+    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) }
+    : {}),
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
@@ -37,7 +60,10 @@ export default function RootLayout({
       lang="en"
       className={`${russoOne.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased" suppressHydrationWarning>
+        <SkipLink />
+        {children}
+      </body>
     </html>
   );
 }

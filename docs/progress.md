@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                            Status                            |            Approval Date            |
-| :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :---------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  | **Implemented (Part 1.5 awaiting user review and approval)** | Parts 1.1–1.4 Approved Oct 30, 2026 |
-| **Phase 2**  | **Content and Domain Extraction**     | 0 / 2  |                   Pending Phase 1 Approval                   |                  —                  |
-| **Phase 3**  | **Static Page Shell**                 | 0 / 8  |                           Pending                            |                  —                  |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |                  —                  |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |                  —                  |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |                  —                  |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                           Pending                            |                  —                  |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                           Pending                            |                  —                  |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                           Pending                            |                  —                  |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                           Pending                            |                  —                  |
+|    Phase     | Title                                 | Parts  |                            Status                            |         Approval Date          |
+| :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :----------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                         **Approved**                         |          Oct 30, 2026          |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                         **Approved**                         |          Oct 30, 2026          |
+| **Phase 3**  | **Static Page Shell**                 | 1 / 8  | **Part 3.1 Implemented (Awaiting User Review and Approval)** | Part 3.0 Approved Oct 30, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |               —                |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |               —                |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |               —                |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                           Pending                            |               —                |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                           Pending                            |               —                |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                           Pending                            |               —                |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                           Pending                            |               —                |
 
 ---
 
@@ -51,7 +51,7 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 1.5: Documentation Skeleton
 
-- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Status:** **APPROVED**
 - **Deliverables:**
   - `README.md` updated with architecture references, commands, and project status.
   - `docs/requirements.md` detailing functional, visual, and non-functional requirements with explicit provenance tracking.
@@ -62,17 +62,51 @@ This document records the verification history, approved milestones, and live st
 
 ---
 
-## 3. Verification Dimensions & Quality Targets
+## 3. Phase 2 Detailed Status Log
 
-To maintain strict truth in reporting, code/build checks are explicitly distinguished from visual, accessibility, and performance verification:
+### Part 2.1: Typed Content Modules
 
-| Dimension                      | Verification Scope                                  | Status                 | Notes                                                                        |
-| :----------------------------- | :-------------------------------------------------- | :--------------------- | :--------------------------------------------------------------------------- |
-| **Code & Build Checks**        | `pnpm lint`, `typecheck`, `format:check`, `build`   | **Verified Passing**   | All 4 commands run and pass with exit code 0.                                |
-| **Repository File Integrity**  | Checksum of `reference/Concepful_Mech_Builder.html` | **Verified Passing**   | SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`. |
-| **Visual Baseline Archive**    | 36 screenshots in `reference/baseline/`             | **Verified Passing**   | Intact across 4 viewports (Part 1.2).                                        |
-| **Font Bundling (CLS = 0)**    | Build-time `.woff2` extraction                      | **Verified Passing**   | Local assets preloaded in head (Part 1.4).                                   |
-| **Visual Fidelity (Scene/UI)** | Reconstructed 3D mechas & HUD vs. baseline          | **Pending Phases 3–7** | Implementation starts in Phase 3.                                            |
-| **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **Pending Phase 8**    | Scheduled for Phase 8 audit.                                                 |
-| **Performance (60 FPS)**       | Profiling render loop & DPR governor                | **Pending Phase 9**    | Scheduled for Phase 9 profiling.                                             |
-| **E2E Test Suite**             | Full Playwright configurator flow                   | **Pending Phase 10**   | Scheduled for Phase 10 QA.                                                   |
+- **Status:** **APPROVED**
+- **Deliverables:** Ported verbatim content from `reference/Concepful_Mech_Builder.html` into 10 typed modules under `src/content/`: `types.ts`, `tiers.ts`, `quests.ts`, `gear.ts`, `objectives.ts`, `buffs.ts`, `classes.ts`, `roles.ts`, `roster.ts`, `callouts.ts`, `story.ts`, and barrel export `index.ts`. All IDs, copy, labels, tooltips, prices, and stats preserved with line citations.
+
+### Part 2.2: Pure Domain Logic & Golden Differential Tests
+
+- **Status:** **APPROVED**
+- **Deliverables:** Ported pure logic functions into `src/domain/`: `quote.ts` (exact pricing formula, discounts, reach multipliers), `roster.ts` (`units()` and `leaders()` mapping), `ship.ts` (`shipFor()` flagship selection), `config.ts` (configuration state, actions, and reducer).
+- **Verification:** Exhaustive 4,100-case differential test suite (`tests/differential.test.ts` and `tests/reducer.test.ts`) comparing against oracle execution of original source JavaScript in `vm2`/Node. 100% parity verified.
+
+---
+
+## 4. Phase 3 Detailed Status Log
+
+### Part 3.0: Token Defect Remediation
+
+- **Status:** **APPROVED**
+- **Deliverables:** Removed circular radius definitions in `@theme` by specifying literals (3px, 6px, 10px, 14px, 18px, 999px); wired font stacks directly through `next/font` CSS variables; pruned dead draft tokens while strictly preserving active `:root` values matching lines 1659–1679.
+
+### Part 3.1: Document Shell
+
+- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Deliverables:**
+  - `src/app/layout.tsx`: Configured Next.js Metadata and Viewport APIs. Verbatim title `"Concepful · Creative Department-as-a-Service"` and description from `src/content/story.ts`. Safe-area aware viewport cover and theme-color `#141624`. Optional `metadataBase` support via `NEXT_PUBLIC_SITE_URL`.
+  - `src/content/a11y.ts`: Accessibility strings added by rewrite (`skipToMain`).
+  - `src/components/shell/SkipLink.tsx`: Server component `<a href="#main">` visually hidden until focused, keyboard accessible, positioned with safe insets and `--z-modal`.
+  - `src/app/page.tsx`: Placeholder wrapped in `<main id="main" tabIndex={-1}>`, rendered with `font-display` utility for Russo One.
+  - `src/styles/base.css` & `src/app/globals.css`: Ported layout-independent base CSS resets (`box-sizing`, `margin`, `color`, `background`, `font-family`, `text-size-adjust`, reduced-motion guarded `scroll-behavior`).
+
+---
+
+## 5. Verification Dimensions & Quality Targets
+
+| Dimension                      | Verification Scope                                  | Status                 | Notes                                                                            |
+| :----------------------------- | :-------------------------------------------------- | :--------------------- | :------------------------------------------------------------------------------- |
+| **Code & Build Checks**        | `pnpm lint`, `typecheck`, `format:check`, `build`   | **Verified Passing**   | All standard commands pass cleanly with exit code 0.                             |
+| **Domain Logic Tests**         | `pnpm test` (4,100 test cases)                      | **Verified Passing**   | 100% parity against original JavaScript oracle.                                  |
+| **Repository File Integrity**  | Checksum of `reference/Concepful_Mech_Builder.html` | **Verified Passing**   | SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`.     |
+| **Visual Baseline Archive**    | 36 screenshots in `reference/baseline/`             | **Verified Passing**   | Intact across 4 viewports (Part 1.2).                                            |
+| **Document Shell Parity**      | HTML head, skip link, keyboard focus                | **Verified Passing**   | Head metadata matches, skip link focuses main, fonts verified in browser engine. |
+| **Font Bundling (CLS = 0)**    | Build-time `.woff2` extraction                      | **Verified Passing**   | Local assets preloaded in head. Russo One, Inter, JetBrains Mono verified.       |
+| **Visual Fidelity (Scene/UI)** | Reconstructed 3D mechas & HUD vs. baseline          | **Pending Phases 3–7** | Layout implementation in progress.                                               |
+| **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **In Progress**        | Skip link added; full audit scheduled for Phase 8.                               |
+| **Performance (60 FPS)**       | Profiling render loop & DPR governor                | **Pending Phase 9**    | Scheduled for Phase 9 profiling.                                                 |
+| **E2E Test Suite**             | Full Playwright configurator flow                   | **Pending Phase 10**   | Scheduled for Phase 10 QA.                                                       |
