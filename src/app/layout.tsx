@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Russo_One } from "next/font/google";
+import { Header } from "@/components/shell/Header";
 import { SkipLink } from "@/components/shell/SkipLink";
 import { STORY_SECTIONS } from "@/content";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
         <SkipLink />
+        <Header />
         {children}
       </body>
     </html>

@@ -10,7 +10,7 @@ This document records the verification history, approved milestones, and live st
 | :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :----------------------------: |
 | **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                         **Approved**                         |          Oct 30, 2026          |
 | **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                         **Approved**                         |          Oct 30, 2026          |
-| **Phase 3**  | **Static Page Shell**                 | 1 / 8  | **Part 3.1 Implemented (Awaiting User Review and Approval)** | Part 3.0 Approved Oct 30, 2026 |
+| **Phase 3**  | **Static Page Shell**                 | 2 / 8  | **Part 3.2 Implemented (Awaiting User Review and Approval)** | Part 3.1 Approved Oct 30, 2026 |
 | **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |               —                |
 | **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |               —                |
 | **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |               —                |
@@ -86,13 +86,29 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.1: Document Shell
 
-- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Status:** **APPROVED**
 - **Deliverables:**
-  - `src/app/layout.tsx`: Configured Next.js Metadata and Viewport APIs. Verbatim title `"Concepful · Creative Department-as-a-Service"` and description from `src/content/story.ts`. Safe-area aware viewport cover and theme-color `#141624`. Optional `metadataBase` support via `NEXT_PUBLIC_SITE_URL`.
+  - `src/app/layout.tsx`: Configured Next.js Metadata and Viewport APIs. Verbatim title `"Concepful · Creative Department-as-a-Service"` and description from `src/content/story.ts`. Safe-area aware viewport cover and theme-color `#141624`. Optional `metadataBase` support via `NEXT_PUBLIC_SITE_URL`. Added `suppressHydrationWarning` on `<body>` to ignore browser extension mutations.
   - `src/content/a11y.ts`: Accessibility strings added by rewrite (`skipToMain`).
   - `src/components/shell/SkipLink.tsx`: Server component `<a href="#main">` visually hidden until focused, keyboard accessible, positioned with safe insets and `--z-modal`.
   - `src/app/page.tsx`: Placeholder wrapped in `<main id="main" tabIndex={-1}>`, rendered with `font-display` utility for Russo One.
   - `src/styles/base.css` & `src/app/globals.css`: Ported layout-independent base CSS resets (`box-sizing`, `margin`, `color`, `background`, `font-family`, `text-size-adjust`, reduced-motion guarded `scroll-behavior`).
+
+### Part 3.2: Static Header
+
+- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Deliverables:**
+  - `src/components/shell/Logo.tsx`: Cel-shaded mecha crest SVG (`.mk`) and vector wordmark SVG (`.wm`) converted to valid JSX, marked with `aria-hidden="true"` and `focusable="false"`. Zero element IDs (no collision risk).
+  - `src/components/shell/Header.tsx`: Fixed `<header id="top">` landmark housing `<a className="logo glass" href="#intro" aria-label="Concepful">` and `<nav className="navl glass" aria-label="Primary">` with `NAV_LINKS` and `NAV_CTA`. Zero hardcoded hrefs.
+  - `src/styles/header.css` & `src/app/globals.css`: Glass backdrop filter (`-webkit-backdrop-filter` declared before `backdrop-filter` to prevent LightningCSS de-duplication), safe-area gutter positioning (`--gl`, `--gr`, `--st`), retro 3D tactile button shadow (`--redLo`), hover/active translations, media query (<=900px) hiding non-CTA links, reduced-motion bypass, and WCAG-compliant `--red` focus rings.
+  - `src/content/story.ts`: Exported `BRAND` (`href: "#intro"`, `label: "Concepful"`).
+  - `src/app/layout.tsx`: Mounted `<Header />` directly following `<SkipLink />`.
+- **Verification:**
+  - **Backdrop filter & Ancestors:** Both original and new app render `backdropFilter: blur(12px) saturate(1.1)` on `.logo` and `.navl` with identical background `rgba(20, 22, 40, 0.84)` across 1280px and 390px.
+  - **Faux-Bold & Fonts:** Russo One verified at single weight 400 (`font-weight: 400` on `.wm`, no synthetic bolding applied). Inter weights verified (600 for links, 700 for CTA).
+  - **Hover & Focus States:** Tested with Playwright at 1280px. Hover translation (`translateY(-1px)`), background color shifts, and focus visible outlines verified against source CSS.
+  - **Client JavaScript Proof:** 0 bytes raw difference, 0 bytes gzip difference (568,669 raw / 174,719 gzip) across identical chunk hashes.
+  - **Pixel Diff:** 0.000% difference at 1280px (89,600 pixels) and 0.000% difference at 390px (25,740 pixels) on flat `#141624` background.
 
 ---
 
@@ -105,8 +121,9 @@ This document records the verification history, approved milestones, and live st
 | **Repository File Integrity**  | Checksum of `reference/Concepful_Mech_Builder.html` | **Verified Passing**   | SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`.     |
 | **Visual Baseline Archive**    | 36 screenshots in `reference/baseline/`             | **Verified Passing**   | Intact across 4 viewports (Part 1.2).                                            |
 | **Document Shell Parity**      | HTML head, skip link, keyboard focus                | **Verified Passing**   | Head metadata matches, skip link focuses main, fonts verified in browser engine. |
+| **Static Header Parity**       | Logo, wordmark, nav links, CTA, glass styling       | **Verified Passing**   | Computed styles match across 4 viewports; mobile link collapsing matches.        |
 | **Font Bundling (CLS = 0)**    | Build-time `.woff2` extraction                      | **Verified Passing**   | Local assets preloaded in head. Russo One, Inter, JetBrains Mono verified.       |
 | **Visual Fidelity (Scene/UI)** | Reconstructed 3D mechas & HUD vs. baseline          | **Pending Phases 3–7** | Layout implementation in progress.                                               |
-| **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **In Progress**        | Skip link added; full audit scheduled for Phase 8.                               |
+| **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **In Progress**        | Skip link and header focus rings verified; full audit scheduled for Phase 8.     |
 | **Performance (60 FPS)**       | Profiling render loop & DPR governor                | **Pending Phase 9**    | Scheduled for Phase 9 profiling.                                                 |
 | **E2E Test Suite**             | Full Playwright configurator flow                   | **Pending Phase 10**   | Scheduled for Phase 10 QA.                                                       |

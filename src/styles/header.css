@@ -1,0 +1,141 @@
+/**
+ * Header styles ported faithfully from reference/Concepful_Mech_Builder.html
+ * Source line references cite the authoritative prototype.
+ */
+
+/* Lines 613-623: Fixed top header bar */
+.top {
+  position: fixed;
+  z-index: var(--z-top, 10);
+  top: calc(12px + var(--st));
+  left: var(--gl);
+  right: var(--gr);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Lines 1453-1458: Mobile header layout */
+@media (max-width: 900px) {
+  .top {
+    flex-wrap: wrap;
+    gap: 8px;
+    top: calc(8px + var(--st));
+  }
+}
+
+/* Lines 606-611: Glass backdrop styling */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+
+/* Lines 624-633, 1701-1706: Brand logo pill */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--display);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  padding: 7px 15px 7px 9px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Lines 1707-1712: Mecha crest mark */
+.logo .mk {
+  width: 24px;
+  height: 27px;
+  display: block;
+  flex: none;
+}
+
+/* Lines 1713-1717: Wordmark SVG */
+.logo .wm {
+  height: 16px;
+  width: auto;
+  display: block;
+}
+
+/* Lines 98-104: Navigation pill */
+.navl {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px;
+  border-radius: 999px;
+}
+
+/* Lines 105-115: Navigation links */
+.navl a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+.navl a:hover {
+  color: var(--fg);
+}
+
+/* Lines 485-488: Hide regular nav links on mobile (<= 900px) */
+@media (max-width: 900px) {
+  .navl a:not(.fu) {
+    display: none;
+  }
+}
+
+/* Lines 116-120, 694-713, 1688-1693: Call-to-action button */
+.fu {
+  border: 0;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  box-shadow: 0 3px 0 var(--redLo);
+  transition: transform 0.1s;
+}
+
+.navl a.fu {
+  color: #fff;
+  padding: 9px 16px;
+  font-size: 13px;
+}
+
+.navl a.fu:hover,
+.fu:hover {
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.navl a.fu:active,
+.fu:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--redLo);
+}
+
+/* Lines 1490-1495: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .fu,
+  .navl a.fu {
+    transition: none;
+  }
+}
+
+/* Accessibility addition: focus-visible ring added by the rewrite */
+.logo:focus-visible,
+.navl a:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}

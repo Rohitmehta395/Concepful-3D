@@ -7,6 +7,15 @@ import type { NavLink, TextSegment, TierId } from "./types";
  */
 
 /**
+ * Top navigation brand logo.
+ * Source: reference/Concepful_Mech_Builder.html (line 1809)
+ */
+export const BRAND = {
+  href: "#intro", // replaces original #s-intro (line 1809); hero section id is "intro"
+  label: "Concepful", // line 1809
+} as const satisfies NavLink;
+
+/**
  * Top navigation bar links.
  * Source: reference/Concepful_Mech_Builder.html (line 1826)
  */
