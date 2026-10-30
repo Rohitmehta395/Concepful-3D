@@ -114,7 +114,24 @@ This document records the verification history, approved milestones, and live st
 
 ---
 
-## 5. Verification Dimensions & Quality Targets
+## 5. Accessibility Backlog
+
+The following items were identified during the Part 3.2 review and are tracked for remediation in Phase 8 (Responsive & Accessibility Pass) without regressing visual parity with the reference prototype:
+
+1. **CTA Text Contrast (`#ffffff` on `--red`):**
+   White text on `--red` (`#ee004e`) measures at 4.425:1. This matches the original prototype exactly, but falls slightly below the WCAG AA requirement of 4.5:1 for small text (<18pt / 24px non-bold).
+2. **Text Contrast on Background (`--red` on `--bg`):**
+   `--red` (`#ee004e`) on `--bg` (`#141624`) measures at 4.056:1 if any regular text uses it (WCAG AA requires 4.5:1 for small text).
+3. **Synthetic / Faux-Bold Display Font (`Russo One` at weight 600):**
+   `Russo One` is a single-weight font (400). In the original prototype, `.navl a.fu` inherits `font-weight: 600` from `.navl a`, causing browser synthetic bolding. Kept for visual parity with original prototype; Phase 8 will evaluate explicit font-weight overrides or typography styling.
+4. **Header Text-Edge Subpixel Difference (22px at 1280px):**
+   At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven (potential difference between Google Fonts woff2 generation vs system-level font rasterization). Tolerance 10 diff is 0.000%.
+5. **Mobile Navigation Link Accessibility (<900px):**
+   Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
+
+---
+
+## 6. Verification Dimensions & Quality Targets
 
 | Dimension                      | Verification Scope                                  | Status                 | Notes                                                                            |
 | :----------------------------- | :-------------------------------------------------- | :--------------------- | :------------------------------------------------------------------------------- |

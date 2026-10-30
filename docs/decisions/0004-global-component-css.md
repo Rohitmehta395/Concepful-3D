@@ -2,34 +2,39 @@
 
 - **Status:** Approved
 - **Date:** October 30, 2026
-- **Context:** Phase 3, Part 3.2 (Static Header Implementation)
+- **Context:** Phase 3, Part 3.2 (Static Header Implementation) & Part 3.3 (Empirical Probe Verification)
 
 ---
 
 ## Context
 
-In Phase 3 Part 3.2, header styling was initially ported into a local CSS Module (`src/components/shell/Header.module.css`) and imported into `Header.tsx`. Two critical issues were observed in the production build:
+In Next.js under Turbopack with Tailwind v4, `next.config.ts` defines:
 
-1. **Unmapped Class Names:**
-   In the prerendered HTML output of the CSS-module build, class name references like `styles.logo` and `styles.glass` evaluated to `undefined`, rendering:
+```ts
+const nextConfig: NextConfig = {
+  turbopack: {
+    rules: {
+      "*.css": {
+        loaders: ["@tailwindcss/turbopack"],
+        as: "*.css",
+      },
+    },
+  },
+};
+```
 
-   ```html
-   <header><a class="undefined undefined" href="#intro">...</a></header>
-   ```
+This wildcard rule matches all CSS files, including `*.module.css`. A direct empirical probe was conducted using an isolated server component and `Probe.module.css` declaring `.probe { color: red; }`:
 
-   The class names were not mapped to scoped CSS Module hashes.
-
-2. **Omission of Unprefixed `backdrop-filter` in Compiled CSS:**
-   When the source CSS declared `backdrop-filter: blur(12px) saturate(1.1);` followed by `-webkit-backdrop-filter: blur(12px) saturate(1.1);`, the compiled production chunk omitted standard `backdrop-filter` entirely, emitting only:
-
-   ```css
-   .glass{-webkit-backdrop-filter:blur(12px)saturate(1.1);...}
-   ```
-
-   Consequently, Chromium computed `backdropFilter` as `'none'`.
-
-3. **Global Class Architecture in Original Prototype:**
-   The original authoritative prototype (`reference/Concepful_Mech_Builder.html`) uses global, semantic class names (`.top`, `.logo`, `.glass`, `.navl`, `.fu`, `.mk`, `.wm`) that are shared across header, cards, and modal components.
+1. **Importing CSS Modules Produces an Empty Object:**
+   Importing `styles` from `Probe.module.css` yields `{}` at runtime. Accessing `styles.probe` evaluates to `undefined`, and `JSON.stringify(styles)` emits `"{}"`.
+2. **Compiled Rules Are Global, Not Scoped:**
+   The compiled production CSS chunk emits `.probe{color:red}` without any module hash suffix or scoping.
+3. **Root Cause:**
+   The Turbopack loader configuration directs all `*.css` files through `@tailwindcss/turbopack` as standard global styles, bypassing the built-in Next.js CSS Module loader that would normally generate scoped class name mappings.
+4. **Superseded Stand-in Repro & Unverified Claims:**
+   An earlier draft of this ADR referenced a reproduction using a stand-in component; that stand-in is superseded by this direct probe. Any prior speculation that CSS Modules caused vendor prefix dropping on `backdrop-filter` is marked as **not verified** (vendor prefix retention was resolved by declaration ordering in global CSS).
+5. **Prototype Architecture Alignment:**
+   The original authoritative prototype (`reference/Concepful_Mech_Builder.html`) relies on semantic global class names (`.top`, `.logo`, `.glass`, `.navl`, `.fu`, `.mk`, `.wm`) shared across headers, cards, and modal components.
 
 ---
 
@@ -55,53 +60,6 @@ We adopt a **Global Component CSS Architecture** for ported prototype styles:
      backdrop-filter: blur(12px) saturate(1.1);
    }
    ```
-
----
-
-## Empirical Reproduction & Build Verification (Option A)
-
-To verify the CSS-module failure mode empirically, a clean build was run in a temporary worktree based on commit `d7435be` with `Header.module.css` imported into `Header.tsx`:
-
-1. **Prerendered HTML Output:**
-
-   ```html
-   <header>
-     <a class="undefined undefined" href="#intro"><span>Logo</span></a>
-   </header>
-   ```
-
-   _Result:_ Class names were not mapped (`undefined`).
-
-2. **Compiled CSS Chunk Output (`.next/static/chunks/*.css`):**
-
-   ```css
-   .top {
-     z-index: 10;
-     position: fixed;
-     top: 12px;
-   }
-   .glass {
-     -webkit-backdrop-filter: blur(12px) saturate(1.1);
-     background: #141628d6;
-     border: 1px solid #ffffff14;
-   }
-   .logo {
-     display: flex;
-   }
-   ```
-
-   _Result:_ The compiled `.glass` rule emitted global class selectors rather than scoped module hashes, and omitted standard `backdrop-filter`.
-
-3. **Current Global Component CSS Build Output (`.next/static/chunks/1vgfrxio1yytr.css`):**
-   ```css
-   .glass {
-     background: var(--glass);
-     border: 1px solid var(--line);
-     -webkit-backdrop-filter: blur(12px) saturate(1.1);
-     backdrop-filter: blur(12px) saturate(1.1);
-   }
-   ```
-   _Result:_ Both declarations are preserved and active. Chromium computes `backdropFilter: "blur(12px) saturate(1.1)"`.
 
 ---
 
