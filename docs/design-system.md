@@ -1,4 +1,4 @@
-# Concepful Mech Builder — Design System & Tokens (Part 1.3)
+# Concepful Mech Builder — Design System & Tokens
 
 This document provides the authoritative provenance, cascade audit, and reference catalog for all design tokens extracted from the original prototype ([`reference/Concepful_Mech_Builder.html`](file:///d:/Projects/Pete/Concepful-3D/reference/Concepful_Mech_Builder.html)).
 
@@ -13,6 +13,7 @@ The prototype's visual theme is a late-90s cel-shaded mecha MMO launcher charact
 - **Navy ink background**: `#141624`
 - **Bone hull / white text accents**: `#ffffff` (active CSS `:root`), with `#ECE6D6` preserved in the 2D canvas sprite palette
 - **Brand hot red-magenta / melon**: `#ee004e`
+- **Discipline accents**: Periwinkle `#8c93e6` (Strategy), Pink `#ff7fa6` (Production), Teal `#55c2b8` (Operations), Gold `#f2b33a` (Sun), Green `#5fd39b` (Online status)
 - **Dark HUD glass overlays**: `rgba(20, 22, 40, 0.84)` with `blur(12px)`
 - **Display typography**: `Russo One`
 - **UI body & specs**: `Inter` and `JetBrains Mono`
@@ -25,6 +26,9 @@ The original HTML contains two `:root` style declarations:
 2. **Active Brand Override Block (lines 1658–1679)**: Introduced under the comment `/* ===== Brand colours only: melon, navy, white ===== */`.
 
 Because both rules target `:root` with identical specificity `(0, 1, 0)` in the same document, standard CSS Cascade rules (order of appearance) mean **the second block completely supersedes the first for all shared properties**.
+
+> [!NOTE] Corrected Palette Finding
+> The active palette is navy `#141624`, brand red `#ee004e`, periwinkle `#8c93e6`, pink `#ff7fa6`, and teal `#55c2b8`. The slate `#4f5a68` and coral `#e2404f` values belong exclusively to the overridden draft block. The draft values are obsolete and not exposed as tokens.
 
 ---
 
@@ -56,30 +60,7 @@ These are the exact properties and computed values active in the browser DOM fro
 | Line Subtle    | `--line`     | `rgba(255, 255, 255, 0.08)` | Line 1664   | Active 1px HUD card border (overrides Line 55 `0.09`)                  |
 | Line Medium    | `--line2`    | `rgba(255, 255, 255, 0.20)` | Line 1665   | Active interactive element border (overrides Line 56 `0.18`)           |
 
-### 2.2 Semantic Aliases
-
-Aliases created in `src/styles/tokens.css` for ergonomic styling and design consistency:
-
-- `--brand-red`: Semantic alias for `--red` (`#ee004e`).
-- `--red-lo`: Kebab-case semantic alias for prototype variable `--redLo` (`#8f0030`).
-- `--font-display`, `--font-body`, `--font-mono`: Semantic aliases for `--display`, `--body`, `--mono`.
-
-### 2.3 Historical / Draft CSS Values
-
-Values declared in lines 51–67 of the initial `:root` block that were superseded by lines 1658–1679. Preserved with explicit `-draft` suffixes for traceability and asset coordination:
-
-- `--bg-draft`: `#4f5a68` (Line 52: early slate sky background).
-- `--fg-draft`: `#f2efe8` (Line 57: warm off-white text draft).
-- `--muted-draft`: `#a7a9b2` (Line 58: slate gray draft).
-- `--dim-draft`: `#6b6e7a` (Line 59: slate dim draft).
-- `--bone-draft`: `#ece6d6` (Line 62: weathered bone hull draft; matches 2D canvas sprite color `C.bone`).
-- `--red-draft`: `#e2404f` (Line 60: early coral red draft).
-- `--red-soft-draft`: `rgba(226, 64, 79, 0.14)` (Line 61).
-- `--str-draft`: `#6e8fcc` (Line 63).
-- `--pro-draft`: `#f2b33a` (Line 65).
-- `--ok-draft`: `#4cc58a` (Line 67).
-
-### 2.4 Derived WebGL Scene & 2D Canvas Palette (JS Constants)
+### 2.2 WebGL Scene & 2D Canvas Palette (JS Constants)
 
 These values do **not** exist as CSS variables in the source HTML; they are JavaScript constants defined in the 3D scene engine and 2D canvas routines:
 
@@ -103,8 +84,6 @@ These values do **not** exist as CSS variables in the source HTML; they are Java
   - `HX.ink` / `HX.navy`: `0x141624` (`#141624`, ink outlines)
   - `HX.cloud`: `0xf1f1f8` (`#f1f1f8`, cloud background plane)
 
-_(Note on `--glass-border`: In the initial extraction, `#2a3060` was incorrectly identified as a CSS glass border. It is actually the 3D scene material `HX.glass` [line 7403, line 10895]. In source CSS, glass borders are strictly `1px solid var(--line)` and `1px solid var(--line2)`. This has been corrected.)_
-
 ---
 
 ## 3. Typography & Tracking Tokens
@@ -114,7 +93,7 @@ _(Note on `--glass-border`: In the initial extraction, `#2a3060` was incorrectly
 The original prototype imports Google Fonts via external stylesheet link:
 `Inter:wght@400;500;600;700;800`, `JetBrains+Mono:wght@500;700`, and `Russo+One` (weight 400).
 
-In Part 1.4, these are integrated via Next.js `next/font/google` in [`src/app/layout.tsx`](file:///d:/Projects/Pete/Concepful-3D/src/app/layout.tsx), self-hosting and bundling `.woff2` font files locally at build time for zero network layout shift (CLS = 0) and zero runtime external CSS requests:
+In Next.js, these are integrated via `next/font/google` in [`src/app/layout.tsx`](file:///d:/Projects/Pete/Concepful-3D/src/app/layout.tsx), self-hosting and bundling `.woff2` font files locally at build time for zero network layout shift (CLS = 0) and zero runtime external CSS requests:
 
 | Font Family        | `next/font` Module | Subsets & Weights                          | Generated Variable      | Design Token Connection                | Fallback Stack                         |
 | :----------------- | :----------------- | :----------------------------------------- | :---------------------- | :------------------------------------- | :------------------------------------- |
@@ -122,34 +101,30 @@ In Part 1.4, these are integrated via Next.js `next/font/google` in [`src/app/la
 | **Inter**          | `Inter`            | `latin`, weights `400, 500, 600, 700, 800` | `--font-inter`          | `--body`, `--font-body`, `--font-sans` | `system-ui, -apple-system, sans-serif` |
 | **JetBrains Mono** | `JetBrains_Mono`   | `latin`, weights `500, 700`                | `--font-jetbrains-mono` | `--mono`, `--font-mono`                | `ui-monospace, Menlo, monospace`       |
 
-In [`src/styles/tokens.css`](file:///d:/Projects/Pete/Concepful-3D/src/styles/tokens.css), Tailwind CSS v4's `@theme` directive directly establishes the non-circular font definitions using the `next/font` CSS variables and authoritative source fallbacks:
-
-```css
-@theme {
-  --font-display:
-    var(--font-russo-one), "Russo One", "Arial Black", system-ui, sans-serif;
-  --font-body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono:
-    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
-}
-```
-
-In `:root`, the public prototype tokens (lines 68–70) match their exact source prototype values:
+In `:root`, the font stacks reference the `next/font` CSS variables prepended to authoritative source fallbacks (lines 68–70):
 
 ```css
 :root {
-  --display: "Russo One", "Arial Black", system-ui, sans-serif; /* Line 68 */
-  --body: "Inter", system-ui, -apple-system, sans-serif; /* Line 69 */
-  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace; /* Line 70 */
+  --display:
+    var(--font-russo-one), "Russo One", "Arial Black", system-ui, sans-serif;
+  --body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  --mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 ```
 
-This guarantees:
+In `@theme`, the Tailwind utility families reference `:root` directly:
 
-1. `html` and `body` automatically default to `Inter` via Tailwind's `--default-font-family: var(--font-sans)`.
-2. Utility classes `.font-display`, `.font-body`, `.font-mono`, and `.font-sans` resolve to their respective loaded font families.
-3. Legacy CSS variables `--display`, `--body`, and `--mono` remain fully functional for custom styles.
+```css
+@theme {
+  --font-display: var(--display);
+  --font-body: var(--body);
+  --font-mono: var(--mono);
+  --font-sans: var(--body);
+}
+```
+
+This guarantees a single point of definition for each font stack.
 
 ### 3.2 Tracking / Letter-Spacing
 
@@ -169,14 +144,19 @@ Direct values extracted from prototype CSS classes:
 
 ### 4.1 Border Radii
 
-Direct values extracted from prototype CSS:
+Direct values extracted from prototype CSS, defined literally in `@theme`:
 
-- `--radius-xs: 3px;` (Line 1318 — `.chip`, progress tick pips)
-- `--radius-sm: 6px;` (Lines 380, 520, 689 — `.btn`, `.input`, small pills)
-- `--radius-md: 10px;` (Lines 440, 725 — `.hud-box`, inner loadout cards)
-- `--radius-lg: 14px;` (Line 640 — `.top-inner` navigation capsule)
-- `--radius-xl: 18px;` (Lines 230, 1345 — `.panel`, `.modal-box`)
-- `--radius-full: 999px;` (Lines 103, 111, 442 — pill buttons, round status tags)
+| Token / Utility | Value   | Source Line(s)      | Prototype Element Usage         |
+| :-------------- | :------ | :------------------ | :------------------------------ |
+| `--radius-xs`   | `3px`   | Line 1318           | `.chip`, progress tick pips     |
+| `--radius-sm`   | `6px`   | Lines 380, 520, 689 | `.btn`, `.input`, small pills   |
+| `--radius-md`   | `10px`  | Lines 440, 725      | `.hud-box`, inner loadout cards |
+| `--radius-lg`   | `14px`  | Line 640            | `.top-inner` navigation capsule |
+| `--radius-xl`   | `18px`  | Lines 230, 1345     | `.panel`, `.modal-box`          |
+| `--radius-full` | `999px` | Lines 103, 111, 442 | Pill buttons, round status tags |
+
+> [!NOTE] Tailwind v4 Radius Overrides
+> Defining `--radius-xs` through `--radius-full` in `@theme` directly overrides Tailwind's built-in radius defaults with the prototype's exact pixel measurements. The duplicate `--radius-*` properties in `:root` have been eliminated to avoid circular self-references.
 
 ### 4.2 Backdrop Filter Blurs
 
@@ -212,8 +192,6 @@ Direct z-index values defined across source CSS rules:
 | Top Nav        | `--z-top`     | `10`  | Line 615: `.top`       | Fixed header navigation bar         |
 | Modal          | `--z-modal`   | `20`  | Line 1340: `.modal`    | Modal dialog backdrop and container |
 
-_Audit Note on Canvas Elements:_ The canvas elements (`#gl` for 3D Three.js and `#cv` for 2D callouts, lines 582–596) **have no `z-index` set in the source CSS**. They reside in normal document flow (`position: fixed; inset: 0; display: block;`) and naturally stack beneath positioned HUD layers.
-
 ---
 
 ## 6. Spacing Scale Audit & Mobile Safe Areas
@@ -233,22 +211,13 @@ The prototype declares safe-area insets in `:root` to support edge-to-edge layou
 
 ---
 
-## 7. Responsive Breakpoint Semantics
+## 7. Breakpoints
 
-The prototype source code relies exclusively on `max-width` media queries:
+The prototype source code is **desktop-first** and relies exclusively on `max-width` media queries:
 
 - `@media (max-width: 900px)` (Lines 485, 1453, 1772): Mobile phone layout adaptation. Top bar wraps, scene moves to top half, loadout panel switches to a bottom sheet.
 - `@media (max-width: 1023px)` (Line 1448): Tablet layout adaptation. The right-hand character card collapses/hides to preserve canvas clearance.
 - `@media (prefers-reduced-motion: reduce)` (Lines 90, 866, 1490): Disables smooth transforms and canvas animations.
 
-### Why Breakpoints are NOT in Tailwind `@theme`
-
-In Tailwind CSS v4, tokens registered under `@theme { --breakpoint-*: ... }` generate `min-width` media query utility variants (`@media (min-width: ...)`).
-If `--breakpoint-mobile: 900px` were added to `@theme`, Tailwind's `mobile:` utility would apply at screen widths **greater than or equal to 900px** (desktop/tablet), which completely inverts the source's `max-width: 900px` mobile behavior.
-
-To prevent this semantic inversion:
-
-1. Breakpoint thresholds are documented and stored as CSS custom properties:
-   - `--breakpoint-mobile-max: 900px;`
-   - `--breakpoint-tablet-max: 1023px;`
-2. In Next.js components, mobile-down styles will be targeted cleanly via CSS modules, Tailwind arbitrary variants (`max-[900px]:`), or specific max-width media queries matching the source.
+> [!IMPORTANT] CSS Custom Properties in Media Queries
+> CSS custom properties (variables) cannot be evaluated inside `@media` rule queries (e.g. `@media (max-width: var(--breakpoint))` is invalid CSS). Furthermore, Tailwind v4 `@theme` breakpoints generate `min-width` mobile-first variants. Therefore, no breakpoint tokens exist in CSS; media queries in Phase 3/4 responsive components will directly reference `max-width: 900px` and `max-width: 1023px` matching the source.

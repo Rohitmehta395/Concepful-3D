@@ -12,7 +12,8 @@
 
   /* ==========================================================================
      Colors: Active Core Backgrounds & Text
-     Direct source values from the active :root cascade (lines 1658-1679).
+     The original has a draft :root (lines 51-76) overridden by the active :root (lines 1659-1679).
+     Only the active values are tokens.
      ========================================================================== */
   /* Line 1660: Active background ink (overrides draft line 52 #4f5a68) */
   --bg: #141624;
@@ -37,10 +38,6 @@
   --red-soft: rgba(238, 0, 78, 0.16);
   /* Line 1671: Direct prototype variable name for 3D tactile button shadow facet */
   --redLo: #8f0030;
-  /* NO SOURCE: invented in Phase 1 (kebab-case alias for --redLo) */
-  --red-lo: #8f0030;
-  /* NO SOURCE: invented in Phase 1 (semantic alias for --red) */
-  --brand-red: #ee004e;
 
   /* ==========================================================================
      Colors: Active Department & Character Roles (MMO Spec Roles)
@@ -73,138 +70,99 @@
   --line2: rgba(255, 255, 255, 0.2);
 
   /* ==========================================================================
-     Historical / Draft CSS Colors (Lines 51-67, overridden by Lines 1658-1679)
-     ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 52 --bg: #4f5a68) */
-  --bg-draft: #4f5a68;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 57 --fg: #f2efe8) */
-  --fg-draft: #f2efe8;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 58 --muted: #a7a9b2) */
-  --muted-draft: #a7a9b2;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 59 --dim: #6b6e7a) */
-  --dim-draft: #6b6e7a;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 62 --bone: #ece6d6) */
-  --bone-draft: #ece6d6;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 60 --red: #e2404f) */
-  --red-draft: #e2404f;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 61 --red-soft: rgba(226, 64, 79, 0.14)) */
-  --red-soft-draft: rgba(226, 64, 79, 0.14);
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 63 --str: #6e8fcc) */
-  --str-draft: #6e8fcc;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 65 --pro: #f2b33a) */
-  --pro-draft: #f2b33a;
-  /* NO SOURCE: invented in Phase 1 (alias for draft line 67 --ok: #4cc58a) */
-  --ok-draft: #4cc58a;
-
-  /* ==========================================================================
      Derived WebGL Scene & 2D Canvas Palette (JS constants HX & C, not CSS variables)
      ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (JS HX.bone line 7395 0xffffff) */
+  /* JS constant, not CSS (HX.bone line 7395). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-bone: #ffffff;
-  /* NO SOURCE: invented in Phase 1 (JS HX.bone2 line 7396 0xc9cadd) */
+  /* JS constant, not CSS (HX.bone2 line 7396). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-bone2: #c9cadd;
-  /* NO SOURCE: invented in Phase 1 (JS HX.gun line 7397 0x3e4270) */
+  /* JS constant, not CSS (HX.gun line 7397). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-gunmetal: #3e4270;
-  /* NO SOURCE: invented in Phase 1 (JS HX.dark line 7398 0x1c1e36) */
+  /* JS constant, not CSS (HX.dark line 7398). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-dark: #1c1e36;
-  /* NO SOURCE: invented in Phase 1 (JS HX.glass line 7403 0x2a3060) */
+  /* JS constant, not CSS (HX.glass line 7403). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-glass: #2a3060;
-  /* NO SOURCE: invented in Phase 1 (JS HX.chrome line 7404 0xcdd0e4) */
+  /* JS constant, not CSS (HX.chrome line 7404). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-chrome: #cdd0e4;
-  /* NO SOURCE: invented in Phase 1 (JS HX.holo line 7405 0xb8c2ff) */
+  /* JS constant, not CSS (HX.holo line 7405). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-holo: #b8c2ff;
-  /* NO SOURCE: invented in Phase 1 (JS HX.cloud line 7407 0xf1f1f8) */
+  /* JS constant, not CSS (HX.cloud line 7407). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --scene-cloud: #f1f1f8;
-  /* NO SOURCE: invented in Phase 1 (JS C.boneLo line 2778 #a9a090) */
+  /* JS constant, not CSS (C.boneLo line 2778). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --canvas-bone-lo: #a9a090;
-  /* NO SOURCE: invented in Phase 1 (JS C.gun line 2779 #56545d) */
+  /* JS constant, not CSS (C.gun line 2779). Candidate to move to a TS palette module in Phase 4; kept here for now. */
   --canvas-gun: #56545d;
 
   /* ==========================================================================
      Typography: Font Families (Lines 68-70, persistent in :root)
-     Restored to exact source prototype values.
      ========================================================================== */
-  /* Line 68: Display font family */
-  --display: "Russo One", "Arial Black", system-ui, sans-serif;
-  /* Line 69: Body font family */
-  --body: "Inter", system-ui, -apple-system, sans-serif;
-  /* Line 70: Monospace font family */
-  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  /* Line 68: Display font family with next/font variable and source fallbacks */
+  --display:
+    var(--font-russo-one), "Russo One", "Arial Black", system-ui, sans-serif;
+  /* Line 69: Body font family with next/font variable and source fallbacks */
+  --body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  /* Line 70: Monospace font family with next/font variable and source fallbacks */
+  --mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
 
   /* ==========================================================================
      Typography: Letter Spacing / Tracking (Direct values from prototype CSS)
      ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 630, 773, 810, 1610) */
+  /* Derived: value from source lines 630, 773, 810, 1610; token name introduced by the rewrite */
   --tracking-tight: 0.02em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 908) */
+  /* Derived: value from source line 908; token name introduced by the rewrite */
   --tracking-normal: 0.04em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 701, 1626) */
+  /* Derived: value from source lines 701, 1626; token name introduced by the rewrite */
   --tracking-medium: 0.05em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 257, 337, 670, 879, 1222, 1552, 1753) */
+  /* Derived: value from source lines 257, 337, 670, 879, 1222, 1552, 1753; token name introduced by the rewrite */
   --tracking-wide: 0.06em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 316, 817, 1009, 1031, 1297, 1501) */
+  /* Derived: value from source lines 316, 817, 1009, 1031, 1297, 1501; token name introduced by the rewrite */
   --tracking-wider: 0.08em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 920, 1251, 1405, 1512, 1653) */
+  /* Derived: value from source lines 920, 1251, 1405, 1512, 1653; token name introduced by the rewrite */
   --tracking-widest: 0.1em;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 186, 737, 1188) */
+  /* Derived: value from source lines 186, 737, 1188; token name introduced by the rewrite */
   --tracking-caps: 0.14em;
 
   /* ==========================================================================
      Glass Backdrop Filters (Direct values from prototype CSS)
      ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 436) */
+  /* Derived: value from source line 436; token name introduced by the rewrite */
   --glass-blur: blur(12px);
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 171, 609) */
+  /* Derived: value from source lines 171, 609; token name introduced by the rewrite */
   --glass-blur-saturate: blur(12px) saturate(1.1);
-
-  /* ==========================================================================
-     Borders & Radii (Direct values from prototype CSS)
-     ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1318) */
-  --radius-xs: 3px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 380, 520, 689) */
-  --radius-sm: 6px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 440, 725) */
-  --radius-md: 10px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 640) */
-  --radius-lg: 14px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 230, 1345) */
-  --radius-xl: 18px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 103, 111, 442) */
-  --radius-full: 999px;
 
   /* ==========================================================================
      Shadows: 3D Retro Tactile Drops & Inset Rings (Direct values from prototype CSS)
      ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1689) */
+  /* Derived: value from source line 1689; token name introduced by the rewrite */
   --shadow-btn: 0 3px 0 var(--redLo);
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1692) */
+  /* Derived: value from source line 1692; token name introduced by the rewrite */
   --shadow-btn-active: 0 1px 0 var(--redLo);
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1682) */
+  /* Derived: value from source line 1682; token name introduced by the rewrite */
   --shadow-text-headline: 3px 3px 0 var(--redLo);
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1686) */
+  /* Derived: value from source line 1686; token name introduced by the rewrite */
   --shadow-text-contrast: 3px 3px 0 #141624;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 805) */
+  /* Derived: value from source line 805; token name introduced by the rewrite */
   --shadow-focus-ring: inset 0 0 0 1px var(--red);
 
   /* ==========================================================================
      Z-Index Layer Hierarchy (Direct source CSS declarations)
      ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 481) */
+  /* Derived: value from source line 481; token name introduced by the rewrite */
   --z-curtain: 4;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1743) */
+  /* Derived: value from source line 1743; token name introduced by the rewrite */
   --z-wmark: 5;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 148) */
+  /* Derived: value from source line 148; token name introduced by the rewrite */
   --z-story: 6;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1268) */
+  /* Derived: value from source line 1268; token name introduced by the rewrite */
   --z-boxart: 7;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1176) */
+  /* Derived: value from source line 1176; token name introduced by the rewrite */
   --z-card: 8;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 717) */
+  /* Derived: value from source line 717; token name introduced by the rewrite */
   --z-panel: 9;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 615) */
+  /* Derived: value from source line 615; token name introduced by the rewrite */
   --z-top: 10;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1340) */
+  /* Derived: value from source line 1340; token name introduced by the rewrite */
   --z-modal: 20;
 
   /* ==========================================================================
@@ -218,14 +176,6 @@
   --st: env(safe-area-inset-top, 0px);
   /* Line 74: safe bottom */
   --sb: env(safe-area-inset-bottom, 0px);
-
-  /* ==========================================================================
-     Responsive Breakpoint Thresholds
-     ========================================================================== */
-  /* NO SOURCE: invented in Phase 1 (prototype CSS lines 485, 1453, 1772) */
-  --breakpoint-mobile-max: 900px;
-  /* NO SOURCE: invented in Phase 1 (prototype CSS line 1448) */
-  --breakpoint-tablet-max: 1023px;
 }
 
 /* ==========================================================================
@@ -242,9 +192,8 @@
   --color-bone: var(--bone);
 
   --color-red: var(--red);
-  --color-brand-red: var(--brand-red);
   --color-red-soft: var(--red-soft);
-  --color-red-lo: var(--red-lo);
+  --color-red-lo: var(--redLo);
   --color-sun: var(--sun);
 
   --color-str: var(--str);
@@ -258,19 +207,23 @@
   --color-line: var(--line);
   --color-line2: var(--line2);
 
-  /* Fonts (wired directly to next/font CSS variables with source fallbacks) */
-  --font-display:
-    var(--font-russo-one), "Russo One", "Arial Black", system-ui, sans-serif;
-  --font-body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono:
-    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  /* Fonts (referencing :root stacks, lines 68-70) */
+  --font-display: var(--display);
+  --font-body: var(--body);
+  --font-mono: var(--mono);
+  --font-sans: var(--body);
 
-  /* Radii */
-  --radius-xs: var(--radius-xs);
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-full: var(--radius-full);
+  /* Radii (overrides Tailwind defaults of the same name) */
+  /* Derived: value from source line 1318; token name introduced by the rewrite */
+  --radius-xs: 3px;
+  /* Derived: value from source lines 380, 520, 689; token name introduced by the rewrite */
+  --radius-sm: 6px;
+  /* Derived: value from source lines 440, 725; token name introduced by the rewrite */
+  --radius-md: 10px;
+  /* Derived: value from source line 640; token name introduced by the rewrite */
+  --radius-lg: 14px;
+  /* Derived: value from source lines 230, 1345; token name introduced by the rewrite */
+  --radius-xl: 18px;
+  /* Derived: value from source lines 103, 111, 442; token name introduced by the rewrite */
+  --radius-full: 999px;
 }
