@@ -105,6 +105,6 @@ This document outlines the 10-phase redevelopment plan for transitioning **Conce
 
 - **10.1 Metadata & SEO:** OpenGraph, Twitter cards, sitemap, robots.txt, and JSON-LD schema.
 - **10.2 Global Error Boundaries:** Graceful error handling and retry mechanisms.
-- **10.3 Playwright E2E Suite:** Automated regression testing covering configurator flows across 4 viewports.
+- **10.3 Playwright E2E Suite:** Automated regression testing covering configurator flows across 4 viewports; assert computed `backdrop-filter` on `.glass` elements (regression for the CSS minification issue).
 - **10.4 Final Documentation Handover:** Technical maintenance guides and architectural summary.
 - **10.5 Deployment:** Production deployment on Vercel with zero-configuration setup.

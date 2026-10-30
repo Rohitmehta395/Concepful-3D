@@ -97,8 +97,10 @@ Concepful-3D/
 - **Zero External State Dependencies:** Application state will be managed via React's built-in `useReducer`. No external global state library (such as Zustand, Redux, or MobX) is introduced, avoiding unnecessary bundle weight.
 - **Bridge to 3D Scene:** The 3D engine will receive updates through a lightweight ref snapshot (`scene/state.ts`), ensuring UI interactions smoothly update 3D mecha loadouts without triggering React re-renders of the canvas.
 
-### 3.5 Styling & Responsive Strategy (Plan Deliverable 1.4 & 3)
+### 3.5 Styling & Responsive Strategy (Plan Deliverable 1.4 & 3, ADR 0004)
 
-- **Tailwind CSS v4 `@theme`:** Utility classes (`font-display`, `font-body`, `font-mono`, `text-brand-red`, `bg-navy`) are exposed through modern Tailwind v4 `@theme` bindings in `src/styles/tokens.css`.
-- **Responsive Media Strategy:** The source prototype exclusively uses `max-width` queries at `900px` (mobile) and `1023px` (tablet). Responsive styles are handled via dedicated CSS modules and Tailwind arbitrary max-width utilities (`max-[900px]:`, `max-[1023px]:`) rather than inverted `min-width` breakpoints.
+- **Global Component CSS & Native Classes (ADR 0004):** Ported prototype component styles reside in dedicated files under `src/styles/<component>.css` (e.g. `header.css`, `base.css`), imported centrally via `src/app/globals.css`. Components preserve authoritative global class names (`.top`, `.logo`, `.glass`, `.navl`, `.fu`) without CSS Module name-munging, eliminating Turbopack CSS-loader conflicts and ensuring zero client JavaScript overhead.
+- **Tailwind CSS v4 `@theme`:** Utility tokens (`font-display`, `font-body`, `font-mono`, `text-brand-red`, `bg-navy`) are exposed through modern Tailwind v4 `@theme` bindings in `src/styles/tokens.css`. Tailwind utilities supplement layouts and new markup.
+- **Vendor-Prefix Order for Glass Filters:** Glass backdrop filters declare `-webkit-backdrop-filter` prior to `backdrop-filter` (`-webkit-backdrop-filter: blur(12px) saturate(1.1); backdrop-filter: blur(12px) saturate(1.1);`) to prevent minifiers (LightningCSS) from deduplicating and stripping the standard property.
+- **Responsive Media Strategy:** The source prototype exclusively uses `max-width` queries at `900px` (mobile) and `1023px` (tablet). Responsive styles are handled via component CSS media rules and Tailwind arbitrary max-width utilities (`max-[900px]:`, `max-[1023px]:`) rather than inverted `min-width` breakpoints.
 - **Safe Area Insets:** Full support for modern edge-to-edge mobile devices using CSS environment variables (`--gl`, `--gr`, `--st`, `--sb`).

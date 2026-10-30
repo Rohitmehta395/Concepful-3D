@@ -221,3 +221,23 @@ The prototype source code is **desktop-first** and relies exclusively on `max-wi
 
 > [!IMPORTANT] CSS Custom Properties in Media Queries
 > CSS custom properties (variables) cannot be evaluated inside `@media` rule queries (e.g. `@media (max-width: var(--breakpoint))` is invalid CSS). Furthermore, Tailwind v4 `@theme` breakpoints generate `min-width` mobile-first variants. Therefore, no breakpoint tokens exist in CSS; media queries in Phase 3/4 responsive components will directly reference `max-width: 900px` and `max-width: 1023px` matching the source.
+
+---
+
+## 8. Ported Global Component Classes (ADR 0004)
+
+Per ADR 0004, components ported from the original prototype retain their global class names in dedicated stylesheets (`src/styles/<component>.css`). All classes ported to date are cataloged below to ensure global namespace integrity:
+
+### Header Component Classes (`src/styles/header.css`)
+
+| Class Selector | Source Lines                      | Description                        | Key Properties                                                                                                                              |
+| :------------- | :-------------------------------- | :--------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `.top`         | Lines 613–623, 1453–1458          | Fixed top navigation bar container | `position: fixed`, `z-index: var(--z-top, 10)`, `top: calc(12px + var(--st))`, `left: var(--gl)`, `right: var(--gr)`                        |
+| `.glass`       | Lines 606–611                     | Translucent glass HUD surface      | `background: var(--glass)`, `border: 1px solid var(--line)`, `backdrop-filter: blur(12px) saturate(1.1)`                                    |
+| `.logo`        | Lines 624–633, 1701–1706          | Brand logo pill container anchor   | `font-family: var(--display)`, `font-size: 17px`, `border-radius: 999px`, `color: #fff`                                                     |
+| `.logo .mk`    | Lines 1707–1712                   | Cel-shaded mecha crest SVG icon    | `width: 24px`, `height: 27px`, `display: block`                                                                                             |
+| `.logo .wm`    | Lines 1713–1717                   | Concepful vector wordmark SVG      | `height: 16px`, `width: auto`, `display: block`                                                                                             |
+| `.navl`        | Lines 98–104                      | Navigation pill wrapper            | `display: flex`, `gap: 6px`, `padding: 5px`, `border-radius: 999px`                                                                         |
+| `.navl a`      | Lines 105–115, 485–488            | Navigation text links              | `color: var(--muted)`, `font-size: 13px`, `font-weight: 600`, `padding: 7px 12px`, hidden on `<=900px`                                      |
+| `.fu`          | Lines 116–120, 694–713, 1688–1693 | Tactile 3D button / CTA            | `background: var(--red)`, `font-family: var(--display)`, `font-size: 13px`, `text-transform: uppercase`, `box-shadow: 0 3px 0 var(--redLo)` |
+| `.navl a.fu`   | Lines 116–120                     | Primary CTA link inside nav pill   | `color: #fff`, `padding: 9px 16px`, `font-size: 13px`, visible across all viewports                                                         |

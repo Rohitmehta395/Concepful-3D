@@ -96,19 +96,19 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.2: Static Header
 
-- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Status:** **committed (371acb0), verification 3.2c in progress**
 - **Deliverables:**
   - `src/components/shell/Logo.tsx`: Cel-shaded mecha crest SVG (`.mk`) and vector wordmark SVG (`.wm`) converted to valid JSX, marked with `aria-hidden="true"` and `focusable="false"`. Zero element IDs (no collision risk).
   - `src/components/shell/Header.tsx`: Fixed `<header id="top">` landmark housing `<a className="logo glass" href="#intro" aria-label="Concepful">` and `<nav className="navl glass" aria-label="Primary">` with `NAV_LINKS` and `NAV_CTA`. Zero hardcoded hrefs.
-  - `src/styles/header.css` & `src/app/globals.css`: Glass backdrop filter (`-webkit-backdrop-filter` declared before `backdrop-filter` to prevent LightningCSS de-duplication), safe-area gutter positioning (`--gl`, `--gr`, `--st`), retro 3D tactile button shadow (`--redLo`), hover/active translations, media query (<=900px) hiding non-CTA links, reduced-motion bypass, and WCAG-compliant `--red` focus rings.
+  - `src/styles/header.css` & `src/app/globals.css`: Global component CSS (ADR 0004); glass backdrop filter (`-webkit-backdrop-filter` declared before `backdrop-filter` to prevent LightningCSS de-duplication), safe-area gutter positioning (`--gl`, `--gr`, `--st`), retro 3D tactile button shadow (`--redLo`), hover/active translations, media query (<=900px) hiding non-CTA links, reduced-motion bypass, and WCAG-compliant `--red` focus rings.
   - `src/content/story.ts`: Exported `BRAND` (`href: "#intro"`, `label: "Concepful"`).
   - `src/app/layout.tsx`: Mounted `<Header />` directly following `<SkipLink />`.
 - **Verification:**
   - **Backdrop filter & Ancestors:** Both original and new app render `backdropFilter: blur(12px) saturate(1.1)` on `.logo` and `.navl` with identical background `rgba(20, 22, 40, 0.84)` across 1280px and 390px.
-  - **Faux-Bold & Fonts:** Russo One verified at single weight 400 (`font-weight: 400` on `.wm`, no synthetic bolding applied). Inter weights verified (600 for links, 700 for CTA).
+  - **Faux-Bold & Fonts:** Resolved font data: `.wm` is SVG vector mark (no text node). `.navl a` renders Inter 600. `.navl a.fu` renders Russo One 600 (inherits `font-weight: 600` from `.navl a`, identical to original prototype). Neither page declares `font-synthesis` in CSS.
   - **Hover & Focus States:** Tested with Playwright at 1280px. Hover translation (`translateY(-1px)`), background color shifts, and focus visible outlines verified against source CSS.
   - **Client JavaScript Proof:** 0 bytes raw difference, 0 bytes gzip difference (568,669 raw / 174,719 gzip) across identical chunk hashes.
-  - **Pixel Diff:** 0.000% difference at 1280px (89,600 pixels) and 0.000% difference at 390px (25,740 pixels) on flat `#141624` background.
+  - **Pixel Diff & Controls:** 0.000% difference at tolerance 10; 0.025% (22 subpixel edges) at tolerance 0. Controls injected on new page produced expected failures: font-weight 400 diff = 1.025% (tol 10) / 1.257% (tol 0); glass alpha 0.5 diff = 21.272% (tol 0).
 
 ---
 
