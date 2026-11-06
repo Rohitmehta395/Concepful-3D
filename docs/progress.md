@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                            Status                            |             Approval Date              |
-| :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                         **Approved**                         |              Oct 30, 2026              |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                         **Approved**                         |              Oct 30, 2026              |
-| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 Implemented (Awaiting User Review and Approval)** | Part 3.1 & 3.2 Approved Oct 30, 2026   |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |                   —                    |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |                   —                    |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |                   —                    |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                           Pending                            |                   —                    |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                           Pending                            |                   —                    |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                           Pending                            |                   —                    |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                           Pending                            |                   —                    |
+|    Phase     | Title                                 | Parts  |                               Status                                |            Approval Date             |
+| :----------: | :------------------------------------ | :----: | :-----------------------------------------------------------------: | :----------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                            **Approved**                             |             Oct 30, 2026             |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                            **Approved**                             |             Oct 30, 2026             |
+| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 + 3.3c Implemented (Awaiting User Review and Approval)** | Part 3.1 & 3.2 Approved Oct 30, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                               Pending                               |                  —                   |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                               Pending                               |                  —                   |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                               Pending                               |                  —                   |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                               Pending                               |                  —                   |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                               Pending                               |                  —                   |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                               Pending                               |                  —                   |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                               Pending                               |                  —                   |
 
 ---
 
@@ -130,6 +130,25 @@ This document records the verification history, approved milestones, and live st
   - **Font Face Readiness:** `document.fonts.check` passes for Russo One, Inter, and JetBrains Mono across tested sizes.
   - **Keyboard Tab Order & ARIA:** Tested tab order moves sequentially from skip link through header links to hero CTAs (`Start your build`, `See how it works`), all displaying `--pro` 2px focus ring.
   - **Client JS Bundle:** 0 bytes added (568,669 raw / 174,719 gzip across identical chunks).
+
+### Part 3.3c: Hero Card Width Fix
+
+- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Commit:** `fix(hero): size card to fit heading`
+- **Problem:** At viewports ≥901px the h1 "DEPARTMENT," token (Russo One, `skewX(-8deg)`, `clamp(36px, 5vw, 66px)`) overflowed the shared `.sc` card's right padding edge. This is an original prototype defect — the reference HTML has the same overflow. The fix is applied only in the rebuild.
+- **Method:** Playwright `getClientRects()` text-node Range measurements at 9 viewports (1920, 1440, 1280, 1100, 1024, 901, 900, 768, 390) on both original and new page. Computed K = `deptWordWidth / fontSize` = 7.2322 (identical at 66px and 64px); rounded up to 7.24. Formula: `max-width: calc(7.24 * var(--hero-h1) + 54px)` where `54px = 2×22px(padding) + 10px(breathing)`.
+- **Scope:** `src/styles/hero.css` only; `.sc.hero` selector only; shared `.sc` rule unchanged.
+- **Deliverables:**
+  - `src/styles/hero.css`: added `.sc.hero { --hero-h1: clamp(36px, 5vw, 66px); max-width: calc(7.24 * var(--hero-h1) + 54px); }` and `.sc.hero { max-width: none }` inside the `@media (max-width: 900px)` block.
+  - `docs/design-system.md`: hero card width note added.
+- **Verification:**
+  - **Overflow (new page, all widths ≥901px):** overflowRight ≤ 0 at 1920 (−17.0px), 1440 (−17.0px), 1280 (−16.7px), 1100 (−15.6px), 1024 (−15.2px), 901 (−14.3px). No horizontal scrollbar (`scrollWidth === innerWidth`).
+  - **Mobile (≤900px):** `max-width: none` correctly applied; card fills row as before.
+  - **h1 font-size unchanged:** 66px at 1920/1440, 64px at 1280, 55px at 1100, 51.2px at 1024, 45.05px at 901, 34px at ≤900px — identical to pre-fix measurements.
+  - **JS bundle:** 568,669 bytes raw — 0 bytes added.
+  - **Quality checks:** `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test` (4,104 tests) — all pass.
+
+> **Part 3.4 Note:** Before porting other `.sc` cards (Classes, Logistics, Rules, Plans, Outro), run the same overflow measurement on each. Do not widen them without first measuring their heading overflow at all ≥901px viewports.
 
 ---
 

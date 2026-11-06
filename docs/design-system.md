@@ -241,3 +241,43 @@ Per ADR 0004, components ported from the original prototype retain their global 
 | `.navl a`      | Lines 105–115, 485–488   | Navigation text links              | `color: var(--muted)`, `font-size: 13px`, `font-weight: 600`, `padding: 7px 12px`, hidden on `<=900px`                                                            |
 | `.fu`          | Lines 694–706, 1688–1690 | Tactile 3D button / CTA base       | `background: var(--red)`, `font-family: var(--display)`, `font-size: 14px`, `text-transform: uppercase`, `padding: 10px 18px`, `box-shadow: 0 3px 0 var(--redLo)` |
 | `.navl a.fu`   | Lines 116–120            | Primary CTA link inside nav pill   | `color: #fff`, `padding: 9px 16px`, `font-size: 13px`, visible across all viewports                                                                               |
+
+---
+
+## 8. Hero Card Width (Part 3.3c)
+
+The shared `.sc` card has `max-width: 460px`. At viewports ≥901px the hero's `h1` heading (Russo One, `skewX(-8deg)`, `clamp(36px, 5vw, 66px)`) overflowed the card's right padding edge — this is an **original prototype defect** present in the reference HTML.
+
+The rebuild fixes this with a heading-relative override scoped to `.sc.hero`:
+
+```css
+.sc.hero {
+  --hero-h1: clamp(36px, 5vw, 66px);
+  max-width: calc(7.24 * var(--hero-h1) + 54px);
+}
+```
+
+**Formula derivation (measured, not guessed):**
+
+| Measurement                          | Value                          |
+| ------------------------------------ | ------------------------------ |
+| "DEPARTMENT," rendered width at 66px | 477.33px                       |
+| "DEPARTMENT," rendered width at 64px | 462.86px                       |
+| K = width / fontSize                 | 7.2322 (rounded up → **7.24**) |
+| Padding: 2 × 22px                    | 44px                           |
+| Breathing room                       | 10px                           |
+| Total constant S = 44 + 10           | **54px**                       |
+
+**Verification (overflowRight = max h1 line right − card paddingBox right):**
+
+| Viewport | h1 fontSize | card max-width | overflowRight |
+| -------- | ----------- | -------------- | ------------- |
+| 1920px   | 66px        | 531.84px       | −17.0px ✓     |
+| 1440px   | 66px        | 531.84px       | −17.0px ✓     |
+| 1280px   | 64px        | 517.36px       | −16.7px ✓     |
+| 1100px   | 55px        | 452.20px       | −15.6px ✓     |
+| 1024px   | 51.2px      | 424.69px       | −15.2px ✓     |
+| 901px    | 45.05px     | 380.16px       | −14.3px ✓     |
+| ≤900px   | 34px        | none           | n/a ✓         |
+
+The `.sc.hero` override is reset to `max-width: none` inside `@media (max-width: 900px)` to restore mobile behavior. The shared `.sc` rule is **not modified**.
