@@ -1,0 +1,167 @@
+/**
+ * Concepful Mech Builder — Hero Section Styles
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+/* Lines 146-149, 597-599: Story section container and canvas pass-through */
+.story {
+  position: relative;
+  z-index: var(--z-story, 6);
+  pointer-events: none;
+}
+
+/* Lines 600-602: Content cards retain pointer events */
+.story .sc {
+  pointer-events: auto;
+}
+
+/* Lines 150-155: Story chapter section layout */
+.st {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-block: 96px 48px;
+}
+
+/* Lines 160-164: Centered content boundary */
+.st .in {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Lines 165-173, 606-611: Content card glassmorphism */
+.sc {
+  max-width: 460px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+
+/* Lines 183-189: Monospace category eyebrow */
+.sc .eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pro);
+}
+
+/* Lines 190-200, 1680-1683: Display heading with skewed styling and active drop shadow */
+.big {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(36px, 5vw, 66px);
+  line-height: 0.94;
+  transform: skewX(-8deg);
+  color: var(--bone);
+  text-shadow: 3px 3px 0 var(--redLo);
+  margin-top: 10px;
+}
+
+/* Lines 201-204, 1684-1686: Emphasized red span with contrasting dark shadow */
+.big span {
+  color: var(--red);
+  text-shadow: 3px 3px 0 #141624;
+}
+
+/* Lines 215-220: Narrative copy paragraph */
+.sc p {
+  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  max-width: 52ch;
+}
+
+/* Lines 221-226: Call-to-action button row */
+.ctas {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Lines 227-230: Primary CTA anchor reset */
+.ctas .fu {
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Lines 231-239: Secondary ghost button */
+.ghost {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: 1px solid var(--line2);
+  border-radius: 999px;
+  padding: 10px 16px;
+}
+
+/* Lines 240-243: Ghost button hover */
+.ghost:hover {
+  border-color: var(--pro);
+  color: var(--pro);
+}
+
+/* Lines 244-249: Telemetry HUD 3-column grid */
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+/* Lines 250-260: HUD spec box */
+.hud span {
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Lines 261-268: HUD spec highlight value */
+.hud b {
+  display: block;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--fg);
+  letter-spacing: 0;
+}
+
+/* Lines 489-512, 548-550: Mobile responsive adjustments (<= 900px) */
+@media (max-width: 900px) {
+  .st {
+    align-items: flex-end;
+    padding-block: 60px 16px;
+  }
+
+  .sc {
+    max-width: none;
+    padding: 16px;
+  }
+
+  .big {
+    font-size: 34px;
+  }
+
+  .sc p {
+    font-size: 13px;
+  }
+
+  .hud b {
+    font-size: 16px;
+  }
+}

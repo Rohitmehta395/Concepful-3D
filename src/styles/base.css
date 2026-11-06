@@ -25,7 +25,7 @@ html {
   box-sizing: border-box;
 }
 
-/* Lines 83-86, 96, 553-562: Base body styles, background, text color, font, line height */
+/* Lines 83-86, 96, 553-562: Base body styles, background, text color, font, line height, horizontal gutters */
 body {
   margin: 0;
   min-height: 100%;
@@ -34,8 +34,18 @@ body {
   font-family: var(--body);
   font-size: 14px;
   line-height: 1.5;
+  padding-left: var(--gl);
+  padding-right: var(--gr);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+/* Lines 563-566: Heading reset and balanced headline wrapping */
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
 }
 
 /* Lines 578-581: Authoritative prototype focus-visible ring */

@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                            Status                            |         Approval Date          |
-| :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :----------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                         **Approved**                         |          Oct 30, 2026          |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                         **Approved**                         |          Oct 30, 2026          |
-| **Phase 3**  | **Static Page Shell**                 | 2 / 8  | **Part 3.2 Implemented (Awaiting User Review and Approval)** | Part 3.1 Approved Oct 30, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |               —                |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |               —                |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |               —                |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                           Pending                            |               —                |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                           Pending                            |               —                |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                           Pending                            |               —                |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                           Pending                            |               —                |
+|    Phase     | Title                                 | Parts  |                            Status                            |             Approval Date              |
+| :----------: | :------------------------------------ | :----: | :----------------------------------------------------------: | :------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                         **Approved**                         |              Oct 30, 2026              |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                         **Approved**                         |              Oct 30, 2026              |
+| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 Implemented (Awaiting User Review and Approval)** | Part 3.1 & 3.2 Approved Oct 30, 2026   |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                           Pending                            |                   —                    |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                           Pending                            |                   —                    |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                           Pending                            |                   —                    |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                           Pending                            |                   —                    |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                           Pending                            |                   —                    |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                           Pending                            |                   —                    |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                           Pending                            |                   —                    |
 
 ---
 
@@ -96,7 +96,7 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.2: Static Header
 
-- **Status:** **approved pending 3.2d review**
+- **Status:** **APPROVED**
 - **Deliverables:**
   - `src/components/shell/Logo.tsx`: Cel-shaded mecha crest SVG (`.mk`) and vector wordmark SVG (`.wm`) converted to valid JSX, marked with `aria-hidden="true"` and `focusable="false"`. Zero element IDs (no collision risk).
   - `src/components/shell/Header.tsx`: Fixed `<header id="top">` landmark housing `<a className="logo glass" href="#intro" aria-label="Concepful">` and `<nav className="navl glass" aria-label="Primary">` with `NAV_LINKS` and `NAV_CTA`. Zero hardcoded hrefs.
@@ -111,6 +111,25 @@ This document records the verification history, approved milestones, and live st
   - **Hover & Focus States:** Tested with Playwright at 1280px and 390px. Global `:focus-visible` renders `rgb(255, 127, 166)` (`--pro`) with `2px solid` and `2px offset` across skip link, logo, nav links, and CTA.
   - **Client JavaScript Proof:** 0 bytes raw difference, 0 bytes gzip difference (568,669 raw / 174,719 gzip) across identical chunk hashes.
   - **Pixel Diff:** Exact tolerance 0 diff is 22 pixels (0.025%) at 1280px (isolated via `elementFromPoint` to nav link text anti-aliasing) and 0 pixels (0.000%) at 390px. Tolerance 10 diff is 0.000% across all viewports. Controls confirmed failure modes.
+
+### Part 3.3: Static Hero Section
+
+- **Status:** **Implemented (Awaiting User Review and Approval)**
+- **Deliverables:**
+  - `src/content/sections.ts`: Exported canonical `SECTION_IDS` (`intro`, `classes`, `howItWorks`, `plans`, `build`) with comments citing original prototype IDs. Barrel exported via `src/content/index.ts`.
+  - `tests/sections.test.ts`: Unit test suite verifying `BRAND`, `NAV_LINKS`, and `NAV_CTA` hrefs align with canonical `SECTION_IDS`.
+  - `src/components/story/Hero.tsx`: Server Component rendering the introductory narrative card (`<section id="intro" className="st" data-scene="intro" aria-labelledby="hero-heading">`) with single `<h1>` (`id="hero-heading"`), highlighted `<span>on demand.</span>`, narrative paragraph, primary/secondary CTAs (`#build`, `#how-it-works`), and 3-column telemetry HUD specs.
+  - `src/styles/hero.css`: Global component CSS per ADR 0004; glass backdrop filter, card boundary layout, slanted Russo One heading with `--redLo` drop shadow, ghost button styling, HUD spec boxes, mobile responsive adjustments (<=900px), imported in `src/app/globals.css`.
+  - `src/styles/base.css`: Added horizontal body gutters `padding-left: var(--gl); padding-right: var(--gr);` (lines 559–560) and heading reset `h1, h2, h3 { margin: 0; text-wrap: balance; }` (lines 563–566).
+  - `src/app/page.tsx`: Replaced placeholder markup with `<main id="main" tabIndex={-1} className="story outline-none"><Hero /></main>`.
+  - `docs/scene-hooks.md`: Full inventory of DOM attributes (`data-scene="intro"`), element classifications (static vs interactive), and Three.js scene hooks.
+- **Verification:**
+  - **Computed Styles Parity:** 100% parity across all 4 viewports (390px, 768px, 1280px, 1920px) across 13 distinct elements.
+  - **Pixel Diff:** Exact tolerance 0 diff on hero card is 28 pixels (0.0117%) at 1280px and 875 pixels (0.5833%) at 390px (subpixel text anti-aliasing edges only; tolerance 10 diff is 0.0004% at 1280px and 0.0393% at 390px). Injected failing controls confirmed sensitivity: h1 font-weight 700 produced 9.87% (1280px) and 7.35% (390px) diff; description color `--fg` produced 1.67% (1280px) and 2.85% (390px) diff.
+  - **No-JS Compatibility:** Page renders complete hero card, heading, copy, CTAs, and HUD stats with JavaScript disabled.
+  - **Font Face Readiness:** `document.fonts.check` passes for Russo One, Inter, and JetBrains Mono across tested sizes.
+  - **Keyboard Tab Order & ARIA:** Tested tab order moves sequentially from skip link through header links to hero CTAs (`Start your build`, `See how it works`), all displaying `--pro` 2px focus ring.
+  - **Client JS Bundle:** 0 bytes added (568,669 raw / 174,719 gzip across identical chunks).
 
 ---
 
@@ -136,13 +155,14 @@ The following items were identified during the Part 3.2 review and are tracked f
 | Dimension                      | Verification Scope                                  | Status                 | Notes                                                                            |
 | :----------------------------- | :-------------------------------------------------- | :--------------------- | :------------------------------------------------------------------------------- |
 | **Code & Build Checks**        | `pnpm lint`, `typecheck`, `format:check`, `build`   | **Verified Passing**   | All standard commands pass cleanly with exit code 0.                             |
-| **Domain Logic Tests**         | `pnpm test` (4,100 test cases)                      | **Verified Passing**   | 100% parity against original JavaScript oracle.                                  |
+| **Domain Logic Tests**         | `pnpm test` (4,104 test cases)                      | **Verified Passing**   | 100% parity against original JavaScript oracle; section ID link unit tests pass. |
 | **Repository File Integrity**  | Checksum of `reference/Concepful_Mech_Builder.html` | **Verified Passing**   | SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`.     |
 | **Visual Baseline Archive**    | 36 screenshots in `reference/baseline/`             | **Verified Passing**   | Intact across 4 viewports (Part 1.2).                                            |
 | **Document Shell Parity**      | HTML head, skip link, keyboard focus                | **Verified Passing**   | Head metadata matches, skip link focuses main, fonts verified in browser engine. |
 | **Static Header Parity**       | Logo, wordmark, nav links, CTA, glass styling       | **Verified Passing**   | Computed styles match across 4 viewports; mobile link collapsing matches.        |
+| **Static Hero Parity**         | Glass card, slanted Russo One h1, copy, CTAs, HUD   | **Verified Passing**   | Computed styles match across 4 viewports; pixel diff <=0.58% (subpixel AA only). |
 | **Font Bundling (CLS = 0)**    | Build-time `.woff2` extraction                      | **Verified Passing**   | Local assets preloaded in head. Russo One, Inter, JetBrains Mono verified.       |
-| **Visual Fidelity (Scene/UI)** | Reconstructed 3D mechas & HUD vs. baseline          | **Pending Phases 3–7** | Layout implementation in progress.                                               |
+| **Visual Fidelity (Scene/UI)** | Reconstructed 3D mechas & HUD vs. baseline          | **Pending Phases 4–7** | Layout implementation in progress.                                               |
 | **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **In Progress**        | Skip link and header focus rings verified; full audit scheduled for Phase 8.     |
 | **Performance (60 FPS)**       | Profiling render loop & DPR governor                | **Pending Phase 9**    | Scheduled for Phase 9 profiling.                                                 |
 | **E2E Test Suite**             | Full Playwright configurator flow                   | **Pending Phase 10**   | Scheduled for Phase 10 QA.                                                       |
