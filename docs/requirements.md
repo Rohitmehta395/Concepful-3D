@@ -27,7 +27,7 @@ All functional requirements below are derived directly from the source HTML prot
 
 - **Story Chapters:** Six continuous story sections scrolling over the full-bleed canvas scene:
   1. Hero / Intro ("Your creative department, on demand")
-  2. Classes ("Four disciplines, one strike team")
+  2. Classes ("Choose your class" · "One goal: to provide a different perspective.")
   3. Rules of Engagement ("How we raid together")
   4. Mission Log (Sticky horizontal telemetry track)
   5. Plans & Pricing ("Pick your hull size")
@@ -37,7 +37,7 @@ All functional requirements below are derived directly from the source HTML prot
 ### 2.3 Pricing Configurator & Character Card `[Source HTML: lines 715–1260, 1832–1990]`
 
 - **Step-by-Step Configurator HUD:** Floating left glass panel allowing user customization:
-  - **Step 1: Tier Selection** — Scout, Strike, Vanguard, Dreadnought.
+  - **Step 1: Tier Selection** — Mission (solo), Full Crew (squad), Full Force (combine).
   - **Step 2: Mission Type** — Web & Digital, Brand & Identity, 3D & Spatial, Full Department.
   - **Step 3: Flagship & Buffs** — Submarine, Sky Cruiser, Star Carrier; add-on buffs (e.g., Rush Delivery, Dedicated PM, 24/7 Coverage).
   - **Billing Toggle** — Monthly vs. Annual (with automatic 15% discount calculation).

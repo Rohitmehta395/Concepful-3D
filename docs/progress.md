@@ -209,8 +209,16 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven. Tolerance 10 diff is 0.000%.
 7. **Mobile Navigation Link Accessibility (<900px):**
    Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
-8. **Dimmed Beat Contrast at Opacity 0.5 (Measured from DOM):**
-   The previous report's entry (citing 5.74:1 and 3.40:1 based on hardcoded colors not in the tokens) was invalid. Real DOM-measured computed values from `getComputedStyle`: base body `rgb(20, 22, 36)`, glass card `rgba(20, 22, 40, 0.84)` (effective `rgb(20, 22, 39)`), beat item background `rgba(40, 43, 76, 0.62)` at 0.5 opacity (effective `rgb(26, 29, 50)`). Composited values: beat title `rgb(141, 142, 153)` yields **5.11:1** (passes WCAG AA Normal Text >= 4.5:1); beat description `rgb(101, 103, 127)` yields **3.00:1** (below 4.5:1 for normal text, meets 3.0:1 for large text). Logged for Phase 8 accessibility pass to evaluate contrast enhancement while preserving visual hierarchy.
+8. **Dimmed Beat Contrast at Opacity 0.5 (Correct Compositing Model):**
+   The earlier report's entries (citing 5.74:1 / 3.40:1 and 5.11:1 / 3.00:1) used incorrect compositing models. Under the correct model where element opacity $o = 0.5$ applies to the entire beat element (`surfaceFinal = o * compose(beatBg over cardEffective) + (1 - o) * cardEffective`; `textPixelFinal = o * textColor + (1 - o) * cardEffective`):
+   - `cardEffective`: `rgb(20, 22, 39)`
+   - `beatOverCard`: `rgb(32, 35, 62)`
+   - `surfaceFinal`: `rgb(26, 29, 51)` (luminance `0.0134`, screenshot sampled `[26, 28, 51]`)
+   - `titlePixelFinal`: `rgb(138, 139, 147)` (luminance `0.2598`, screenshot sampled `[137, 138, 148]`), yielding **4.89:1** (passes WCAG AA Normal Text >= 4.5:1).
+   - `descPixelFinal`: `rgb(98, 100, 121)` (luminance `0.1309`, screenshot sampled `[97, 99, 122]`), yielding **2.85:1** (below 4.5:1 for normal text and 3.0:1 for large text).
+     Logged for Phase 8 accessibility pass to evaluate contrast enhancement.
+9. **Static Beat Non-Interactive Pointer Cursor:**
+   Classes beats show `cursor: pointer` and a focus-visible style but are not interactive in the static build; the original makes them `role="button"` and `tabIndex = 0` by script (reference lines 15092–15121). Decide at Phase 4/6 (wire the behavior or remove the pointer cursor).
 
 ---
 

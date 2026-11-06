@@ -85,7 +85,7 @@
   font-size: 13.5px;
 }
 
-/* Lines 306-311: Beat numeric or discipline prefix */
+/* Lines 306-311: Beat numeric or discipline prefix (unused in markup, original line 306) */
 .beat b i {
   font-style: normal;
   font-family: var(--mono);
@@ -93,7 +93,7 @@
   color: var(--red);
 }
 
-/* Lines 312-320: Beat metadata right-aligned indicator */
+/* Lines 312-320: Beat metadata right-aligned indicator (unused in markup, original line 312) */
 .beat b em {
   font-style: normal;
   font-family: var(--mono);
@@ -133,25 +133,30 @@
   padding: 3px 9px;
 }
 
-/* Lines 489-512, 539-544: Mobile responsive adjustments (<= 900px) */
+/* Mobile responsive adjustments (<= 900px) */
 @media (max-width: 900px) {
+  /* Lines 500-502: Tall section flex alignment */
   .st.tall {
     align-items: flex-end;
   }
 
+  /* Lines 493-495: Tall inner bottom alignment */
   .st.tall .in {
     justify-content: flex-end;
   }
 
+  /* Lines 496-499: Tall card pinned to bottom */
   .st.tall .sc {
     top: auto;
     bottom: 12px;
   }
 
+  /* Lines 539-541: Inactive beat description hidden on mobile */
   .beat small {
     display: none;
   }
 
+  /* Lines 542-544: Active beat description displayed on mobile */
   .beat.on small {
     display: block;
   }

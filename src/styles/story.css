@@ -5,7 +5,7 @@
  * Line references cite reference/Concepful_Mech_Builder.html.
  */
 
-/* Lines 146-149, 597-599: Story section container and canvas pass-through */
+/* Lines 146-149 (z-index), lines 597-599 (pointer-events): Story section container */
 .story {
   position: relative;
   z-index: var(--z-story, 6);
@@ -60,18 +60,21 @@
   max-width: 52ch;
 }
 
-/* Lines 489-512: Mobile responsive adjustments (<= 900px) */
+/* Mobile responsive adjustments (<= 900px) */
 @media (max-width: 900px) {
+  /* Lines 489-492: Story section flex alignment on mobile */
   .st {
     align-items: flex-end;
     padding-block: 60px 16px;
   }
 
+  /* Lines 503-506: Story card unconstrained max-width and reduced padding on mobile */
   .sc {
     max-width: none;
     padding: 16px;
   }
 
+  /* Lines 510-512: Paragraph font size on mobile */
   .sc p {
     font-size: 13px;
   }
