@@ -7,13 +7,13 @@
 export const SECTION_IDS = {
   /** Replaces original #s-intro (line 1809, 1994) */
   intro: "intro",
-  /** Replaces original #s-classes (line 1826, 2018) */
+  /** Replaces original #s-classes (line 1869, 2018) */
   classes: "classes",
-  /** Replaces original #s-logi (line 1826, 2058) */
+  /** Replaces original #s-logi (line 1869, 2058) */
   howItWorks: "how-it-works",
-  /** Replaces original #s-stages (line 1826, 2135) */
+  /** Replaces original #s-stages (line 1870, 2135) */
   plans: "plans",
-  /** Matches original #build (line 1826, 2191) */
+  /** Matches original #build (line 1871, 2191) */
   build: "build",
 } as const;
 

@@ -159,24 +159,28 @@ This document records the verification history, approved milestones, and live st
 
 ---
 
-## 6. Accessibility Backlog
+## 6. Accessibility & Polish Backlog
 
-The following items were identified during the Part 3.2 review and are tracked for remediation in Phase 8 (Responsive & Accessibility Pass) without regressing visual parity with the reference prototype:
+The following items are tracked for remediation in Phase 8 (Responsive & Accessibility Pass) without regressing visual parity with the reference prototype:
 
-1. **CTA Text Contrast (`#ffffff` on `--red`):**
-   White text on `--red` (`#ee004e`) measures at 4.425:1. This matches the original prototype exactly, but falls slightly below the WCAG AA requirement of 4.5:1 for small text (<18pt / 24px non-bold).
-2. **Text Contrast on Background (`--red` on `--bg`):**
+1. **Polish Backlog — Hero Text Left Clearance:**
+   Hero heading text left clearance to card border box is 4.4px at 1920/1440, 5.0px at 1280, and 7.6px at 1100 (original prototype: 0.09px across 5 lines). Candidate remediation: `padding-left` on the heading about `0.27 * var(--hero-h1)` plus matching extra card width; decision pending.
+2. **Polish Backlog — Subpixel Text Edge Difference:**
+   47 to 48 px of heading glyph-edge diff at <=768px; cause unproven (subpixel text anti-aliasing / font engine rasterization).
+3. **Polish Backlog — CTA Label Contrast:**
+   White text on `--red` (`#ee004e`) measures at 4.43:1 (WCAG AA non-bold small text target is 4.5:1). Matches original prototype.
+4. **Text Contrast on Background (`--red` on `--bg`):**
    `--red` (`#ee004e`) on `--bg` (`#141624`) measures at 4.056:1 if any regular text uses it (WCAG AA requires 4.5:1 for small text).
-3. **Synthetic / Faux-Bold Display Font (`Russo One` at weight 600):**
+5. **Synthetic / Faux-Bold Display Font (`Russo One` at weight 600):**
    `Russo One` is a single-weight font (400). In the original prototype, `.navl a.fu` inherits `font-weight: 600` from `.navl a`, causing browser synthetic bolding. Kept for visual parity with original prototype; Phase 8 will evaluate explicit font-weight overrides or typography styling.
-4. **Header Text-Edge Subpixel Difference (22px at 1280px):**
-   At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven (potential difference between Google Fonts woff2 generation vs system-level font rasterization). Tolerance 10 diff is 0.000%.
-5. **Mobile Navigation Link Accessibility (<900px):**
+6. **Header Text-Edge Subpixel Difference (22px at 1280px):**
+   At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven. Tolerance 10 diff is 0.000%.
+7. **Mobile Navigation Link Accessibility (<900px):**
    Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
 
 ---
 
-## 6. Verification Dimensions & Quality Targets
+## 7. Verification Dimensions & Quality Targets
 
 | Dimension                      | Verification Scope                                  | Status                 | Notes                                                                            |
 | :----------------------------- | :-------------------------------------------------- | :--------------------- | :------------------------------------------------------------------------------- |

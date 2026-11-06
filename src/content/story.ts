@@ -17,24 +17,24 @@ export const BRAND = {
 
 /**
  * Top navigation bar links.
- * Source: reference/Concepful_Mech_Builder.html (line 1826)
+ * Source: reference/Concepful_Mech_Builder.html (lines 1868-1872)
  */
 export const NAV_LINKS = [
-  { href: "#classes", label: "Classes" /* line 1826: replaces #s-classes */ },
+  { href: "#classes", label: "Classes" /* line 1869: replaces #s-classes */ },
   {
     href: "#how-it-works",
-    label: "How it works" /* line 1826: replaces #s-logi */,
+    label: "How it works" /* line 1869: replaces #s-logi */,
   },
-  { href: "#plans", label: "Plans" /* line 1826: replaces #s-stages */ },
+  { href: "#plans", label: "Plans" /* line 1870: replaces #s-stages */ },
 ] as const satisfies readonly NavLink[];
 
 /**
  * Top navigation call-to-action button.
- * Source: reference/Concepful_Mech_Builder.html (line 1826)
+ * Source: reference/Concepful_Mech_Builder.html (lines 1871-1872)
  */
 export const NAV_CTA = {
-  href: "#build", // line 1826: replaces #build
-  label: "Start your build", // line 1826
+  href: "#build", // line 1871: replaces #build
+  label: "Start your build", // line 1871
 } as const satisfies NavLink;
 
 /**

@@ -28,7 +28,7 @@ All elements within `s-intro` are purely static server markup with the exception
 | `<p>`         | `.sc p`               | **Static**      | —                                    | Narrative copy text. No JS bindings.                                              |
 | `<div>`       | `.ctas`               | **Static**      | `class="ctas"`                       | Flexbox container for action links.                                               |
 | `<a>`         | `.ctas a.fu`          | **Interactive** | `class="fu"`, `href="#build"`        | Anchor navigating to the configurator/builder section (`#build`).                 |
-| `<a>`         | `.ctas a.ghost`       | **Interactive** | `class="ghost"`, `href="#s-logi"`    | Anchor navigating to the logistics/how-it-works section (`#s-logi`).              |
+| `<a>`         | `.ctas a.ghost`       | **Interactive** | `class="ghost"`, `href="#s-logi"`    | Anchor navigating to the logistics/how-it-works section (`#s-logi`, line 1869).   |
 | `<div>`       | `.hud`                | **Static**      | `class="hud"`                        | 3-column telemetry grid displaying 3 spec items. No JS bindings.                  |
 | `<span>` (x3) | `.hud span`           | **Static**      | —                                    | Telemetry item boxes (`1 lead`, `Fixed`, `Your IP`). No JS bindings.              |
 
