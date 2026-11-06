@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                               Status                                |            Approval Date             |
-| :----------: | :------------------------------------ | :----: | :-----------------------------------------------------------------: | :----------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                            **Approved**                             |             Oct 30, 2026             |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                            **Approved**                             |             Oct 30, 2026             |
-| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 + 3.3c Implemented (Awaiting User Review and Approval)** | Part 3.1 & 3.2 Approved Oct 30, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                               Pending                               |                  —                   |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                               Pending                               |                  —                   |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                               Pending                               |                  —                   |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                               Pending                               |                  —                   |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                               Pending                               |                  —                   |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                               Pending                               |                  —                   |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                               Pending                               |                  —                   |
+|    Phase     | Title                                 | Parts  |                       Status                        |            Approval Date             |
+| :----------: | :------------------------------------ | :----: | :-------------------------------------------------: | :----------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                    **Approved**                     |             Oct 30, 2026             |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                    **Approved**                     |             Oct 30, 2026             |
+| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 + 3.3c approved pending review of 3.3d** | Part 3.1 & 3.2 Approved Oct 30, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                       Pending                       |                  —                   |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                       Pending                       |                  —                   |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                       Pending                       |                  —                   |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                       Pending                       |                  —                   |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                       Pending                       |                  —                   |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                       Pending                       |                  —                   |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                       Pending                       |                  —                   |
 
 ---
 
@@ -152,7 +152,14 @@ This document records the verification history, approved milestones, and live st
 
 ---
 
-## 5. Accessibility Backlog
+## 5. Open Questions & Technical Spikes
+
+1. **Turbopack CSS Loader & CSS Modules:**
+   `turbopack.rules['*.css']` custom loader makes CSS Modules unusable (ADR 0004); evaluate the standard Tailwind v4 PostCSS integration in a spike before Phase 4, with a visual diff of header and hero.
+
+---
+
+## 6. Accessibility Backlog
 
 The following items were identified during the Part 3.2 review and are tracked for remediation in Phase 8 (Responsive & Accessibility Pass) without regressing visual parity with the reference prototype:
 
