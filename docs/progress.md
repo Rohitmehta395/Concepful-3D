@@ -209,8 +209,8 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven. Tolerance 10 diff is 0.000%.
 7. **Mobile Navigation Link Accessibility (<900px):**
    Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
-8. **Dimmed Beat Contrast at Opacity 0.5:**
-   Static beats are at opacity 0.5 as in the original; Phase 4 toggles .on; measured contrast: beat title is 5.74:1 against card background (4.91:1 against beat box background); beat description is 3.40:1 against card background (2.91:1 against beat box background).
+8. **Dimmed Beat Contrast at Opacity 0.5 (Measured from DOM):**
+   The previous report's entry (citing 5.74:1 and 3.40:1 based on hardcoded colors not in the tokens) was invalid. Real DOM-measured computed values from `getComputedStyle`: base body `rgb(20, 22, 36)`, glass card `rgba(20, 22, 40, 0.84)` (effective `rgb(20, 22, 39)`), beat item background `rgba(40, 43, 76, 0.62)` at 0.5 opacity (effective `rgb(26, 29, 50)`). Composited values: beat title `rgb(141, 142, 153)` yields **5.11:1** (passes WCAG AA Normal Text >= 4.5:1); beat description `rgb(101, 103, 127)` yields **3.00:1** (below 4.5:1 for normal text, meets 3.0:1 for large text). Logged for Phase 8 accessibility pass to evaluate contrast enhancement while preserving visual hierarchy.
 
 ---
 
