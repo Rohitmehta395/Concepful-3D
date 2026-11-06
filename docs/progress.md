@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                       Status                        |            Approval Date             |
-| :----------: | :------------------------------------ | :----: | :-------------------------------------------------: | :----------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                    **Approved**                     |             Oct 30, 2026             |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                    **Approved**                     |             Oct 30, 2026             |
-| **Phase 3**  | **Static Page Shell**                 | 3 / 8  | **Part 3.3 + 3.3c approved pending review of 3.3d** | Part 3.1 & 3.2 Approved Oct 30, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                       Pending                       |                  —                   |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                       Pending                       |                  —                   |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                       Pending                       |                  —                   |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                       Pending                       |                  —                   |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                       Pending                       |                  —                   |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                       Pending                       |                  —                   |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                       Pending                       |                  —                   |
+|    Phase     | Title                                 | Parts  |                                Status                                 |                            Approval Date                            |
+| :----------: | :------------------------------------ | :----: | :-------------------------------------------------------------------: | :-----------------------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                             **Approved**                              |                            Oct 30, 2026                             |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                             **Approved**                              |                            Oct 30, 2026                             |
+| **Phase 3**  | **Static Page Shell**                 | 4 / 8  | **Part 3.1, 3.2, 3.3 approved; Part 3.4 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                                Pending                                |                                  —                                  |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                                Pending                                |                                  —                                  |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                                Pending                                |                                  —                                  |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                                Pending                                |                                  —                                  |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                                Pending                                |                                  —                                  |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                                Pending                                |                                  —                                  |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                                Pending                                |                                  —                                  |
 
 ---
 
@@ -114,7 +114,7 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.3: Static Hero Section
 
-- **Status:** **Implemented (Awaiting User Review and Approval)**
+- **Status:** **APPROVED** (Covering Part 3.3, 3.3c, 3.3d via commits `91f9f76`, `fb34812`, `df1b1b6`)
 - **Deliverables:**
   - `src/content/sections.ts`: Exported canonical `SECTION_IDS` (`intro`, `classes`, `howItWorks`, `plans`, `build`) with comments citing original prototype IDs. Barrel exported via `src/content/index.ts`.
   - `tests/sections.test.ts`: Unit test suite verifying `BRAND`, `NAV_LINKS`, and `NAV_CTA` hrefs align with canonical `SECTION_IDS`.
@@ -133,8 +133,8 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.3c: Hero Card Width Fix
 
-- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
-- **Commit:** `fix(hero): size card to fit heading`
+- **Status:** **APPROVED**
+- **Commit:** `fix(hero): size card to fit heading` (`fb34812`)
 - **Problem:** At viewports ≥901px the h1 "DEPARTMENT," token (Russo One, `skewX(-8deg)`, `clamp(36px, 5vw, 66px)`) overflowed the shared `.sc` card's right padding edge. This is an original prototype defect — the reference HTML has the same overflow. The fix is applied only in the rebuild.
 - **Method:** Playwright `getClientRects()` text-node Range measurements at 9 viewports (1920, 1440, 1280, 1100, 1024, 901, 900, 768, 390) on both original and new page. Computed K = `deptWordWidth / fontSize` = 7.2322 (identical at 66px and 64px); rounded up to 7.24. Formula: `max-width: calc(7.24 * var(--hero-h1) + 54px)` where `54px = 2×22px(padding) + 10px(breathing)`.
 - **Scope:** `src/styles/hero.css` only; `.sc.hero` selector only; shared `.sc` rule unchanged.
@@ -147,6 +147,38 @@ This document records the verification history, approved milestones, and live st
   - **h1 font-size unchanged:** 66px at 1920/1440, 64px at 1280, 55px at 1100, 51.2px at 1024, 45.05px at 901, 34px at ≤900px — identical to pre-fix measurements.
   - **JS bundle:** 568,669 bytes raw — 0 bytes added.
   - **Quality checks:** `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test` (4,104 tests) — all pass.
+
+### Part 3.3d: Hero Refactor & Verification Closure
+
+- **Status:** **APPROVED**
+- **Commit:** `refactor(hero): single source for heading size, evidence docs` (`df1b1b6`)
+- **Deliverables:** Eliminated duplicate `--hero-h1` definition in `src/styles/hero.css` by scoping directly to `.sc.hero h1.big { font-size: var(--hero-h1); }`. Redid CTA interaction measurements with 300ms transition buffer and no-transition controls; corrected navigation anchor citations in `src/content/story.ts`, `src/content/sections.ts`, and `docs/scene-hooks.md` to exact lines 1868–1872 (`d2ce7aa`).
+
+### Part 3.4: Static "Classes" and "Server Rules" Sections
+
+- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Deliverables:**
+  - `src/styles/story.css`: Extracted shared layout rules (`.story`, `.st`, `.in`, `.sc`, `.sc .eyebrow`, `.sc p`) out of `hero.css` to share across story sections.
+  - `src/styles/hero.css`: Refactored to hero-specific rules only (`.sc.hero`, `h1.big`, `.ctas`, `.hud`).
+  - `src/content/sections.ts`: Added `rules: "rules"` to `SECTION_IDS` (citing line 2103).
+  - `tests/sections.test.ts`: Added unit test asserting `SECTION_IDS.rules === "rules"`.
+  - `src/components/story/Classes.tsx`: Server Component rendering `<section id="classes" className="st tall" data-scene="classes" aria-labelledby="classes-heading">` with 3 `.beat` elements and 4 `.perks` tags (lines 2018–2057).
+  - `src/styles/classes.css`: Section styles for `.st.tall` (`min-height: 240vh`), `.st.tall .sc` (`position: sticky`), `.beats`, `.beat`, `.perks`, and mobile responsive overrides (<=900px).
+  - `src/components/story/Rules.tsx`: Server Component rendering `<section id="rules" className="st" data-scene="rules" aria-labelledby="rules-heading">` with 6 `.rules li` bulleted items (lines 2103–2134).
+  - `src/styles/rules.css`: Section styles for `.rules`, `.rules li`, red rotated square marker pseudo-elements (`.rules li::before`), and mobile font adjustments.
+  - `src/app/globals.css`: Imported `story.css`, `hero.css`, `classes.css`, `rules.css`.
+  - `src/app/page.tsx`: Mounted `<Hero />`, `<Classes />`, and `<Rules />` in sequence inside `<main>`.
+  - `docs/scene-hooks.md`: Documented scene hooks, scroll-driven beat detection (`data-beats`), unit camera bindings, and layout specifications.
+- **Verification:**
+  - **Quality Gates:** `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test` (4,104 tests), `pnpm build` all pass cleanly.
+  - **Overflow Pre-check:** Measured original prototype across 9 viewports; neither card overflows its padding boundaries (`overflowRight < 0` at all widths). Preserved canonical `max-width: 460px`.
+  - **Computed Styles Parity:** 0 differences across all 19 elements in Classes and 17 elements in Rules across all 4 standard viewports (390px, 768px, 1280px, 1920px).
+  - **Visual Diff:** Rules card has near-zero diff across all widths (diffCount: 6 at 390px; 1146 vs noise 1140 at 768px; 81 at 1280px; 86 at 1920px). Classes diff on original prototype reflects scroll-driven `.beat.on` active state triggered by prototype JS scroll listener. Injected failing controls (heading font-weight 700, paragraph color `--fg`) confirmed high test sensitivity across all cards.
+  - **No-JS Compatibility:** Full text, beats, perks, and server rules render visible and legible with JavaScript disabled (`javaScriptEnabled: false`).
+  - **Fonts:** Every distinct (family, weight, size, style) tuple over text nodes matches 100% between original and new pages at 1280px and 390px.
+  - **Keyboard & Semantics:** Tab order navigates sequentially through header and hero CTAs; `ariaSnapshot` shows clean semantic outline with regions and list; heading outline contains exactly one H1 and two H2s with zero skipped levels; zero duplicate IDs.
+  - **Client JS Bundle:** 0 client JS bytes added (568,669 raw / 174,719 gzip across identical chunks).
+  - **Document Heights & Offsets:** Classes height matches 2,160px on both pages; Rules height matches 900px on both pages.
 
 > **Part 3.4 Note:** Before porting other `.sc` cards (Classes, Logistics, Rules, Plans, Outro), run the same overflow measurement on each. Do not widen them without first measuring their heading overflow at all ≥901px viewports.
 
@@ -177,6 +209,8 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven. Tolerance 10 diff is 0.000%.
 7. **Mobile Navigation Link Accessibility (<900px):**
    Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
+8. **Dimmed Beat Contrast at Opacity 0.5:**
+   Static beats are at opacity 0.5 as in the original; Phase 4 toggles .on; measured contrast: beat title is 5.74:1 against card background (4.91:1 against beat box background); beat description is 3.40:1 against card background (2.91:1 against beat box background).
 
 ---
 

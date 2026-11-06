@@ -1,0 +1,49 @@
+/**
+ * Concepful Mech Builder — Rules Section Styles
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+/* Lines 367-374: Rules list container reset */
+.rules {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Lines 375-381: Rule item row layout */
+.rules li {
+  font-size: 12.5px;
+  color: var(--muted);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.4;
+}
+
+/* Lines 382-391: Custom diamond bullet indicator */
+.rules li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  background: var(--red);
+  transform: rotate(45deg);
+}
+
+/* Lines 392-394: Bold lead-in high-contrast foreground color */
+.rules b {
+  color: var(--fg);
+}
+
+/* Lines 545-547: Mobile font size adjustment (<= 900px) */
+@media (max-width: 900px) {
+  .rules li {
+    font-size: 11.5px;
+  }
+}

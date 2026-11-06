@@ -1,0 +1,158 @@
+/**
+ * Concepful Mech Builder — Classes Section Styles
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+/* Lines 156-159: Tall section min-height for scene diorama scrubbing */
+.st.tall {
+  min-height: 240vh;
+  align-items: flex-start;
+}
+
+/* Lines 174-178: Tall section inner boundary layout */
+.st.tall .in {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Lines 179-182: Sticky card positioning during scene diorama */
+.st.tall .sc {
+  position: sticky;
+  top: calc(92px + var(--st));
+}
+
+/* Lines 205-214: Medium display section heading */
+.mid {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1;
+  transform: skewX(-6deg);
+  color: var(--bone);
+  margin-top: 8px;
+}
+
+/* Lines 269-274: Beats vertical list container */
+.beats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+/* Lines 275-286: Beat card item surface */
+.beat {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--glass2);
+  opacity: 0.5;
+  transition:
+    opacity 0.3s,
+    border-color 0.3s,
+    transform 0.3s;
+  cursor: pointer;
+}
+
+/* Lines 287-290: Beat item hover state */
+.beat:hover {
+  opacity: 0.85;
+  border-color: var(--line2);
+}
+
+/* Lines 291-294: Beat item focus-visible ring */
+.beat:focus-visible {
+  outline: 2px solid var(--pro);
+  outline-offset: 2px;
+}
+
+/* Lines 295-299: Active/scrubbed beat highlighted by scene engine */
+.beat.on {
+  opacity: 1;
+  border-color: var(--red);
+  transform: translateX(4px);
+}
+
+/* Lines 300-305: Beat item title flex layout */
+.beat b {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+/* Lines 306-311: Beat numeric or discipline prefix */
+.beat b i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--red);
+}
+
+/* Lines 312-320: Beat metadata right-aligned indicator */
+.beat b em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pro);
+  margin-left: auto;
+}
+
+/* Lines 321-327: Beat narrative description */
+.beat small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Lines 328-333: Delivery perks tag container */
+.perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+/* Lines 334-343: Delivery perk badge */
+.perks span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(76, 197, 138, 0.4);
+  color: var(--ok);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+/* Lines 489-512, 539-544: Mobile responsive adjustments (<= 900px) */
+@media (max-width: 900px) {
+  .st.tall {
+    align-items: flex-end;
+  }
+
+  .st.tall .in {
+    justify-content: flex-end;
+  }
+
+  .st.tall .sc {
+    top: auto;
+    bottom: 12px;
+  }
+
+  .beat small {
+    display: none;
+  }
+
+  .beat.on small {
+    display: block;
+  }
+}

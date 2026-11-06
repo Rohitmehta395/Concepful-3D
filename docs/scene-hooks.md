@@ -54,3 +54,43 @@ All elements within `s-intro` are purely static server markup with the exception
   - `h1.big`: `clamp(36px, 5vw, 66px)` on desktop; capped at `34px` on mobile (<=900px).
   - `.sc p`: `14.5px` on desktop; `13px` on mobile (<=900px).
   - `.hud b`: `20px` on desktop; `16px` on mobile (<=900px).
+
+---
+
+## 5. Classes Section (`s-classes`) Scene Hooks
+
+| Attribute / Selector   | Element in Classes                         | Reference Line   | JS Reader / Handler   | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                                                                                      |
+| :--------------------- | :----------------------------------------- | :--------------- | :-------------------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-scene="classes"` | `<section class="st tall" id="s-classes">` | 2018             | `storyScan()`         | 11954          | Queried via `document.querySelectorAll("[data-scene]")`. When its vertical midpoint crosses viewport center (`r.top <= mid && r.bottom > mid`), `STORY.key` is set to `"classes"`. Lazily initializes `STB.classes()` (line 11624).                              |
+| `data-beats`           | `<div class="beats" data-beats>`           | 2024             | `storyScan()`         | 11987–11993    | During scroll, reads `bs.children` count (3 beats) and scroll progress `p` (0.0 to 1.0). Calculates active beat index: `idx = Math.min(bs.children.length - 1, Math.max(0, Math.floor(p * bs.children.length)))`. Toggles `c.classList.toggle("on", i === idx)`. |
+| `.beat` (x3)           | `<div class="beat">`                       | 2025, 2030, 2035 | Click listener        | 15092–15121    | Interactive click listener on `.beat` elements. Clicking a beat updates active class selection and triggers unit camera focus in Three.js scene.                                                                                                                 |
+| `id="s-classes"`       | `<section class="st tall" id="s-classes">` | 2018             | DOM Navigation Anchor | 1869           | Target for top navigation link `<a href="#s-classes">Classes</a>`. Not read directly by scene JS.                                                                                                                                                                |
+
+### Classes Layout & Sticky Behavior
+
+- **Container Height (`.st.tall`):**
+  - **Desktop (>900px):** `min-height: 240vh; align-items: flex-start;` (tall scrollable runway allows scrolling through 3 sub-discipline beats).
+  - **Mobile (<=900px):** `min-height: 240vh; align-items: flex-end;`.
+- **Card Sticky Pinning (`.st.tall .sc`):**
+  - **Desktop (>900px):** `position: sticky; top: calc(92px + var(--st)); max-width: 460px;` (pins card below header while background mecha showcases rotate).
+  - **Mobile (<=900px):** `position: sticky; top: auto; bottom: 12px; max-width: none;` (pins card to viewport bottom).
+- **Default State in Static HTML:**
+  - In original static markup (lines 2018–2057), all three `.beat` elements have `class="beat"` (no `.beat.on`). In CSS (lines 527–531), `.beat` has `opacity: 0.5`. Phase 4 will wire scroll-driven active-beat toggling.
+
+---
+
+## 6. Server Rules Section (`s-rules`) Scene Hooks
+
+| Attribute / Selector | Element in Rules                    | Reference Line | JS Reader / Handler   | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                                                     |
+| :------------------- | :---------------------------------- | :------------- | :-------------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data-scene="rules"` | `<section class="st" id="s-rules">` | 2103           | `storyScan()`         | 11954          | Queried via `document.querySelectorAll("[data-scene]")`. When its vertical midpoint crosses viewport center (`r.top <= mid && r.bottom > mid`), `STORY.key` is set to `"rules"`. Lazily initializes `STB.rules()` (line 11720). |
+| `id="s-rules"`       | `<section class="st" id="s-rules">` | 2103           | DOM Navigation Anchor | —              | Section anchor identifier. Target for navigation. No internal JS event bindings; pure static server-rendered presentation.                                                                                                      |
+
+### Server Rules Layout Behavior
+
+- **Container Height (`.st`):**
+  - **Desktop (>900px):** `min-height: 100vh; display: flex; align-items: center; padding-block: 96px 48px;`.
+  - **Mobile (<=900px):** `align-items: flex-end; padding-block: 60px 16px;`.
+- **Card Sizing (`.sc`):**
+  - **Desktop (>900px):** `max-width: 460px; padding: 22px;`.
+  - **Mobile (<=900px):** `max-width: none; padding: 16px;`.

@@ -11,6 +11,8 @@ export const SECTION_IDS = {
   classes: "classes",
   /** Replaces original #s-logi (line 1869, 2058) */
   howItWorks: "how-it-works",
+  /** Replaces original #s-rules (line 2103) */
+  rules: "rules",
   /** Replaces original #s-stages (line 1870, 2135) */
   plans: "plans",
   /** Matches original #build (line 1871, 2191) */
