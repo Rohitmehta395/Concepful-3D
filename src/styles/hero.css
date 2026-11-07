@@ -30,7 +30,7 @@
  * overflows at ≥901px. The fix is applied only to the rebuild.
  * Scope: .sc.hero only; the shared .sc rule is unchanged.
  */
-.sc.hero {
+#intro .sc.hero {
   /* --hero-h1 defined once: card width and .big font-size both derive from it */
   --hero-h1: clamp(36px, 5vw, 66px);
   max-width: calc(7.24 * var(--hero-h1) + 54px);
@@ -49,8 +49,8 @@
   margin-top: 10px;
 }
 
-/* Single source: inside .sc.hero, .big consumes the single --hero-h1 token */
-.sc.hero .big {
+/* Single source: inside #intro .sc.hero, .big consumes the single --hero-h1 token */
+#intro .sc.hero .big {
   font-size: var(--hero-h1);
 }
 
@@ -125,7 +125,7 @@
 /* Lines 489-512, 548-550: Mobile responsive adjustments (<= 900px) */
 @media (max-width: 900px) {
   /* Reset hero-specific max-width override so .sc mobile rule applies, and update --hero-h1 */
-  .sc.hero {
+  #intro .sc.hero {
     --hero-h1: 34px;
     max-width: none;
   }
