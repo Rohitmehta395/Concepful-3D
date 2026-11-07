@@ -19,7 +19,7 @@ All functional requirements below are derived directly from the source HTML prot
 
 ### 2.1 Navigation & Global Shell `[Source HTML: lines 613–660, 1808–1830]`
 
-- **Fixed Top Header:** Contains brand logo SVG, anchor navigation links (`#classes`, `#how-it-works` [original `#s-logi`], `#rules` [original `#s-rules`], `#plans` [original `#s-plans`]), live pricing badge reflecting current configuration (`#chip`), and primary CTA link ("START YOUR BUILD", `#build`, lines 1870, 2006).
+- **Fixed Top Header:** Contains brand logo SVG, anchor navigation links (`NAV_LINKS`: Classes `#classes`, How it works `#how-it-works`, Plans `#plans`), live pricing badge reflecting current configuration (`#chip`), and primary CTA link (`NAV_CTA`: Start your build `#build`). Rules is not in the navigation. (Source of truth: `src/content/story.ts`, verbatim from original lines 1808–1872).
 - **Header Responsiveness:** On mobile viewports (`<= 900px`), navigation links `.navl a:not(.fu)` are hidden via media query, while logo, live pricing badge, and primary CTA remain visible.
 - **Watermark:** Fixed bottom-right watermark badge (`.wmark`, lines 1741–1785, 2196–2206) with SVG/PNG icon, sound/environment status indicator, and branding ("BUILT WITH CONCEPFUL").
 
@@ -30,40 +30,90 @@ All functional requirements below are derived directly from the source HTML prot
   2. Classes (`#s-classes` / `#classes`): "Choose your class" · "One goal: to provide a different perspective."
   3. Mission Log / Logistics (`#s-logi` / `#how-it-works`): "Mission log" · "How it actually works." (horizontal telemetry track)
   4. Server Rules (`#s-rules` / `#rules`): "Server rules" · "How we raid together."
-  5. Plans & Pricing (`#s-plans` / `#plans`): "Hull sizes" · "Three ways to deploy."
+  5. Plans & Pricing (`#s-stages` / `#plans`): "Hull sizes" · "Three ways to deploy." (Original section ID: `s-stages`)
   6. Outro (`#s-outro` / `#outro`): "Ready to deploy?" · "Enter the server."
 - **Scene Coordination:** Canvas camera angle, background environment (Sea, Sky, Space), and active mecha assets adapt dynamically as narrative sections scroll into view.
 
 ### 2.3 Pricing Configurator & Character Card `[Source HTML: lines 715–1260, 1832–1990]`
 
 - **Step-by-Step Configurator HUD:** Floating left glass panel allowing user customization:
-  - **Step 1: Tier Selection (`TIERS`)** — Mission (`solo`, $4,200/mo), Full crew (`squad`, $8,900/mo), Full force (`combine`, $16,500/mo).
-  - **Step 2: Objectives & Quests** —
-    - Solo quests (`QUESTS`): Brand identity, Pitch deck, Landing page, Motion piece, Product MVP, Full overhaul.
-    - Squad / Combine objectives (`OBJECTIVES`): Launch something, Scale up production, Shift perception, Keep shipping.
-  - **Step 3: Flagships, Gear & Buffs** —
-    - Flagship vessel tiers (`CLASSES`): Sub vessel (ABYSS-01 / Sea), Sky cruiser (NIMBUS-07 / Sky), Star carrier (ORBITAL-99 / Space).
-    - Solo optional gear (`GEAR`): Custom skin (+$600), Afterburner (+$900), Overdrive (+$1,400).
-    - Squad / Combine buffs (`BUFFS`): 3D visualization, Campaign assets, Frontend build, Sound design, Motion system.
+  - **Step 1: Tier Selection (`TIERS`)** — Source of truth: `src/content/tiers.ts` (verbatim from the original).
+  - **Step 2: Objectives & Quests** — Source of truth: `src/content/quests.ts` and `src/content/objectives.ts` (verbatim from the original).
+  - **Step 3: Flagships, Gear & Buffs** — Source of truth: `src/content/classes.ts`, `src/content/gear.ts`, and `src/content/buffs.ts` (verbatim from the original).
   - **Billing Toggle** — Monthly vs. Annual (annual plan offers 12 months for the price of 10 months, providing a 2-month discount).
   - **Itemized Quote Breakdown** — Live calculation displaying base fee, mission modifier, flagship cost, active buffs/gear, subtotal, discount, and total.
-- **Character Spec Card:** Floating right glass card displaying selected unit designation, class badge, stat polygon/bars, active party roster, and guild motto.
+- **Character Spec Card:** Floating right glass card displaying selected unit designation, class badge, stat polygon/bars, active party roster, and guild motto. Source of truth: `src/content/roster.ts` and `src/content/classes.ts` (verbatim from the original).
 - **Mobile Adaptation:** On mobile (`<= 900px`), the loadout panel transitions into an interactive bottom sheet.
 
 ### 2.4 Modal Dialog `[Source HTML: lines 2208–2284]`
 
 - **"Create Your Guild" Modal:** Accessible dialog triggered by the "START YOUR BUILD" CTA.
-- **Form UI:**
-  - Guild (company) input (`#co`, autocomplete `organization`, max 18 chars)
-  - Server start timeline select (`#ko`: "This week", "Within 2 weeks", "This month", "Just exploring")
-  - Mission objective input (`#mi`: "Mission objective, in one line")
-  - Intel file attachment (`#br`, optional file upload)
-  - Submit button: "Enter world"
+- **Form UI:** Source of truth: `src/content/story.ts` (modal copy and form field labels, verbatim from original lines 2208–2284).
 - **Submission Feedback (`#m-done`):** Unlocks celebratory "Patch unlocked" graphic (`canvas#patch2`) and three-step onboarding briefing:
   1. Senior lead reviews brief and confirms the number.
   2. Client receives SOW and secure Stripe link; IP transfers on delivery.
   3. Context™ workspace opens with the build loaded and the mission begins.
      _(Note: Pure client-side prototype; no external API or data transmission occurs)._
+
+---
+
+## 2.5 Generated facts (script output)
+
+Generated by `C:/Users/steve/concepful_scratch/task2_facts.mjs` directly from `reference/Concepful_Mech_Builder.html` and `src/content/*.ts`:
+
+```text
+=== Original section elements (grep -n "<section") ===
+1903:<section class="step" id="st-mode">
+1911:<section class="step" id="st-pick">
+1923:<section class="step" id="st-ship">
+1934:<section class="step" id="st-buffs">
+1944:<section class="step" id="st-load">
+1966:<section class="card glass" id="card" aria-label="Character sheet">
+1994:<section class="st" data-scene="intro" id="s-intro">
+2018:<section class="st tall" data-scene="classes" id="s-classes">
+2058:<section class="hz-sec" data-scene="logi" id="s-logi">
+2103:<section class="st" data-scene="rules" id="s-rules">
+2135:<section class="st tall" data-scene="stages" id="s-stages">
+2172:<section class="st" data-scene="outro" id="s-outro">
+2188:<section
+
+=== Original story section IDs (grep -n "id=\"s-") ===
+1994:<section class="st" data-scene="intro" id="s-intro">
+2018:<section class="st tall" data-scene="classes" id="s-classes">
+2058:<section class="hz-sec" data-scene="logi" id="s-logi">
+2103:<section class="st" data-scene="rules" id="s-rules">
+2135:<section class="st tall" data-scene="stages" id="s-stages">
+2172:<section class="st" data-scene="outro" id="s-outro">
+
+=== Original Plans section element (grep -n "s-stages") ===
+1870:><a href="#s-stages">Plans</a
+2135:<section class="st tall" data-scene="stages" id="s-stages">
+2183:><a class="ghost" href="#s-stages">Compare plans</a>
+
+=== Original navigation markup (grep -n "<nav" and lines) ===
+1868:      <nav class="navl glass" aria-label="Sections">
+1869:        <a href="#s-classes">Classes</a><a href="#s-logi">How it works</a
+1870:        ><a href="#s-stages">Plans</a
+1871:        ><a class="fu" href="#build">Start your build</a>
+1872:      </nav>
+
+=== Content module item counts ===
+TIERS: 3 (keys: solo, squad, combine)
+QUESTS: 9
+GEAR: 3
+OBJECTIVES: 4
+BUFFS: 7
+CLASSES: 4
+UNITS: 19 (keys: pos, gtm, dir, naming, research, brand, uiux, decks, copy, illus, web, motion, 3d, fab, hw, pm, ws, cmd, intel)
+
+=== Navigation items (src/content/story.ts) ===
+BRAND: label="Concepful", href="#intro"
+NAV_LINKS:
+  1. label="Classes", href="#classes"
+  2. label="How it works", href="#how-it-works"
+  3. label="Plans", href="#plans"
+NAV_CTA: label="Start your build", href="#build"
+```
 
 ---
 
