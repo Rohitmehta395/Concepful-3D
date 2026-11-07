@@ -268,15 +268,23 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
     Classes beats show `cursor: pointer` and a focus-visible style but are not interactive in the static build; the original makes them `role="button"` and `tabIndex = 0` by script (reference lines 15092–15121). Decide at Phase 4/6 (wire the behavior or remove the pointer cursor).
 11. **Mission Log Slide Opacity & List Semantics:**
     Slides carry the `.beat` class, rendering at `opacity: 0.5` until `.on` is applied by script (same as the original prototype; contrast measured for beats applies). Slide markup consists of `div/i/b/small` without semantic list elements (candidate enhancement: ordered list `<ol>/<li>`, "added by the rewrite", Phase 8).
-12. **Mission Log Mobile Description Visibility:**
+12. **Plans and Outro CTA and Beat Contrast Measurements:**
+    - Primary CTA (`.fu` on Plans 'Build yours' and Outro 'Choose your plan'): `#ffffff` on `#ee004e` (`--red`) measures at **4.43:1** (target: 4.5:1 for normal text, passes WCAG Large AA >= 3.0:1; matches prototype).
+    - Outro Secondary Ghost CTA (`.ghost` 'Compare plans'): `#ffffff` on composited dark glass background (`rgb(20, 22, 39)`) measures at **17.89:1** (passes WCAG AAA).
+    - Plans Beat Title ('Solo founders'): `#ffffff` on composited dark glass background (`rgb(20, 22, 39)`) measures at **17.89:1** (passes WCAG AAA).
+    - Plans Beat Tier Chip ('Mission'): `#ff7fa6` on composited dark glass background (`rgb(20, 22, 39)`) measures at **7.53:1** (passes WCAG AA).
+    - Plans Beat Description ('From zero to...'): `#afb1cb` on composited dark glass background (`rgb(20, 22, 39)`) measures at **8.50:1** (passes WCAG AA).
+13. **Plans Tier Chip Arrow Glyph Font Fallback:**
+    U+2192 in Plans tier chips renders from a system fallback on the rebuild; original used Google-hosted JetBrains Mono; decision pending.
+14. **Mission Log Mobile Description Visibility:**
     At `<=900px`, step descriptions (`.slide small`) and the section paragraph (`.hz-head p`) are `display: none` unless `.on` is set by script; without JS they are invisible (same in the original prototype). Decide at Phase 4/8.
-13. **Plans & Outro Primary CTA Contrast (`.fu` on Red):**
+15. **Plans & Outro Primary CTA Contrast (`.fu` on Red):**
     Measured luminance on white `#fff` text (`L = 1.000`) over red `#ee004e` button (`L = 0.187`) yields **4.43:1**, passing WCAG Large Text AA (>= 3.0:1) and falling just below 4.5:1 normal text threshold. Identical to original prototype.
-14. **Plans Stage Beat Typography Contrast:**
+16. **Plans Stage Beat Typography Contrast:**
     - Beat Titles (`b`): white text on card glass yields **17.89:1** (passes WCAG AAA).
     - Beat Tiers (`em`): `var(--pro)` (`rgb(255, 127, 166)`, $L = 0.392$) on card glass yields **7.53:1** (passes WCAG AAA).
     - Beat Descriptions (`small`): `var(--muted)` (`rgb(175, 177, 203)`, $L = 0.449$) on card glass yields **8.50:1** (passes WCAG AAA).
-15. **Outro Secondary Ghost CTA Contrast:**
+17. **Outro Secondary Ghost CTA Contrast:**
     Measured white `#fff` text over card glass background yields **17.89:1** (passes WCAG AAA). Border (`var(--line2)`) provides boundary definition over glass.
 
 ---

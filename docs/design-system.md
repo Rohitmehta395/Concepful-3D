@@ -101,6 +101,9 @@ In Next.js, these are integrated via `next/font/google` in [`src/app/layout.tsx`
 | **Inter**          | `Inter`            | `latin`, weights `400, 500, 600, 700, 800` | `--font-inter`          | `--body`, `--font-body`, `--font-sans` | `system-ui, -apple-system, sans-serif` |
 | **JetBrains Mono** | `JetBrains_Mono`   | `latin`, weights `500, 700`                | `--font-jetbrains-mono` | `--mono`, `--font-mono`                | `ui-monospace, Menlo, monospace`       |
 
+> [!NOTE]
+> U+2192 in Plans tier chips renders from a system fallback on the rebuild; original used Google-hosted JetBrains Mono; decision pending.
+
 In `:root`, the font stacks reference the `next/font` CSS variables prepended to authoritative source fallbacks (lines 68–70):
 
 ```css
