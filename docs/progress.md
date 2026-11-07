@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                             Status                              |                                                           Approval Date                                                           |
-| :----------: | :------------------------------------ | :----: | :-------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
-| **Phase 3**  | **Static Page Shell**                 | 6 / 8  | **Part 3.1–3.6 approved; Part 3.7 in progress** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                             Pending                             |                                                                 —                                                                 |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                             Pending                             |                                                                 —                                                                 |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                             Pending                             |                                                                 —                                                                 |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                             Pending                             |                                                                 —                                                                 |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                             Pending                             |                                                                 —                                                                 |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                             Pending                             |                                                                 —                                                                 |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                             Pending                             |                                                                 —                                                                 |
+|    Phase     | Title                                 | Parts  |                   Status                    |                                                                                          Approval Date                                                                                          |
+| :----------: | :------------------------------------ | :----: | :-----------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                **Approved**                 |                                                                                          Oct 30, 2026                                                                                           |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                **Approved**                 |                                                                                          Oct 30, 2026                                                                                           |
+| **Phase 3**  | **Static Page Shell**                 | 7 / 8  | **Part 3.1–3.7 approved; Part 3.8 pending** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026; Part 3.7 Approved Nov 8, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                   Pending                   |                                                                                                —                                                                                                |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                   Pending                   |                                                                                                —                                                                                                |
 
 ---
 
@@ -226,6 +226,31 @@ This document records the verification history, approved milestones, and live st
   - No-JS: All text and cards 100% visible and accessible without JavaScript; innerText matches prototype identically.
   - Semantics: 1 H1, 5 H2s (0 skipped levels); 0 duplicate IDs; tab order strictly sequential across all 11 focusable links.
   - Client JS Bundle: Exactly 0 bytes added (raw diff: 0, gzip diff: 0).
+  - Quality Gates: All lint, typecheck, format, test (4,108 tests), and build checks pass cleanly.
+
+### Part 3.7: Static Ending — Build Skeleton & Watermark Footer (`#build`, `.wmark`)
+
+- **Status:** **APPROVED**
+- **Deliverables:**
+  - `src/components/story/Build.tsx`: Static server component for `#build` (`.app-sec`, lines 2189–2194), rendering empty 100vh landing skeleton with `data-scene="app"` and `aria-label="Build your department"`.
+  - `src/components/shell/Footer.tsx`: Static server component for `.wmark` watermark footer (lines 2196–2206), rendering disclaimer copy and embedded base64 brand mark.
+  - `src/styles/build.css`: Dedicated stylesheet declaring `.app-sec { height: 100vh; }` (lines 395–397).
+  - `src/styles/footer.css`: Dedicated stylesheet porting lines 1741–1786 (fixed positioning, typography, responsive mobile query hiding text at `<=900px`).
+  - `src/app/page.tsx`: Mounted `<Build />` inside `<main>` as the 7th and concluding section.
+  - `src/app/layout.tsx`: Mounted `<Footer />` as the global shell footer directly following `<main>`.
+  - `src/app/globals.css`: Imported `build.css` and `footer.css`.
+  - `docs/scene-hooks.md`: Added Section 10 documenting `#build` and `.wmark` scene hooks, attributes, and classification.
+- **Verification:**
+  - Geometry: Page scrollHeight matches reference exactly at 11,700px at 1280x900 ($13 \times 900\text{px}$). `#build` offsetTop is 10,800px, offsetHeight 900px on both pages.
+  - Computed Styles: 100% match across all 9 standard viewports (1920 to 390) for `.app-sec`, `.wmark`, `.wmark span`, and `.wmark img`.
+  - Parity (Footer): 0 diff pixels at 390px and 768px (exact match); 4 diff pixels at 1280px and 1920px (0.0368%, maxDelta 3).
+  - Parity (Classes Mobile Re-check): With `.wmark` now present in rebuild, the Classes mobile diff dropped from 1,096px down to **24px** at 390px and **25px** at 768px, fulfilling the $\le 100\text{px}$ target and confirming the overlay probe findings.
+  - Parity (Existing Sections): Hero card (47–48px mobile, matching baseline), Outro card (25–41px, matching baseline), and Plans card (381–425px, matching baseline) verified with 0 regressions.
+  - No-JS: `#build` and `.wmark` visible and styled without JavaScript; text matches reference byte-for-byte.
+  - Fonts: 100% JetBrains Mono (110 glyphs), 0 fallback fonts used on `.wmark`.
+  - Semantics & Landmarks: Accessible region landmark on `#build`, contentinfo role on `.wmark`, 0 duplicate IDs.
+  - Bundle Size: Exactly 0 bytes added to client JavaScript bundle (`isServerOnly: true`).
+  - Contrast: Analytical 3.85:1 desktop (`opacity: 0.6` on dark background); text hidden at `<=900px`.
   - Quality Gates: All lint, typecheck, format, test (4,108 tests), and build checks pass cleanly.
 
 ---

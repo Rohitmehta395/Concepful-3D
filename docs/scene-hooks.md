@@ -168,3 +168,33 @@ All elements within `s-intro` are purely static server markup with the exception
 - **Card Sizing (`.sc`):**
   - **Desktop (>900px):** `max-width: 460px; padding: 22px;`.
   - **Mobile (<=900px):** `max-width: none; padding: 16px;`.
+
+---
+
+## 10. Build Section Skeleton (`#build`) & Watermark Footer (`.wmark`) Scene Hooks
+
+### Build Section (`#build`)
+
+| Attribute / Selector | Element in Build                       | Reference Line | JS Reader / Handler | Line in Script         | Effect on 3D Scene / Engine                                                                                                                                                                                                                                  |
+| :------------------- | :------------------------------------- | :------------- | :------------------ | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-scene="app"`   | `<section class="app-sec" id="build">` | 2190           | `storyScan()`       | 11954–11974            | Queried via `document.querySelectorAll("[data-scene]")`. When scrolled into view, sets `mode = "app"`, toggling `document.body.classList.toggle("app", mode === "app")`. Transitions camera and UI from passive story mode to interactive configurator mode. |
+| `id="build"`         | `<section class="app-sec" id="build">` | 2191           | DOM Anchor Target   | 1871, 2006, 2167, 2182 | Global destination anchor for all "Start your build" / "Build yours" / "Choose your plan" CTAs in Header, Character Card, Plans, and Outro.                                                                                                                  |
+| `aria-label="..."`   | `<section ... aria-label="Build ...">` | 2192           | Accessibility Tree  | —                      | Accessible landmark naming: `"Build your department"`.                                                                                                                                                                                                       |
+
+### Watermark Footer (`.wmark`)
+
+| Attribute / Selector | Element in Footer                        | Reference Line | JS Reader / Handler | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                           |
+| :------------------- | :--------------------------------------- | :------------- | :------------------ | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `class="wmark"`      | `<footer class="wmark">`                 | 2196           | CSS Cascade         | 1741–1786      | Fixed watermark banner at viewport bottom right (`z-index: 5; pointer-events: none`). In `body.app`, opacity shifts from `0.6` to `0.45` on desktop, and hides (`display: none`) on mobile `<=900px`. |
+| `<span>`             | `<footer class="wmark"><span>...</span>` | 2197–2200      | CSS Media Query     | 1773–1775      | Copyright & disclaimer text. Hidden via `display: none` at `<=900px`.                                                                                                                                 |
+| `<img>`              | `<footer class="wmark"><img ...>`        | 2201–2205      | CSS Media Query     | 1780–1783      | Base64 PNG mark (28x28px desktop with 7px border-radius, scaled to 20x20px with 5px border-radius on mobile `<=900px`).                                                                               |
+
+### Element Classification Table (Static vs. Configurator vs. Modal)
+
+| Element / Selector               | Prototype Range (Lines) | Classification                     | Implementation Target                        |
+| :------------------------------- | :---------------------- | :--------------------------------- | :------------------------------------------- |
+| `<section class="app-sec">`      | 2189–2194               | **Static Skeleton**                | Part 3.7 (`src/components/story/Build.tsx`)  |
+| `<footer class="wmark">`         | 2196–2206               | **Static Shell Footer**            | Part 3.7 (`src/components/shell/Footer.tsx`) |
+| `#gl`, `#cv` (Canvases)          | 1803–1806               | **Phase 4 Scene Engine**           | Phase 4 (`src/components/scene/`)            |
+| `#card` (Configurator Card)      | 1966–2014               | **Phase 6 Configurator Wireframe** | Phase 6 (`src/components/configurator/`)     |
+| `<div class="modal" id="modal">` | 2209–2283               | **Part 3.8 Static Modal Shell**    | Part 3.8 (`src/components/shell/Modal.tsx`)  |

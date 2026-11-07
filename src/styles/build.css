@@ -1,0 +1,9 @@
+/* ==========================================================================
+   Build Section (Configurator Landing) Styles
+   Source: reference/Concepful_Mech_Builder.html (lines 395-397)
+   ========================================================================== */
+
+/* Lines 395-397: Viewport landing section for interactive mech builder */
+.app-sec {
+  height: 100vh;
+}

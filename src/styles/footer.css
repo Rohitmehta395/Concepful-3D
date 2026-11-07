@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Watermark Footer Styles
+   Source: reference/Concepful_Mech_Builder.html (lines 1741-1786)
+   ========================================================================== */
+
+/* Lines 1741-1758: Fixed watermark container */
+.wmark {
+  position: fixed;
+  z-index: 5;
+  right: calc(var(--gr) + 2px);
+  bottom: calc(10px + var(--sb));
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  pointer-events: none;
+  opacity: 0.6;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  line-height: 1.45;
+  color: var(--muted);
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* Lines 1759-1765: Watermark brand logo mark */
+.wmark img {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 7px;
+  display: block;
+}
+
+/* Lines 1766-1768: Watermark opacity in interactive configurator mode */
+body.app .wmark {
+  opacity: 0.45;
+}
+
+/* Lines 1772-1786: Mobile responsiveness (<=900px) */
+@media (max-width: 900px) {
+  /* Lines 1773-1775: Hide disclaimer copy on mobile */
+  .wmark span {
+    display: none;
+  }
+
+  /* Lines 1776-1779: Mobile position & opacity */
+  .wmark {
+    opacity: 0.4;
+    bottom: calc(8px + var(--sb));
+  }
+
+  /* Lines 1780-1784: Mobile image sizing */
+  .wmark img {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+
+  /* Lines 1785-1787: Hide watermark entirely when configurator mode active on mobile */
+  body.app .wmark {
+    display: none;
+  }
+}

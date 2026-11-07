@@ -1,3 +1,4 @@
+import { Build } from "@/components/story/Build";
 import { Classes } from "@/components/story/Classes";
 import { Hero } from "@/components/story/Hero";
 import { Logistics } from "@/components/story/Logistics";
@@ -14,6 +15,7 @@ export default function Home() {
       <Rules />
       <Plans />
       <Outro />
+      <Build />
     </main>
   );
 }
