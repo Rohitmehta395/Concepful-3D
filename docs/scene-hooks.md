@@ -18,19 +18,19 @@ This document inventories all DOM attributes, IDs, and classes read or manipulat
 
 All elements within `s-intro` are purely static server markup with the exception of the two CTA anchors:
 
-| Element       | Selectors / Hierarchy | Classification  | Attributes / Targets                 | Interactive Behavior                                                              |
-| :------------ | :-------------------- | :-------------- | :----------------------------------- | :-------------------------------------------------------------------------------- |
-| `<section>`   | `.st#s-intro`         | **Static**      | `data-scene="intro"`, `id="s-intro"` | Scroll tracking anchor for Three.js diorama scene.                                |
-| `<div>`       | `.in`                 | **Static**      | `class="in"`                         | Centered content boundary (`max-width: 1280px`).                                  |
-| `<div>`       | `.sc.hero`            | **Static**      | `class="sc hero"`                    | Glassmorphism card container. Pointer-events re-enabled (`pointer-events: auto`). |
-| `<div>`       | `.eyebrow`            | **Static**      | `class="eyebrow"`                    | Monospace category label. No JS bindings.                                         |
-| `<h1>`        | `h1.big`              | **Static**      | `class="big"`                        | Display title with highlighted `<span>`. No JS bindings.                          |
-| `<p>`         | `.sc p`               | **Static**      | —                                    | Narrative copy text. No JS bindings.                                              |
-| `<div>`       | `.ctas`               | **Static**      | `class="ctas"`                       | Flexbox container for action links.                                               |
-| `<a>`         | `.ctas a.fu`          | **Interactive** | `class="fu"`, `href="#build"`        | Anchor navigating to the configurator/builder section (`#build`).                 |
-| `<a>`         | `.ctas a.ghost`       | **Interactive** | `class="ghost"`, `href="#s-logi"`    | Anchor navigating to the logistics/how-it-works section (`#s-logi`, line 1869).   |
-| `<div>`       | `.hud`                | **Static**      | `class="hud"`                        | 3-column telemetry grid displaying 3 spec items. No JS bindings.                  |
-| `<span>` (x3) | `.hud span`           | **Static**      | —                                    | Telemetry item boxes (`1 lead`, `Fixed`, `Your IP`). No JS bindings.              |
+| Element       | Selectors / Hierarchy | Classification  | Attributes / Targets                 | Interactive Behavior                                                                                         |
+| :------------ | :-------------------- | :-------------- | :----------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| `<section>`   | `.st#s-intro`         | **Static**      | `data-scene="intro"`, `id="s-intro"` | Scroll tracking anchor for Three.js diorama scene.                                                           |
+| `<div>`       | `.in`                 | **Static**      | `class="in"`                         | Centered content boundary (`max-width: 1280px`).                                                             |
+| `<div>`       | `.sc.hero`            | **Static**      | `class="sc hero"`                    | Glassmorphism card container. Pointer-events re-enabled (`pointer-events: auto`).                            |
+| `<div>`       | `.eyebrow`            | **Static**      | `class="eyebrow"`                    | Monospace category label. No JS bindings.                                                                    |
+| `<h1>`        | `h1.big`              | **Static**      | `class="big"`                        | Display title with highlighted `<span>`. No JS bindings.                                                     |
+| `<p>`         | `.sc p`               | **Static**      | —                                    | Narrative copy text. No JS bindings.                                                                         |
+| `<div>`       | `.ctas`               | **Static**      | `class="ctas"`                       | Flexbox container for action links.                                                                          |
+| `<a>`         | `.ctas a.fu`          | **Interactive** | `class="fu"`, `href="#build"`        | Anchor navigating to the configurator/builder section (`#build`).                                            |
+| `<a>`         | `.ctas a.ghost`       | **Interactive** | `class="ghost"`, `href="#s-logi"`    | Anchor navigating to the logistics/how-it-works section (`#s-logi`, line 2007; section starts at line 2058). |
+| `<div>`       | `.hud`                | **Static**      | `class="hud"`                        | 3-column telemetry grid displaying 3 spec items. No JS bindings.                                             |
+| `<span>` (x3) | `.hud span`           | **Static**      | —                                    | Telemetry item boxes (`1 lead`, `Fixed`, `Your IP`). No JS bindings.                                         |
 
 ---
 
@@ -75,7 +75,7 @@ All elements within `s-intro` are purely static server markup with the exception
   - **Desktop (>900px):** `position: sticky; top: calc(92px + var(--st)); max-width: 460px;` (pins card below header while background mecha showcases rotate).
   - **Mobile (<=900px):** `position: sticky; top: auto; bottom: 12px; max-width: none;` (pins card to viewport bottom).
 - **Default State in Static HTML:**
-  - In original static markup (lines 2018–2057), all three `.beat` elements have `class="beat"` (no `.beat.on`). In CSS (lines 527–531), `.beat` has `opacity: 0.5`. Phase 4 will wire scroll-driven active-beat toggling.
+  - In original static markup (lines 2018–2057), all three `.beat` elements have `class="beat"` (no `.beat.on`). In CSS (lines 275–286), `.beat` has `opacity: 0.5`. Phase 4 will wire scroll-driven active-beat toggling.
 
 ---
 

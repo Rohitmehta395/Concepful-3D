@@ -32,7 +32,7 @@
   margin: 0 auto;
 }
 
-/* Lines 165-173, 606-611: Content card glassmorphism */
+/* Lines 165-173: Content card (.sc) */
 .sc {
   max-width: 460px;
   background: var(--glass);

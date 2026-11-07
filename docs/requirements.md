@@ -19,37 +19,51 @@ All functional requirements below are derived directly from the source HTML prot
 
 ### 2.1 Navigation & Global Shell `[Source HTML: lines 613–660, 1808–1830]`
 
-- **Fixed Top Header:** Contains brand logo SVG, anchor navigation links (`#classes`, `#rules`, `#log`, `#plans`), live pricing badge reflecting current configuration, and a primary CTA ("START") opening the guild modal.
-- **Header Responsiveness:** On mobile viewports (`<= 900px`), navigation gracefully compresses/wraps.
-- **Watermark:** Fixed bottom-right watermark badge with sound/environment status and branding.
+- **Fixed Top Header:** Contains brand logo SVG, anchor navigation links (`#classes`, `#how-it-works` [original `#s-logi`], `#rules` [original `#s-rules`], `#plans` [original `#s-plans`]), live pricing badge reflecting current configuration (`#chip`), and primary CTA link ("START YOUR BUILD", `#build`, lines 1870, 2006).
+- **Header Responsiveness:** On mobile viewports (`<= 900px`), navigation links `.navl a:not(.fu)` are hidden via media query, while logo, live pricing badge, and primary CTA remain visible.
+- **Watermark:** Fixed bottom-right watermark badge (`.wmark`, lines 1741–1785, 2196–2206) with SVG/PNG icon, sound/environment status indicator, and branding ("BUILT WITH CONCEPFUL").
 
 ### 2.2 Scroll-Driven Narrative `[Source HTML: lines 146–160, 1993–2180]`
 
 - **Story Chapters:** Six continuous story sections scrolling over the full-bleed canvas scene:
-  1. Hero / Intro ("Your creative department, on demand")
-  2. Classes ("Choose your class" · "One goal: to provide a different perspective.")
-  3. Rules of Engagement ("How we raid together")
-  4. Mission Log (Sticky horizontal telemetry track)
-  5. Plans & Pricing ("Pick your hull size")
-  6. Outro / Call-to-Action ("Launch your build")
+  1. Hero / Intro (`#s-intro` / `#hero`): "Creative Department-as-a-Service" · "Your creative department, on demand."
+  2. Classes (`#s-classes` / `#classes`): "Choose your class" · "One goal: to provide a different perspective."
+  3. Mission Log / Logistics (`#s-logi` / `#how-it-works`): "Mission log" · "How it actually works." (horizontal telemetry track)
+  4. Server Rules (`#s-rules` / `#rules`): "Server rules" · "How we raid together."
+  5. Plans & Pricing (`#s-plans` / `#plans`): "Hull sizes" · "Three ways to deploy."
+  6. Outro (`#s-outro` / `#outro`): "Ready to deploy?" · "Enter the server."
 - **Scene Coordination:** Canvas camera angle, background environment (Sea, Sky, Space), and active mecha assets adapt dynamically as narrative sections scroll into view.
 
 ### 2.3 Pricing Configurator & Character Card `[Source HTML: lines 715–1260, 1832–1990]`
 
 - **Step-by-Step Configurator HUD:** Floating left glass panel allowing user customization:
-  - **Step 1: Tier Selection** — Mission (solo), Full Crew (squad), Full Force (combine).
-  - **Step 2: Mission Type** — Web & Digital, Brand & Identity, 3D & Spatial, Full Department.
-  - **Step 3: Flagship & Buffs** — Submarine, Sky Cruiser, Star Carrier; add-on buffs (e.g., Rush Delivery, Dedicated PM, 24/7 Coverage).
-  - **Billing Toggle** — Monthly vs. Annual (with automatic 15% discount calculation).
-  - **Itemized Quote Breakdown** — Live calculation displaying base fee, mission modifier, flagship cost, active buffs, subtotal, discount, and total.
+  - **Step 1: Tier Selection (`TIERS`)** — Mission (`solo`, $4,200/mo), Full crew (`squad`, $8,900/mo), Full force (`combine`, $16,500/mo).
+  - **Step 2: Objectives & Quests** —
+    - Solo quests (`QUESTS`): Brand identity, Pitch deck, Landing page, Motion piece, Product MVP, Full overhaul.
+    - Squad / Combine objectives (`OBJECTIVES`): Launch something, Scale up production, Shift perception, Keep shipping.
+  - **Step 3: Flagships, Gear & Buffs** —
+    - Flagship vessel tiers (`CLASSES`): Sub vessel (ABYSS-01 / Sea), Sky cruiser (NIMBUS-07 / Sky), Star carrier (ORBITAL-99 / Space).
+    - Solo optional gear (`GEAR`): Custom skin (+$600), Afterburner (+$900), Overdrive (+$1,400).
+    - Squad / Combine buffs (`BUFFS`): 3D visualization, Campaign assets, Frontend build, Sound design, Motion system.
+  - **Billing Toggle** — Monthly vs. Annual (annual plan offers 12 months for the price of 10 months, providing a 2-month discount).
+  - **Itemized Quote Breakdown** — Live calculation displaying base fee, mission modifier, flagship cost, active buffs/gear, subtotal, discount, and total.
 - **Character Spec Card:** Floating right glass card displaying selected unit designation, class badge, stat polygon/bars, active party roster, and guild motto.
 - **Mobile Adaptation:** On mobile (`<= 900px`), the loadout panel transitions into an interactive bottom sheet.
 
-### 2.4 Modal Dialog `[Source HTML: lines 1337–1440, 2250–2320]`
+### 2.4 Modal Dialog `[Source HTML: lines 2208–2284]`
 
-- **"Create Your Guild" Modal:** Accessible dialog triggered by the "START" CTA.
-- **Form UI:** Input fields for guild name, mission parameters, and contact handle.
-- **Submission Feedback:** Unlocks celebratory "Patch Unlocked" graphic and simulated confirmation. _(Note: Pure client-side prototype; no external API or data transmission occurs)._
+- **"Create Your Guild" Modal:** Accessible dialog triggered by the "START YOUR BUILD" CTA.
+- **Form UI:**
+  - Guild (company) input (`#co`, autocomplete `organization`, max 18 chars)
+  - Server start timeline select (`#ko`: "This week", "Within 2 weeks", "This month", "Just exploring")
+  - Mission objective input (`#mi`: "Mission objective, in one line")
+  - Intel file attachment (`#br`, optional file upload)
+  - Submit button: "Enter world"
+- **Submission Feedback (`#m-done`):** Unlocks celebratory "Patch unlocked" graphic (`canvas#patch2`) and three-step onboarding briefing:
+  1. Senior lead reviews brief and confirms the number.
+  2. Client receives SOW and secure Stripe link; IP transfers on delivery.
+  3. Context™ workspace opens with the build loaded and the mission begins.
+     _(Note: Pure client-side prototype; no external API or data transmission occurs)._
 
 ---
 
