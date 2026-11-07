@@ -16,3 +16,5 @@ export * from "./callouts";
 export * from "./story";
 export * from "./a11y";
 export * from "./sections";
+export * from "./assets";
+export * from "./modal";

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Russo_One } from "next/font/google";
 import { Footer } from "@/components/shell/Footer";
+import { GuildModal } from "@/components/shell/GuildModal";
 import { Header } from "@/components/shell/Header";
 import { SkipLink } from "@/components/shell/SkipLink";
 import { STORY_SECTIONS } from "@/content";
@@ -67,6 +68,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <GuildModal />
       </body>
     </html>
   );

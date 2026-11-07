@@ -1,0 +1,165 @@
+/* ==========================================================================
+   Guild Modal Styles
+   Source: reference/Concepful_Mech_Builder.html (lines 1337-1446, 1582-1587, 1649-1655)
+   ========================================================================== */
+
+/* Lines 1337-1346: Fixed backdrop container */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 5, 10, 0.5);
+  padding: calc(16px + var(--st)) var(--gr) calc(16px + var(--sb)) var(--gl);
+}
+
+/* Lines 1347-1353: Modal dialog card container */
+.mcard {
+  width: min(460px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  border-radius: 18px;
+  position: relative;
+}
+
+/* Lines 1354-1361: Modal card header bar */
+.mcard .hd {
+  background: var(--red);
+  font-family: var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 9px 16px;
+}
+
+/* Lines 1362-1364: Modal card body container */
+.mcard .bd {
+  padding: 18px;
+}
+
+/* Lines 1365-1371: Modal title heading */
+.mcard h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 24px;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+/* Lines 1372-1376: Modal introductory narrative paragraph */
+.mcard p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0 14px;
+}
+
+/* Lines 1377-1387: Modal close button */
+.x {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+/* Lines 1388-1392: Form grid */
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Lines 1393-1398: Form field container */
+.fld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Lines 1399-1401: Full-width form field */
+.fld.full {
+  grid-column: 1 / -1;
+}
+
+/* Lines 1402-1408: Form field label */
+.fld label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Lines 1409-1417: Form inputs and select dropdowns */
+.fld input,
+.fld select {
+  background: var(--glass2);
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Lines 1418-1422: Form focus ring */
+.fld input:focus,
+.fld select:focus {
+  border-color: var(--pro);
+  outline: none;
+}
+
+/* Lines 1423-1427: File input custom styling */
+.fld input[type="file"] {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Lines 1428-1434: Full-width primary submit CTA */
+.form .fu {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding: 13px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* Lines 1435-1443: Success state ordered list */
+.done ol {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Lines 1444-1446: Success state list bold prefixes */
+.done ol b {
+  color: var(--fg);
+}
+
+/* Lines 1582-1587: Success state unlocked patch canvas */
+#patch2 {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: 4px auto 10px;
+}
+
+/* Lines 1649-1655: Success state badge label */
+.done .unl {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pro);
+}

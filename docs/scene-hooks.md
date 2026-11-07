@@ -305,3 +305,85 @@ div.boxart#boxart (lines 1980-1991)
 | `div#party`            | 1975            | **Script-Driven**                  | 14867                        | Injected with interactive party roster member chips.                                          |
 | `q#motto`              | 1976            | **Script-Driven**                  | 14882                        | Injected with tier/role motto quotation text.                                                 |
 | `div#boxart`           | 1980–1991       | **Static Container / Script Rect** | 2733                         | Hero title art banner; bounding rect measured during layout.                                  |
+
+---
+
+## 12. Part 3.8: Static Guild Modal Hooks (`#modal`)
+
+Source: `reference/Concepful_Mech_Builder.html` (lines 2208–2283).
+
+### Modal Element Hierarchy
+
+```
+div.modal#modal[hidden] (lines 2208-2283)
+└── div.mcard.glass[role="dialog"][aria-modal="true"][aria-labelledby="m-h"] (lines 2209-2282)
+    ├── div.hd (line 2215: "Create your guild")
+    ├── button.x#mx[type="button"][aria-label="Close"] (line 2216: "×")
+    └── div.bd (lines 2217-2281)
+        ├── div#m-form (lines 2218-2259)
+        │   ├── h3#m-h (line 2219: "Your build is ready.")
+        │   ├── p (lines 2220-2223)
+        │   └── form.form#pilot (lines 2224-2258)
+        │       ├── div.fld
+        │       │   ├── label[for="co"] ("Guild (company)")
+        │       │   └── input#co[type="text"][maxlength="18"][placeholder="Harbor & Vane"][autocomplete="organization"]
+        │       ├── div.fld
+        │       │   ├── label[for="ko"] ("Server start")
+        │       │   └── select#ko
+        │       │       ├── option ("This week")
+        │       │       ├── option[selected] ("Within 2 weeks")
+        │       │       ├── option ("This month")
+        │       │       └── option ("Just exploring")
+        │       ├── div.fld.full
+        │       │   ├── label[for="mi"] ("Mission objective, in one line")
+        │       │   └── input#mi[type="text"][placeholder="Rebrand ahead of our Series A launch"]
+        │       ├── div.fld.full
+        │       │   ├── label[for="br"] ("Attach intel: brief or materials (optional)")
+        │       │   └── input#br[type="file"][multiple]
+        │       └── button.fu[type="submit"] ("Enter world")
+        └── div.done#m-done[hidden] (lines 2260-2280)
+            ├── canvas#patch2[aria-hidden="true"]
+            ├── div.unl ("Patch unlocked")
+            ├── h3#d-h[style="text-align: center; margin-top: 6px"] ("Welcome to the server")
+            └── ol (lines 2266-2279)
+                ├── li ("First, a senior lead...")
+                ├── li ("You get the SOW...")
+                └── li ("Your Context™ workspace opens...")
+```
+
+### Element Classification Table
+
+| Element / Selector         | Prototype Lines | Classification             | Accessibility & State Lifecycle                                                                     | Wired In  |
+| :------------------------- | :-------------- | :------------------------- | :-------------------------------------------------------------------------------------------------- | :-------- |
+| `div.modal#modal`          | 2208–2283       | **Static Shell (Hidden)**  | Initial `hidden` boolean attribute; backdrop overlay (`rgba(5, 5, 10, 0.5)`).                       | Phase 6   |
+| `div.mcard.glass`          | 2209–2214       | **Static Dialog Card**     | `role="dialog"`, `aria-modal="true"`, `aria-labelledby="m-h"`. Max width `min(460px, 100%)`.        | Part 3.8  |
+| `div.hd`                   | 2215            | **Static Header**          | Category bar with `var(--red)` background and `var(--display)` font.                                | Part 3.8  |
+| `button.x#mx`              | 2216            | **Static Button**          | Close button with `aria-label="Close"`; click calls `closeModal()`.                                 | Phase 6   |
+| `div.bd`                   | 2217            | **Static Body**            | Inner padding container (`18px`).                                                                   | Part 3.8  |
+| `div#m-form`               | 2218–2259       | **Static Form Wrapper**    | Visible while modal open; hidden when submission succeeds (`$("m-form").hidden = true`).            | Phase 6   |
+| `h3#m-h`                   | 2219            | **Static Heading**         | Dialog accessible name target (`aria-labelledby="m-h"`).                                            | Part 3.8  |
+| `p`                        | 2220–2223       | **Static Paragraph**       | Explanatory copy (`var(--muted)` font).                                                             | Part 3.8  |
+| `form.form#pilot`          | 2224–2258       | **Static Form**            | 2-column CSS grid; submit intercepted by script (`e.preventDefault()`).                             | Phase 6   |
+| `input#co`                 | 2227–2233       | **Static Input / State**   | Focused on modal open (`$("co").focus()`); input event updates `company` state.                     | Phase 6   |
+| `select#ko`                | 2237–2242       | **Static Select**          | 4 scheduling options; "Within 2 weeks" default selected.                                            | Part 3.8  |
+| `input#mi`                 | 2246–2250       | **Static Input**           | Single-line mission brief text input.                                                               | Part 3.8  |
+| `input#br`                 | 2253–2256       | **Static File Input**      | Multiple file upload input (optional intel).                                                        | Part 3.8  |
+| `button.fu[type="submit"]` | 2257            | **Static Submit Button**   | Full-width primary CTA ("Enter world").                                                             | Part 3.8  |
+| `div.done#m-done`          | 2260–2280       | **Static Success State**   | Initial `hidden` boolean attribute; unhidden upon form submit.                                      | Phase 6   |
+| `canvas#patch2`            | 2261            | **Script-Driven Canvas**   | Procedural 2D patch canvas animated by `drawPatch($("patch2"), t)` while modal visible.             | Phase 6/7 |
+| `div.unl`                  | 2262            | **Static Monospace Label** | "Patch unlocked" uppercase badge.                                                                   | Part 3.8  |
+| `h3#d-h`                   | 2263–2265       | **Script-Driven Heading**  | Displays personalized welcome message: `"Welcome to the server" + (company ? ", " + company : "")`. | Phase 6   |
+| `ol`                       | 2266–2279       | **Static Ordered List**    | 3-step onboarding pipeline steps.                                                                   | Part 3.8  |
+
+### Script Readers & Event Listeners
+
+| Function / Handler      | Script Lines | Trigger / Behavior                                                                                                                               |
+| :---------------------- | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `openModal()`           | 15047–15050  | Sets `$("modal").hidden = false;`, focuses first input `$("co").focus()`. Triggered after form-up CTA delay (1900ms or 0ms with reduced motion). |
+| `closeModal()`          | 15051–15053  | Sets `$("modal").hidden = true;`.                                                                                                                |
+| `#mx` click             | 15054        | Click on close button calls `closeModal()`.                                                                                                      |
+| `#modal` backdrop click | 15055–15057  | Click directly on `#modal` backdrop (outside `.mcard`) calls `closeModal()`.                                                                     |
+| `Escape` keydown        | 15058–15060  | Pressing `Escape` when modal is open calls `closeModal()`.                                                                                       |
+| `#co` input             | 15075–15078  | Input on company field updates `company = e.target.value.trim(); repaint();`.                                                                    |
+| `#pilot` submit         | 15079–15087  | Intercepts submit, hides `#m-form`, unhides `#m-done`, updates `#d-h` greeting with company name, logs system audio callout.                     |
+| `drawPatch` render loop | 7376, 7380   | If `!$("modal").hidden`, runs `drawPatch($("patch2"), t)` each frame.                                                                            |

@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                   Status                    |                                                                                          Approval Date                                                                                          |
-| :----------: | :------------------------------------ | :----: | :-----------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                **Approved**                 |                                                                                          Oct 30, 2026                                                                                           |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                **Approved**                 |                                                                                          Oct 30, 2026                                                                                           |
-| **Phase 3**  | **Static Page Shell**                 | 7 / 8  | **Part 3.1–3.7 approved; Part 3.8 pending** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026; Part 3.7 Approved Nov 8, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                   Pending                   |                                                                                                —                                                                                                |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                   Pending                   |                                                                                                —                                                                                                |
+|    Phase     | Title                                 | Parts  |             Status              |                                                                                                         Approval Date                                                                                                          |
+| :----------: | :------------------------------------ | :----: | :-----------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
+| **Phase 3**  | **Static Page Shell**                 | 8 / 8  | **Approved (Phase 3 Complete)** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026; Part 3.7 Approved Nov 8, 2026; Part 3.8 Approved Nov 8, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |             Pending             |                                                                                                               —                                                                                                                |
 
 ---
 
@@ -270,6 +270,23 @@ This document records the verification history, approved milestones, and live st
   - Geometry Parity at 390px: Exact 0.0000px delta on bounding box x, y, width, height, position (fixed), left (352px), right (18px), and bottom (8px).
   - Computed Styles: Reconciled across 9 viewports (390 to 1920). 0 custom or layout differences; exactly 14 universal Tailwind v4 reset property differences (-webkit-font-smoothing, -webkit-locale, -webkit-tap-highlight-color, 8 border-*-style, font-family, tab-size, text-size-adjust).
   - Client JS Bundle: Exactly 0 bytes added to client JS bundle (pure server components).
+
+### Part 3.8: Static Guild Modal Shell
+
+- **Status:** **COMPLETE & VERIFIED**
+- **Deliverables:**
+  - `src/components/shell/GuildModal.tsx` & `src/styles/modal.css`: Static "Create your guild" modal (`<div class="modal" id="modal" hidden>`) with dialog card (`.mcard.glass`), red header (`.hd`), close button (`#mx`), intake form (`#pilot`), and success card skeleton (`#m-done`, hidden) matching reference lines 2208–2283.
+  - `src/content/modal.ts`: Verbatim modal copy matching reference lines 2208–2283.
+  - Mount: Mounted in `src/app/layout.tsx` following original DOM order after `<Footer />`.
+- **Verification Evidence:**
+  - Exact Pixel Diff: 0 differing pixels on full page at 390px, 768px, 1280px, and 1920px (mounting hidden modal alters 0 rendered pixels).
+  - Computed Styles: Compared 19 modal elements across all 9 standard viewports (390 to 1920) when unhidden. 0 layout, box-sizing, display, position, margin, padding, or border-radius differences; exact matching colors and glass backdrop-filter; only universal Tailwind v4 reset property differences (-webkit-font-smoothing, -webkit-locale, -webkit-tap-highlight-color, border-style, tab-size, text-size-adjust). Full report saved outside repo in `verify2_computed_styles.json` (733,722 bytes).
+  - Overflow & Sizing: Verified unhidden `.mcard` dimensions and scrollability. At heights 900px and 600px, `.mcard` does not scroll at any viewport width (`scrollHeight === clientHeight`). Minimum viewport height preventing scroll is 526px at 390px width and 436px at 1280px width.
+  - Form Controls: All 4 inputs, select options ("Within 2 weeks" defaultSelected), file input, submit button, and 3-item ordered list verified matching reference lines 2224–2280.
+  - Focus & Accessibility: Modal completely omitted from accessibility tree while hidden (`hidden: true`, `display: none`). 0 modal elements focusable via keyboard Tab. When unhidden: `role="dialog"`, `aria-modal="true"`, `aria-labelledby="m-h"`, `aria-label="Close"` on `#mx`, `aria-hidden="true"` on `#patch2`. 0 duplicate IDs across all 29 document IDs.
+  - Noise Floor & Fonts: 0 unexpected font fallbacks (Russo One on header/h3/CTA, JetBrains Mono on labels/badge, Inter on body/inputs).
+  - Client Bundle Size: 0 client JS bytes added (pure server component, `modalInClientChunks: false`).
+  - Quality Gates: Pass on `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test` (4,108 tests), and `pnpm build`.
 
 ---
 
