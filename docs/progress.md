@@ -10,7 +10,7 @@ This document records the verification history, approved milestones, and live st
 | :----------: | :------------------------------------ | :----: | :-------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------: |
 | **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
 | **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
-| **Phase 3**  | **Static Page Shell**                 | 6 / 8  | **Part 3.1–3.5 approved; Part 3.6 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026 |
+| **Phase 3**  | **Static Page Shell**                 | 6 / 8  | **Part 3.1–3.6 approved; Part 3.7 in progress** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026 |
 | **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                             Pending                             |                                                                 —                                                                 |
 | **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                             Pending                             |                                                                 —                                                                 |
 | **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                             Pending                             |                                                                 —                                                                 |
@@ -209,16 +209,18 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.6: Static Plans & Outro Sections (`#plans`, `#outro`)
 
-- **Status:** **IMPLEMENTED (Awaiting Review)**
+- **Status:** **APPROVED** (commits `012a93e`, `ed63120`, evidence `184028e`, fix `d6b9c90`)
 - **Deliverables:**
   - `src/components/story/Plans.tsx`: Static server component for `#plans` (`s-stages` in prototype), rendering stage beats with `data-pick` attributes and primary CTA link.
   - `src/components/story/Outro.tsx`: Static server component for `#outro` (`s-outro` in prototype), rendering concluding hero card with primary and secondary CTAs.
-  - `src/styles/plans.css` and `src/styles/outro.css`: Section-specific responsive styles with faithful citations to prototype lines.
+  - `src/styles/plans.css`: Section-specific responsive styles for Plans beats, tags, and actions.
   - `src/content/sections.ts`: Added `outro: "outro"` mapping (line 2172).
   - `src/app/page.tsx`: Rendered all 6 static story sections in order: Hero, Classes, Logistics, Rules, Plans, Outro.
+  - `src/styles/hero.css`: Follow-up `d6b9c90` scoped `.sc.hero` rules to `#intro .sc.hero`, allowing removal of redundant `src/styles/outro.css` while maintaining exact 0px diff against HEAD across all viewports.
 - **Verification:**
   - Geometry: Exact match on offsetTop (Plans: 7740px, Outro: 9900px) and offsetHeight (Plans: 2160px, Outro: 900px) on both pages at 390px and 1280px.
   - Parity: Outro card diff is 25 px at 1280px (0.0128%), 27 px at 1920px (0.0136%), 40 px at 768px (0.0273%), 41 px at 390px (0.0406%). Plans card diff is 381–425 px across all viewports; attribution probe confirmed 375–379 px are localized exclusively to the fallback arrow glyph (`→`) in `<em>Mission → Full Crew</em>`.
+  - Follow-up Scope Fix (`d6b9c90`): Proved exact 0 diff pixels against HEAD across all 4 standard viewports (390, 768, 1280, 1920) across all 7 component targets (hero card, outro card, header, classes card, logistics head/track, rules card, plans card). Outro card vs reference retains identical 25–41 px residual.
   - Controls: Heading font-weight 700 produces 15,337 diff px (7.22%); button background changed produces 14,393 diff px (6.77%), both vastly exceeding noise floors.
   - Sticky: Plans card bounding rect matches to the subpixel across $f \in \{0, 0.5, 1\}$ on both pages (390px and 1280px).
   - No-JS: All text and cards 100% visible and accessible without JavaScript; innerText matches prototype identically.
@@ -228,10 +230,34 @@ This document records the verification history, approved milestones, and live st
 
 ---
 
-## 5. Open Questions & Technical Spikes
+## 5. Open Decisions & Technical Spikes
 
 1. **Turbopack CSS Loader & CSS Modules:**
    `turbopack.rules['*.css']` custom loader makes CSS Modules unusable (ADR 0004); evaluate the standard Tailwind v4 PostCSS integration in a spike before Phase 4, with a visual diff of header and hero.
+
+2. **Plans Tier Chip Arrow Glyph Width Difference (U+2192):**
+   - **Context:** In `reference/Concepful_Mech_Builder.html` line 2148, the Plans section contains `<b>Startups <em>Mission → Full Crew</em></b>`. This is the sole occurrence of `→` (U+2192) in the entire reference file.
+   - **Measurements at 1280px:**
+     - Reference chip `<em>` width: `122.265625px` (rendered with fallback system monospace font in offline/test context).
+     - Rebuild chip `<em>` width: `129.828125px` (rendered with bundled JetBrains Mono webfont).
+     - Width delta: `7.5625px`.
+     - Glyphs at `font-size: 9.5px`, `letter-spacing: 0.08em`:
+       - Consolas: `→` = `5.984375px`, '0'/'M'/' ' = `5.984375px`.
+       - Arial: `→` = `10.265625px`, '0' = `6.046875px`, 'M' = `8.6875px`.
+       - Consolas, Arial, sans-serif: `→` = `5.984375px`.
+       - JetBrains Mono: advance = `6.46875px`; `→` glyph falls back to Consolas at `5.984375px` in Windows Chromium.
+     - The `7.5625px` difference across the chip is the cumulative width difference of the 18 ASCII characters taking JetBrains Mono advance (`6.46875px`) vs Consolas (`5.984375px`), plus letter-spacing.
+   - **Layout Impact:** None. Parent `<b>` is flex (`display: flex; flex-wrap: nowrap; gap: 8px`), `em` is styled `margin-left: auto;`, and `scrollHeight === clientHeight` (`wraps: false`). No line wraps anywhere on the page as a result of the arrow width.
+   - **Decision:** Keep canonical UTF-8 glyph `→` in `src/content/story.ts`.
+
+3. **Body Reset & User-Agent Style Parity:**
+   - Subtree property comparison across 136 elements in Plans and Outro verified that 0 geometric differences exist outside the Plans arrow chip.
+   - Four body-level styling differences between prototype and rebuild were measured:
+     - `-webkit-font-smoothing`: `antialiased` (rebuild, from Tailwind `@theme`/utility) vs `auto` (prototype). Overriding body to `auto` in Windows Chromium DirectWrite yielded exact 0 pixel delta on Hero and Plans cards.
+     - `tab-size`: `4` (rebuild) vs `8` (prototype UA default).
+     - `text-size-adjust`: `100%` (rebuild) vs `auto` (prototype UA default).
+     - `-webkit-tap-highlight-color`: `transparent` (rebuild) vs UA default.
+   - **Decision:** Keep Tailwind v4 standard reset properties; font smoothing produces identical DirectWrite rasterization on Windows Chromium.
 
 ---
 
