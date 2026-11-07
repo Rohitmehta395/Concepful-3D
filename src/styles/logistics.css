@@ -56,8 +56,8 @@
   padding: 16px 18px;
   border-radius: 14px;
   background: var(--glass);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 /* Lines 439-441: Active slide transform override */
