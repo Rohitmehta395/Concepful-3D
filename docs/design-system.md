@@ -281,3 +281,9 @@ The rebuild fixes this with a heading-relative override scoped to `.sc.hero`:
 | ≤900px   | 34px        | none           | n/a ✓         |
 
 The `.sc.hero` override is reset to `max-width: none` inside `@media (max-width: 900px)` to restore mobile behavior. The shared `.sc` rule is **not modified**.
+
+---
+
+## 9. Modular Component Stylesheet Cascade Order (ADR 0004)
+
+Split stylesheets change cascade order relative to the original single stylesheet. Order in `globals.css`: tokens, base, header, story, hero, classes, rules, logistics, (next sections). Ported rules that rely on later-wins ordering must be verified by an exact diff; example: `.hz-head` `max-width` in `logistics.css` overrides the shared `.sc` mobile `max-width`, which needed an explicit `<=900px` rule.

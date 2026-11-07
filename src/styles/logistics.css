@@ -1,0 +1,149 @@
+/**
+ * Logistics / Mission Log Section Component Styles (#s-logi / #how-it-works)
+ *
+ * Source: reference/Concepful_Mech_Builder.html
+ * Lines 398-464 (base layout and slide cards)
+ * Lines 513-538 (@media (max-width: 900px) responsive overrides)
+ * Lines 1769-1771, 1788-1790 (footer safe area padding overrides)
+ */
+
+/* Lines 398-401: Horizontal section runway container */
+.hz-sec {
+  position: relative;
+  height: 420vh;
+}
+
+/* Lines 402-412, 1769-1771: Sticky viewport frame and column layout */
+.hz {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(84px + var(--st)) 0 calc(52px + var(--sb));
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Lines 413-419: Centered section header card */
+.hz-head {
+  max-width: 560px;
+  width: calc(100% - 32px);
+  padding: 18px 22px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Lines 420-422: Track viewport container */
+.hz-view {
+  padding: 6px 0;
+}
+
+/* Lines 423-429: 4-column telemetry grid track */
+.hz-track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Lines 430-438: Step slide card surface */
+.slide {
+  min-width: 0;
+  pointer-events: auto;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Lines 439-441: Active slide transform override */
+.slide.on {
+  transform: none;
+}
+
+/* Lines 442-449: Step index number indicator */
+.slide i {
+  display: block;
+  font-style: normal;
+  font-family: var(--display);
+  font-size: 30px;
+  color: var(--red);
+  line-height: 1;
+}
+
+/* Lines 450-457: Step heading lead-in title */
+.slide b {
+  display: block;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Lines 458-464: Step explanatory description */
+.slide small {
+  display: block !important;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+  margin-top: 6px;
+}
+
+/* ==========================================================================
+   Responsive Overrides (max-width: 900px)
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  /* Lines 1788-1790: Reduced bottom padding on mobile */
+  .hz {
+    padding-bottom: calc(24px + var(--sb));
+  }
+
+  /* Lines 503-506, 513-515: Unconstrained card max-width and reduced padding on mobile/tablet */
+  .hz-head {
+    max-width: none;
+    padding: 14px;
+  }
+
+  /* Lines 516-518: Hide explanatory paragraph on mobile */
+  .hz-head p {
+    display: none;
+  }
+
+  /* Lines 519-522: 2x2 grid track on mobile */
+  .hz-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Lines 523-525: Compact slide padding */
+  .slide {
+    padding: 10px 12px;
+  }
+
+  /* Lines 526-528: Smaller step number on mobile */
+  .slide i {
+    font-size: 18px;
+  }
+
+  /* Lines 529-531: Smaller step heading on mobile */
+  .slide b {
+    font-size: 13px;
+  }
+
+  /* Lines 532-534: Hide description on inactive slides */
+  .slide small {
+    display: none !important;
+  }
+
+  /* Lines 535-538: Reveal description on active slide */
+  .slide.on small {
+    display: block !important;
+    font-size: 11.5px;
+  }
+}

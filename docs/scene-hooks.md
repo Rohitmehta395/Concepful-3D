@@ -94,3 +94,34 @@ All elements within `s-intro` are purely static server markup with the exception
 - **Card Sizing (`.sc`):**
   - **Desktop (>900px):** `max-width: 460px; padding: 22px;`.
   - **Mobile (<=900px):** `max-width: none; padding: 16px;`.
+
+---
+
+## 7. Mission Log / Logistics Section (`s-logi`) Scene Hooks
+
+| Attribute / Selector | Element in Logistics                         | Reference Line | JS Reader / Handler   | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                                                                                             |
+| :------------------- | :------------------------------------------- | :------------- | :-------------------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-scene="logi"`  | `<section class="hz-sec" id="s-logi">`       | 2058           | `storyScan()`         | 11954          | Queried via `document.querySelectorAll("[data-scene]")`. When its vertical midpoint crosses viewport center (`r.top <= mid && r.bottom > mid`), `STORY.key` is set to `"logi"`. Lazily initializes `STB.logi()` (line 11709 / 13934). Triggers `layout()` (line 11983). |
+| `id="s-logi"`        | `<section class="hz-sec" id="s-logi">`       | 2058           | DOM Navigation Anchor | 1869, 2007     | Target for top navigation link `<a href="#s-logi">How it works</a>` (line 1869) and hero CTA `<a class="ghost" href="#s-logi">See how it works</a>` (line 2007). Target in canonical rewrite is `#how-it-works`.                                                        |
+| `data-beats`         | `<div class="hz-track" id="hzt" data-beats>` | 2069           | `storyScan()`         | 11987–11993    | During scroll through the 420vh section runway, reads `p` (progress from 0.0 to 1.0) and calculates active slide index: `idx = Math.min(n - 1, Math.floor(p * n * 1.05))` where `n = 4`. Toggles `c.classList.toggle("on", i === idx)` on the 4 `.slide` elements.      |
+| `#hzt` (`.hz-track`) | `<div class="hz-track" id="hzt">`            | 2069           | CSS Grid Layout       | —              | The track is not translated horizontally by JavaScript. Layout is pure CSS grid: 4 columns on desktop (`repeat(4, minmax(0, 1fr))`, line 425), 2x2 grid on mobile (`repeat(2, minmax(0, 1fr))`, line 520).                                                              |
+| `#clk`, `#clk-l`     | Canvas HUD indicators                        | —              | `storyScan()`         | 11996–12002    | When `key === "logi"`, scroll progress `p` maps to timeline schedule array: `i = Math.min(CLK.length - 1, Math.floor(p * CLK.length))`, updating clock HUD text.                                                                                                        |
+
+### Mission Log Layout & Track Behavior
+
+- **Runway Section (`.hz-sec`):**
+  - `position: relative; height: 420vh;` creates a 4.2x viewport height scrollable runway for scrubbed storytelling.
+- **Sticky Viewport Frame (`.hz`):**
+  - `position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; max-width: 1280px; margin: 0 auto;`.
+  - Desktop padding: `calc(84px + var(--st)) 0 calc(52px + var(--sb));`.
+  - Mobile padding (<=900px): `padding-bottom: calc(24px + var(--sb));`.
+- **Header Card (`.hz-head.sc`):**
+  - Desktop (>900px): `max-width: 560px; width: calc(100% - 32px); padding: 18px 22px; margin: 0 auto; text-align: center;`.
+  - Mobile (<=900px): `max-width: none; padding: 14px;` (paragraph `.hz-head p` hidden via `display: none`).
+- **Telemetry Track (`.hz-track`):**
+  - Desktop (>900px): `display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto;`. All 4 slide cards are fully visible side-by-side; `small` description text is `display: block !important;`.
+  - Mobile (<=900px): `display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;`. Inactive slides have `small { display: none !important; }`, while the active slide (`.slide.on small`) expands to `display: block !important; font-size: 11.5px;`.
+  - No-JS / Accessibility Note: At `<=900px`, step descriptions (`.slide small`) and the section paragraph (`.hz-head p`) are `display: none` unless `.on` is set by script; without JS they are invisible (same in the original). Measured with JS off at 390px: paragraph height 0px (`display: none`), slide 1..4 descriptions height 0px (`display: none`). When `.on` is forced, active slide description becomes `display: block` (height 83.36px on slide 1, 66.69px on slides 2–4). Decide at Phase 4/8.
+- **Track Position Formula:**
+  - Track translation formula: `None`. The track is statically positioned via CSS grid at both desktop and mobile viewports.
+  - Active beat formula: `idx = Math.min(n - 1, Math.floor(p * n * 1.05))` (toggles `.on` on slide `idx`).

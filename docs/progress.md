@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                                Status                                 |                            Approval Date                            |
-| :----------: | :------------------------------------ | :----: | :-------------------------------------------------------------------: | :-----------------------------------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                             **Approved**                              |                            Oct 30, 2026                             |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                             **Approved**                              |                            Oct 30, 2026                             |
-| **Phase 3**  | **Static Page Shell**                 | 4 / 8  | **Part 3.1, 3.2, 3.3 approved; Part 3.4 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                                Pending                                |                                  —                                  |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                                Pending                                |                                  —                                  |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                                Pending                                |                                  —                                  |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                                Pending                                |                                  —                                  |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                                Pending                                |                                  —                                  |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                                Pending                                |                                  —                                  |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                                Pending                                |                                  —                                  |
+|    Phase     | Title                                 | Parts  |                                   Status                                   |                                           Approval Date                                            |
+| :----------: | :------------------------------------ | :----: | :------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                                **Approved**                                |                                            Oct 30, 2026                                            |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                                **Approved**                                |                                            Oct 30, 2026                                            |
+| **Phase 3**  | **Static Page Shell**                 | 5 / 8  | **Part 3.1, 3.2, 3.3, 3.4 approved; Part 3.5 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                                  Pending                                   |                                                 —                                                  |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                                  Pending                                   |                                                 —                                                  |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                                  Pending                                   |                                                 —                                                  |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                                  Pending                                   |                                                 —                                                  |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                                  Pending                                   |                                                 —                                                  |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                                  Pending                                   |                                                 —                                                  |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                                  Pending                                   |                                                 —                                                  |
 
 ---
 
@@ -156,7 +156,7 @@ This document records the verification history, approved milestones, and live st
 
 ### Part 3.4: Static "Classes" and "Server Rules" Sections
 
-- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Status:** **APPROVED** (Commits `0dd19c3`, `d2ce7aa`, `efca537`, `8c0d26e`, `8c3ebfa`)
 - **Deliverables:**
   - `src/styles/story.css`: Extracted shared layout rules (`.story`, `.st`, `.in`, `.sc`, `.sc .eyebrow`, `.sc p`) out of `hero.css` to share across story sections.
   - `src/styles/hero.css`: Refactored to hero-specific rules only (`.sc.hero`, `h1.big`, `.ctas`, `.hud`).
@@ -169,18 +169,29 @@ This document records the verification history, approved milestones, and live st
   - `src/app/globals.css`: Imported `story.css`, `hero.css`, `classes.css`, `rules.css`.
   - `src/app/page.tsx`: Mounted `<Hero />`, `<Classes />`, and `<Rules />` in sequence inside `<main>`.
   - `docs/scene-hooks.md`: Documented scene hooks, scroll-driven beat detection (`data-beats`), unit camera bindings, and layout specifications.
+
+### Part 3.5: Static "Mission Log" (how-it-works) Section
+
+- **Status:** **IMPLEMENTED (Awaiting User Review and Approval)**
+- **Deliverables:**
+  - `src/components/story/Logistics.tsx`: Server Component rendering `<section id="how-it-works" className="hz-sec" data-scene="logi" aria-labelledby="how-it-works-heading">` with centered header card `.hz-head.sc` and 4-step telemetry pipeline grid track `.hz-track#hzt` (lines 2058–2101).
+  - `src/styles/logistics.css`: Section styles for `.hz-sec` (`height: 420vh`), `.hz` (`position: sticky`), `.hz-head`, `.hz-view`, `.hz-track`, `.slide`, `.slide i`, `.slide b`, `.slide small`, and mobile responsive overrides (`@media (max-width: 900px)`), using exact line citations and active tokens only.
+  - `src/app/globals.css`: Imported `logistics.css` after `rules.css`.
+  - `src/app/page.tsx`: Rendered sections in canonical visual order: `<Hero />`, `<Classes />`, `<Logistics />`, `<Rules />`.
+  - `docs/scene-hooks.md`: Documented scene hook `data-scene="logi"`, scroll progress active beat toggling formula `idx = Math.min(n - 1, Math.floor(p * n * 1.05))`, and CSS grid layout behavior.
 - **Verification:**
   - **Quality Gates:** `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test` (4,104 tests), `pnpm build` all pass cleanly.
-  - **Overflow Pre-check:** Measured original prototype across 9 viewports; neither card overflows its padding boundaries (`overflowRight < 0` at all widths). Preserved canonical `max-width: 460px`.
-  - **Computed Styles Parity:** 0 differences across all 19 elements in Classes and 17 elements in Rules across all 4 standard viewports (390px, 768px, 1280px, 1920px).
-  - **Visual Diff:** Rules card has near-zero diff across all widths (diffCount: 6 at 390px; 1146 vs noise 1140 at 768px; 81 at 1280px; 86 at 1920px). Classes diff on original prototype reflects scroll-driven `.beat.on` active state triggered by prototype JS scroll listener. Injected failing controls (heading font-weight 700, paragraph color `--fg`) confirmed high test sensitivity across all cards.
-  - **No-JS Compatibility:** Full text, beats, perks, and server rules render visible and legible with JavaScript disabled (`javaScriptEnabled: false`).
-  - **Fonts:** Every distinct (family, weight, size, style) tuple over text nodes matches 100% between original and new pages at 1280px and 390px.
-  - **Keyboard & Semantics:** Tab order navigates sequentially through header and hero CTAs; `ariaSnapshot` shows clean semantic outline with regions and list; heading outline contains exactly one H1 and two H2s with zero skipped levels; zero duplicate IDs.
-  - **Client JS Bundle:** 0 client JS bytes added (568,669 raw / 174,719 gzip across identical chunks).
-  - **Document Heights & Offsets:** Classes height matches 2,160px on both pages; Rules height matches 900px on both pages.
+  - **Overflow Pre-check:** Measured original prototype across 9 viewports (1920 to 390); all cards have negative overflow (`hasOverflow: false` across all cards and widths).
+  - **Document Geometry:** Offsets match the original exactly on both pages at 390px and 1280px (Hero: 0/900; Classes: 900/2160; Logistics: 3060/3780; Rules: 6840/900).
+  - **Computed Styles Parity:** 0 structural mismatches; 0 unexpected property differences across all 24 elements in the Logistics subtree across 390px, 768px, 1280px, and 1920px (total 4,896 property comparisons).
+  - **Visual Diff:** Exact 0 diff pixels on head card at 390px and 768px; 9px and 22px at 1280px and 1920px (subpixel text antialiasing). Forced states and sensitive controls (heading weight 700: 3,539–5,460 diff px; slide color `--fg`: 2,391–2,851 diff px) vastly exceed noise floor.
+  - **No-JS Compatibility:** All 4 slides render and are visible in grid without clipping; innerText matches original identically.
+  - **Fonts:** Every distinct (family, weight, size) tuple matches 100%; `document.fonts.check` and `load` pass for all families.
+  - **Semantics:** Tab order strictly sequential; heading outline valid with 1 H1 and 3 H2s (0 skipped levels); 0 duplicate IDs; aria snapshot confirms complete accessible region hierarchy.
+  - **Client JS Bundle:** Exactly 0 bytes added (raw diff: 0, gzip diff: 0).
+  - **Screenshots:** Element screenshots of original, new, and diff saved to OS temporary directory.
 
-> **Part 3.4 Note:** Before porting other `.sc` cards (Classes, Logistics, Rules, Plans, Outro), run the same overflow measurement on each. Do not widen them without first measuring their heading overflow at all ≥901px viewports.
+> **Part 3.5 Note:** Before porting subsequent sections (Plans, Outro), run the same overflow measurement on each. Do not widen them without first measuring their heading overflow at all ≥901px viewports.
 
 ---
 
@@ -218,9 +229,14 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    - `descPixelFinal`: `rgb(98, 100, 121)` (luminance `0.1309`, screenshot sampled `[97, 99, 122]`), yielding **2.85:1** (below 4.5:1 for normal text and 3.0:1 for large text).
      Logged for Phase 8 accessibility pass to evaluate contrast enhancement.
 9. **mobile Classes card 1-unit channel residual: probe 0.2 findings:**
-   Variant (c) (hiding canvases and setting flat html/body background) left 1,096 diff pixels at 390px and 1,097 at 768px. In-depth DOM layer probe identified that 1,072 of these pixels are caused by the fixed watermark footer (`.wmark`, lines 1741–1785 / 2196–2206) in the reference prototype, which sits at `position: fixed; z-index: 5; bottom: calc(8px + var(--sb)); right: calc(var(--gr) + 2px)` and overlays the bottom-right corner of the sticky card at viewports `<= 900px`. When `.wmark` is hidden, the Classes card diff drops from 1,096 to **24 pixels** at 390px and from 1,097 to **25 pixels** at 768px, which are pure subpixel glyph-edge rasterization differences.
+   Classes mobile diff caused by original .wmark overlay; re-measure after the footer is built (Part 3.7).
+   Variant (c) (hiding canvases and setting flat html/body background) left 1,096 diff pixels at 390px and 1,097 at 768px. In-depth DOM layer probe identified that 1,072 of these pixels are caused by the fixed watermark footer (`.wmark`, lines 1741–1785 / 2196–2206) in the reference prototype, which sits at `position: fixed; z-index: 5; bottom: calc(8px + var(--sb)); right: calc(var(--gr) + 2px)` and overlays the bottom-right corner of the sticky card at viewports `<= 900px`. When `.wmark` is hidden (Variant d), the Classes card diff drops from 1,096 to **24 pixels** at 390px and from 1,097 to **25 pixels** at 768px, which are pure subpixel glyph-edge rasterization differences.
 10. **Static Beat Non-Interactive Pointer Cursor:**
     Classes beats show `cursor: pointer` and a focus-visible style but are not interactive in the static build; the original makes them `role="button"` and `tabIndex = 0` by script (reference lines 15092–15121). Decide at Phase 4/6 (wire the behavior or remove the pointer cursor).
+11. **Mission Log Slide Opacity & List Semantics:**
+    Slides carry the `.beat` class, rendering at `opacity: 0.5` until `.on` is applied by script (same as the original prototype; contrast measured for beats applies). Slide markup consists of `div/i/b/small` without semantic list elements (candidate enhancement: ordered list `<ol>/<li>`, "added by the rewrite", Phase 8).
+12. **Mission Log Mobile Description Visibility:**
+    At `<=900px`, step descriptions (`.slide small`) and the section paragraph (`.hz-head p`) are `display: none` unless `.on` is set by script; without JS they are invisible (same in the original prototype). Decide at Phase 4/8.
 
 ---
 

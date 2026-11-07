@@ -69,5 +69,6 @@ We adopt a **Global Component CSS Architecture** for ported prototype styles:
    All ported classes reside in the global CSS namespace. To prevent unintended collisions, every ported class must be documented in `docs/design-system.md`.
 2. **Deterministic Build & SSR Hydration:**
    Direct global imports through `globals.css` integrate smoothly with `@tailwindcss/turbopack`, emit zero runtime JS class map lookups, maintain 0 bytes added client JS, and ensure consistent server-rendered and hydrated markup.
-3. **Collision Governance:**
+3. **Collision Governance & Cascade Order:**
    If style collisions occur as additional components (cards, configurator, modal) are ported, specificity scoping (e.g., `.top .glass` vs `.card .glass`) or explicit prefixed wrappers will be adopted.
+   Split stylesheets change cascade order relative to the original single stylesheet. Order in globals.css: tokens, base, header, story, hero, classes, rules, logistics, (next sections). Ported rules that rely on later-wins ordering must be verified by an exact diff; example: `.hz-head` `max-width` in `logistics.css` overrides the shared `.sc` mobile `max-width`, which needed an explicit `<=900px` rule.
