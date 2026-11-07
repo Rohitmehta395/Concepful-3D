@@ -17,8 +17,10 @@ describe("Section IDs and Navigation Link Consistency", () => {
     expect(NAV_CTA.href).toBe(`#${SECTION_IDS.build}`);
   });
 
-  it("SECTION_IDS map to unique, non-empty anchor slugs including rules", () => {
+  it("SECTION_IDS map to unique, non-empty anchor slugs including rules, plans, and outro", () => {
     expect(SECTION_IDS.rules).toBe("rules");
+    expect(SECTION_IDS.plans).toBe("plans");
+    expect(SECTION_IDS.outro).toBe("outro");
     const ids = Object.values(SECTION_IDS);
     const uniqueIds = new Set(ids);
     expect(uniqueIds.size).toBe(ids.length);

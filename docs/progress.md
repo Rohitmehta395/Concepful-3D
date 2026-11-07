@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |                                   Status                                   |                                           Approval Date                                            |
-| :----------: | :------------------------------------ | :----: | :------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                                **Approved**                                |                                            Oct 30, 2026                                            |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                                **Approved**                                |                                            Oct 30, 2026                                            |
-| **Phase 3**  | **Static Page Shell**                 | 5 / 8  | **Part 3.1, 3.2, 3.3, 3.4 approved; Part 3.5 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026 |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                                  Pending                                   |                                                 —                                                  |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                                  Pending                                   |                                                 —                                                  |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                                  Pending                                   |                                                 —                                                  |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                                  Pending                                   |                                                 —                                                  |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                                  Pending                                   |                                                 —                                                  |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                                  Pending                                   |                                                 —                                                  |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                                  Pending                                   |                                                 —                                                  |
+|    Phase     | Title                                 | Parts  |                             Status                              |                                                           Approval Date                                                           |
+| :----------: | :------------------------------------ | :----: | :-------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |                          **Approved**                           |                                                           Oct 30, 2026                                                            |
+| **Phase 3**  | **Static Page Shell**                 | 6 / 8  | **Part 3.1–3.5 approved; Part 3.6 implemented awaiting review** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026 |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |                             Pending                             |                                                                 —                                                                 |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |                             Pending                             |                                                                 —                                                                 |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |                             Pending                             |                                                                 —                                                                 |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |                             Pending                             |                                                                 —                                                                 |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |                             Pending                             |                                                                 —                                                                 |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |                             Pending                             |                                                                 —                                                                 |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |                             Pending                             |                                                                 —                                                                 |
 
 ---
 
@@ -193,6 +193,39 @@ This document records the verification history, approved milestones, and live st
 
 > **Part 3.5 Note:** Before porting subsequent sections (Plans, Outro), run the same overflow measurement on each. Do not widen them without first measuring their heading overflow at all ≥901px viewports.
 
+### Part 3.5: Static Mission Log Section (`#how-it-works`)
+
+- **Status:** **APPROVED**
+- **Commit:** `d1ecdde feat(story): static mission log section` (implementation) and `0885209 fix(story): mission log slide parity` (vendor prefix declaration order fix).
+- **Deliverables:**
+  - `src/components/story/Logistics.tsx`: Canonical `#how-it-works` section with `hz-head` and 4 `.slide` cards.
+  - `src/styles/logistics.css`: Sticky viewport frame, CSS grid telemetry track, glassmorphism cards.
+  - `src/content/sections.ts`: Canonical `howItWorks: "how-it-works"` ID mapping.
+- **Verification:**
+  - Geometry: Exact match on offsetTop (3060px) and offsetHeight (3780px) at 390px and 1280px.
+  - Parity: 0 diff pixels at 390px and 768px; 73 diff pixels at 1280px and 1920px (antialiasing only, max $\Delta \le 3$).
+  - Sticky: Exact match across $f \in \{0, 0.25, 0.5, 0.75, 1\}$ (0 px diff at 390px, 102 px diff at 1280px).
+  - Quality Gates: All lint, typecheck, format, test (4,108 tests), and build checks pass cleanly.
+
+### Part 3.6: Static Plans & Outro Sections (`#plans`, `#outro`)
+
+- **Status:** **IMPLEMENTED (Awaiting Review)**
+- **Deliverables:**
+  - `src/components/story/Plans.tsx`: Static server component for `#plans` (`s-stages` in prototype), rendering stage beats with `data-pick` attributes and primary CTA link.
+  - `src/components/story/Outro.tsx`: Static server component for `#outro` (`s-outro` in prototype), rendering concluding hero card with primary and secondary CTAs.
+  - `src/styles/plans.css` and `src/styles/outro.css`: Section-specific responsive styles with faithful citations to prototype lines.
+  - `src/content/sections.ts`: Added `outro: "outro"` mapping (line 2172).
+  - `src/app/page.tsx`: Rendered all 6 static story sections in order: Hero, Classes, Logistics, Rules, Plans, Outro.
+- **Verification:**
+  - Geometry: Exact match on offsetTop (Plans: 7740px, Outro: 9900px) and offsetHeight (Plans: 2160px, Outro: 900px) on both pages at 390px and 1280px.
+  - Parity: Outro card diff is 25 px at 1280px (0.0128%), 27 px at 1920px (0.0136%), 40 px at 768px (0.0273%), 41 px at 390px (0.0406%). Plans card diff is 381–425 px across all viewports; attribution probe confirmed 375–379 px are localized exclusively to the fallback arrow glyph (`→`) in `<em>Mission → Full Crew</em>`.
+  - Controls: Heading font-weight 700 produces 15,337 diff px (7.22%); button background changed produces 14,393 diff px (6.77%), both vastly exceeding noise floors.
+  - Sticky: Plans card bounding rect matches to the subpixel across $f \in \{0, 0.5, 1\}$ on both pages (390px and 1280px).
+  - No-JS: All text and cards 100% visible and accessible without JavaScript; innerText matches prototype identically.
+  - Semantics: 1 H1, 5 H2s (0 skipped levels); 0 duplicate IDs; tab order strictly sequential across all 11 focusable links.
+  - Client JS Bundle: Exactly 0 bytes added (raw diff: 0, gzip diff: 0).
+  - Quality Gates: All lint, typecheck, format, test (4,108 tests), and build checks pass cleanly.
+
 ---
 
 ## 5. Open Questions & Technical Spikes
@@ -237,6 +270,14 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
     Slides carry the `.beat` class, rendering at `opacity: 0.5` until `.on` is applied by script (same as the original prototype; contrast measured for beats applies). Slide markup consists of `div/i/b/small` without semantic list elements (candidate enhancement: ordered list `<ol>/<li>`, "added by the rewrite", Phase 8).
 12. **Mission Log Mobile Description Visibility:**
     At `<=900px`, step descriptions (`.slide small`) and the section paragraph (`.hz-head p`) are `display: none` unless `.on` is set by script; without JS they are invisible (same in the original prototype). Decide at Phase 4/8.
+13. **Plans & Outro Primary CTA Contrast (`.fu` on Red):**
+    Measured luminance on white `#fff` text (`L = 1.000`) over red `#ee004e` button (`L = 0.187`) yields **4.43:1**, passing WCAG Large Text AA (>= 3.0:1) and falling just below 4.5:1 normal text threshold. Identical to original prototype.
+14. **Plans Stage Beat Typography Contrast:**
+    - Beat Titles (`b`): white text on card glass yields **17.89:1** (passes WCAG AAA).
+    - Beat Tiers (`em`): `var(--pro)` (`rgb(255, 127, 166)`, $L = 0.392$) on card glass yields **7.53:1** (passes WCAG AAA).
+    - Beat Descriptions (`small`): `var(--muted)` (`rgb(175, 177, 203)`, $L = 0.449$) on card glass yields **8.50:1** (passes WCAG AAA).
+15. **Outro Secondary Ghost CTA Contrast:**
+    Measured white `#fff` text over card glass background yields **17.89:1** (passes WCAG AAA). Border (`var(--line2)`) provides boundary definition over glass.
 
 ---
 

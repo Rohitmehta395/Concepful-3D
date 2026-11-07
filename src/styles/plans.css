@@ -1,0 +1,43 @@
+/**
+ * Concepful Mech Builder — Plans (Stages) Section Styles
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+/* Lines 156-159: Tall section min-height for diorama scrubbing */
+#plans.st.tall {
+  min-height: 240vh;
+  align-items: flex-start;
+}
+
+/* Lines 174-178: Tall section inner boundary layout */
+#plans.st.tall .in {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Lines 179-182: Sticky card positioning during scene diorama */
+#plans.st.tall .sc {
+  position: sticky;
+  top: calc(92px + var(--st));
+}
+
+@media (max-width: 900px) {
+  /* Lines 493-495: Mobile inner layout */
+  #plans.st.tall .in {
+    justify-content: flex-end;
+  }
+
+  /* Lines 496-499: Mobile bottom-pinned sticky card */
+  #plans.st.tall .sc {
+    top: auto;
+    bottom: 12px;
+  }
+
+  /* Lines 500-502: Mobile tall section flex alignment */
+  #plans.st.tall {
+    align-items: flex-end;
+  }
+}

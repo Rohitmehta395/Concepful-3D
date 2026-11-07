@@ -125,3 +125,46 @@ All elements within `s-intro` are purely static server markup with the exception
 - **Track Position Formula:**
   - Track translation formula: `None`. The track is statically positioned via CSS grid at both desktop and mobile viewports.
   - Active beat formula: `idx = Math.min(n - 1, Math.floor(p * n * 1.05))` (toggles `.on` on slide `idx`).
+
+---
+
+## 8. Plans / Stages Section (`s-stages`) Scene Hooks
+
+| Attribute / Selector   | Element in Plans                          | Reference Line         | JS Reader / Handler      | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                                                                                                                          |
+| :--------------------- | :---------------------------------------- | :--------------------- | :----------------------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-scene="stages"`  | `<section class="st tall" id="s-stages">` | 2135                   | `storyScan()`            | 11954          | Queried via `document.querySelectorAll("[data-scene]")`. When its vertical midpoint crosses viewport center (`r.top <= mid && r.bottom > mid`), `STORY.key` is set to `"stages"`. Lazily initializes `STB.stages()` (lines 11848–11901), creating multi-vessel formation (Drone, Sub, Star, Mother). |
+| `id="s-stages"`        | `<section class="st tall" id="s-stages">` | 2135                   | DOM Navigation Anchor    | 1870, 2183     | Navigation target for top navigation link `<a href="#s-stages">Plans</a>` (line 1870) and Outro CTA `<a class="ghost" href="#s-stages">Compare plans</a>` (line 2183). Target in rewrite is `#plans`.                                                                                                |
+| `data-beats`           | `<div class="beats" data-beats>`          | 2140                   | `storyScan()`            | 11987–11993    | During scroll, reads `bs.children` count (4 stage beats) and scroll progress `p` (0.0 to 1.0). Calculates active beat index: `idx = Math.min(n - 1, Math.floor(p * n * 1.05))`. Toggles `c.classList.toggle("on", i === idx)`.                                                                       |
+| `data-pick="..."` (x4) | `<div class="beat" data-pick="...">`      | 2141, 2147, 2153, 2160 | Click / Keydown Listener | 15092–15120    | Script dynamically injects `role="button"` and `tabIndex=0` (lines 15094–15095). Clicking calls `setTier(c.dataset.pick)` (line 15111) and smoothly scrolls the diorama (`go()`, line 15096–15108). In static server component, interaction is deferred to Phase 6.                                  |
+| `.ctas a.fu`           | `<div class="ctas"><a class="fu" ...>`    | 2167                   | Static Anchor Link       | 2167           | Navigates to `#build` configurator section.                                                                                                                                                                                                                                                          |
+
+### Plans Layout & Sticky Behavior
+
+- **Container Height (`.st.tall`):**
+  - **Desktop (>900px):** `min-height: 240vh; align-items: flex-start;` (scrollable runway allows scrubbing through 4 stage tiers).
+  - **Mobile (<=900px):** `min-height: 240vh; align-items: flex-end;`.
+- **Card Sticky Pinning (`.st.tall .sc`):**
+  - **Desktop (>900px):** `position: sticky; top: calc(92px + var(--st)); max-width: 460px;` (pins card below header).
+  - **Mobile (<=900px):** `position: sticky; top: auto; bottom: 12px; max-width: none;` (pins card to viewport bottom).
+- **Default State in Static HTML:**
+  - In original static markup (lines 2135–2170), all four `.beat` elements have `class="beat"` (no `.beat.on`). In CSS (lines 275–286), `.beat` has `opacity: 0.5`. On mobile (lines 539–541), `.beat small` is `display: none` unless `.beat.on` is added by script.
+
+---
+
+## 9. Outro Section (`s-outro`) Scene Hooks
+
+| Attribute / Selector | Element in Outro                     | Reference Line | JS Reader / Handler | Line in Script | Effect on 3D Scene / Engine                                                                                                                                                                                                                                                                 |
+| :------------------- | :----------------------------------- | :------------- | :------------------ | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data-scene="outro"` | `<section class="st" id="s-outro">`  | 2172           | `storyScan()`       | 11954          | Queried via `document.querySelectorAll("[data-scene]")`. When its vertical midpoint crosses viewport center (`r.top <= mid && r.bottom > mid`), `STORY.key` is set to `"outro"`. Lazily initializes `STB.outro()` (lines 11902–11940), rendering hyper-speed streak field and glowing core. |
+| `id="s-outro"`       | `<section class="st" id="s-outro">`  | 2172           | Section Anchor      | —              | Section anchor identifier. Not read directly by scene JS.                                                                                                                                                                                                                                   |
+| `.ctas a.fu`         | `<a class="fu" href="#build">`       | 2182           | Static Anchor Link  | 2182           | Primary CTA navigating to `#build`.                                                                                                                                                                                                                                                         |
+| `.ctas a.ghost`      | `<a class="ghost" href="#s-stages">` | 2183           | Static Anchor Link  | 2183           | Secondary CTA navigating back to `#s-stages` (`#plans` in rewrite).                                                                                                                                                                                                                         |
+
+### Outro Layout Behavior
+
+- **Container Height (`.st`):**
+  - **Desktop (>900px):** `min-height: 100vh; display: flex; align-items: center; padding-block: 96px 48px;`.
+  - **Mobile (<=900px):** `align-items: flex-end; padding-block: 60px 16px;`.
+- **Card Sizing (`.sc`):**
+  - **Desktop (>900px):** `max-width: 460px; padding: 22px;`.
+  - **Mobile (<=900px):** `max-width: none; padding: 16px;`.

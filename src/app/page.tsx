@@ -1,6 +1,8 @@
 import { Classes } from "@/components/story/Classes";
 import { Hero } from "@/components/story/Hero";
 import { Logistics } from "@/components/story/Logistics";
+import { Outro } from "@/components/story/Outro";
+import { Plans } from "@/components/story/Plans";
 import { Rules } from "@/components/story/Rules";
 
 export default function Home() {
@@ -10,6 +12,8 @@ export default function Home() {
       <Classes />
       <Logistics />
       <Rules />
+      <Plans />
+      <Outro />
     </main>
   );
 }

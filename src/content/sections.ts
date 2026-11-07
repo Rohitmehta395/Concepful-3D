@@ -15,6 +15,8 @@ export const SECTION_IDS = {
   rules: "rules",
   /** Replaces original #s-stages (line 1870, 2135) */
   plans: "plans",
+  /** Replaces original #s-outro (line 2172) */
+  outro: "outro",
   /** Matches original #build (line 1871, 2191) */
   build: "build",
 } as const;
