@@ -253,6 +253,24 @@ This document records the verification history, approved milestones, and live st
   - Contrast: Analytical 3.85:1 desktop (`opacity: 0.6` on dark background); text hidden at `<=900px`.
   - Quality Gates: All lint, typecheck, format, test (4,108 tests), and build checks pass cleanly.
 
+### Part 3.7: Build Section Skeleton & Watermark Footer
+
+- **Status:** **COMPLETE & VERIFIED**
+- **Deliverables:**
+  - `src/components/story/Build.tsx` & `src/styles/build.css`: Static 100vh `#build` landing section skeleton matching original lines 2189–2194 (`<section class="app-sec" data-scene="app" id="build" aria-label="Build your department">`).
+  - `src/components/shell/Footer.tsx`, `src/styles/footer.css`, & `src/content/assets.ts`: Fixed watermark footer (`.wmark`, lines 2196–2206) with copyright text, responsive disclaimer hiding (`display: none` at `<=900px`), and 28x28px brand mark extracted into typed asset constant with ADR 0005 justification.
+  - `docs/decisions/0005-inline-data-uri-img.md`: Documented architectural decision for inline base64 mark without next/image wrapper.
+- **Interim UX Note:**
+  With Part 3.7 complete, the story scroll flows smoothly through all narrative sections (Hero, Classes, Mission log, Rules, Plans, Outro) to the `#build` landing zone, where the footer watermark pins to the bottom right of the viewport.
+- **Empty Region Landmark Note:**
+  The skeleton `<section id="build" aria-label="Build your department">` creates an empty landmark region until Phase 6 interactive configurator populates it; this is deliberate and documented.
+- **Verification Evidence:**
+  - Exact Worktree Diff: 0 differing pixels across all 8 previous targets (`header.top`, `#intro .sc`, `#classes .sc`, `#how-it-works .hz-head`, `#how-it-works .hz-track`, `#rules .sc`, `#plans .sc`, `#outro .sc`) at 390px, 768px, 1280px, and 1920px against commit `184028e`.
+  - Noise Floors: Exactly 0 differing pixels between 3 consecutive runs on `footer.wmark` and `#classes .sc` across all 4 viewports; controls passed (0 px on identical white rect, 154 px on 1-px shifted text).
+  - Geometry Parity at 390px: Exact 0.0000px delta on bounding box x, y, width, height, position (fixed), left (352px), right (18px), and bottom (8px).
+  - Computed Styles: Reconciled across 9 viewports (390 to 1920). 0 custom or layout differences; exactly 14 universal Tailwind v4 reset property differences (-webkit-font-smoothing, -webkit-locale, -webkit-tap-highlight-color, 8 border-*-style, font-family, tab-size, text-size-adjust).
+  - Client JS Bundle: Exactly 0 bytes added to client JS bundle (pure server components).
+
 ---
 
 ## 5. Open Decisions & Technical Spikes
@@ -263,16 +281,11 @@ This document records the verification history, approved milestones, and live st
 2. **Plans Tier Chip Arrow Glyph Width Difference (U+2192):**
    - **Context:** In `reference/Concepful_Mech_Builder.html` line 2148, the Plans section contains `<b>Startups <em>Mission → Full Crew</em></b>`. This is the sole occurrence of `→` (U+2192) in the entire reference file.
    - **Measurements at 1280px:**
-     - Reference chip `<em>` width: `122.265625px` (rendered with fallback system monospace font in offline/test context).
-     - Rebuild chip `<em>` width: `129.828125px` (rendered with bundled JetBrains Mono webfont).
-     - Width delta: `7.5625px`.
-     - Glyphs at `font-size: 9.5px`, `letter-spacing: 0.08em`:
-       - Consolas: `→` = `5.984375px`, '0'/'M'/' ' = `5.984375px`.
-       - Arial: `→` = `10.265625px`, '0' = `6.046875px`, 'M' = `8.6875px`.
-       - Consolas, Arial, sans-serif: `→` = `5.984375px`.
-       - JetBrains Mono: advance = `6.46875px`; `→` glyph falls back to Consolas at `5.984375px` in Windows Chromium.
-     - The `7.5625px` difference across the chip is the cumulative width difference of the 18 ASCII characters taking JetBrains Mono advance (`6.46875px`) vs Consolas (`5.984375px`), plus letter-spacing.
-   - **Layout Impact:** None. Parent `<b>` is flex (`display: flex; flex-wrap: nowrap; gap: 8px`), `em` is styled `margin-left: auto;`, and `scrollHeight === clientHeight` (`wraps: false`). No line wraps anywhere on the page as a result of the arrow width.
+     - Reference chip `<em>` width: `122.265625px` ("Mission " = `51.6875px` in `JetBrains-Mono-Bold`, "→" = `6.0px` in `Consolas-Bold`, " Full Crew" = `64.609375px` in `JetBrains-Mono-Bold`).
+     - Rebuild chip `<em>` width: `129.828125px` ("Mission " = `51.6875px` in `JetBrains-Mono-Bold`, "→" = `13.5625px` in `ArialMT`, " Full Crew" = `64.609375px` in `JetBrains-Mono-Bold`).
+     - ASCII slice delta: **0.0000px** on both Slice 1 ("Mission ") and Slice 3 (" Full Crew"). Both environments render all 18 ASCII characters identically with bundled `JetBrains-Mono-Bold`.
+     - Arrow slice delta: Exactly `+7.5625px` (`13.5625px` vs `6.0000px`), 100% attributable to U+2192 resolving to fallback `Consolas-Bold` (reference) vs `ArialMT` (rebuild).
+   - **Layout Impact:** None. Bounding box and wrapping probe across 1024px, 901px, and 390px confirmed `scrollHeight === clientHeight === 20px`, `wraps: false`. No line wrapping occurs anywhere on the page.
    - **Decision:** Keep canonical UTF-8 glyph `→` in `src/content/story.ts`.
 
 3. **Body Reset & User-Agent Style Parity:**
@@ -337,6 +350,8 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
     - Beat Descriptions (`small`): `var(--muted)` (`rgb(175, 177, 203)`, $L = 0.449$) on card glass yields **8.50:1** (passes WCAG AAA).
 17. **Outro Secondary Ghost CTA Contrast:**
     Measured white `#fff` text over card glass background yields **17.89:1** (passes WCAG AAA). Border (`var(--line2)`) provides boundary definition over glass.
+18. **Footer Watermark Text Contrast (Phase 8 Backlog):**
+    Footer watermark copyright/disclaimer text is styled with `color: var(--muted)` (`#afb1cb`) at container `opacity: 0.6` on dark background (`--bg: #141624`), matching original design (lines 1741–1758). Analytical contrast measures at ~2.8:1 (below WCAG AA 4.5:1 for small text). Text is hidden below 900px. Logged for Phase 8 cleanup to evaluate bumping contrast (e.g. opacity 0.85 -> 4.5:1).
 
 ---
 

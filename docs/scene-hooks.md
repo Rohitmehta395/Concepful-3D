@@ -198,3 +198,110 @@ All elements within `s-intro` are purely static server markup with the exception
 | `#gl`, `#cv` (Canvases)          | 1803–1806               | **Phase 4 Scene Engine**           | Phase 4 (`src/components/scene/`)            |
 | `#card` (Configurator Card)      | 1966–2014               | **Phase 6 Configurator Wireframe** | Phase 6 (`src/components/configurator/`)     |
 | `<div class="modal" id="modal">` | 2209–2283               | **Part 3.8 Static Modal Shell**    | Part 3.8 (`src/components/shell/Modal.tsx`)  |
+
+---
+
+## 11. Phase 6: Configurator DOM Hooks (Pre-Main Elements)
+
+Between `</nav>` in `<header class="top">` (line 1872) and `<main class="story">` (line 1993), the original prototype contains the markup for the interactive 3D configurator, live character sheet card, mode switchers, and boxart headline.
+
+### Element Hierarchy Tree
+
+```
+header.top#top (lines 1808-1890)
+├── div.seg.glass#seg (lines 1873-1883)
+│   ├── button[type="button"][data-tier="solo"]
+│   ├── button[type="button"][data-tier="squad"]
+│   └── button[type="button"][data-tier="combine"]
+└── div.tr.glass (lines 1884-1889)
+    ├── div.tot
+    │   ├── b#pr
+    │   └── small#prs
+    └── button.fu[type="button"][data-formup]
+
+aside.panel.glass#panel (lines 1892-1964)
+├── div.intro (lines 1893-1902)
+│   ├── div.eyebrow
+│   ├── div.mt
+│   └── p#intro-p
+├── section.step#st-mode (lines 1903-1910)
+│   ├── div.sh (span.n, h2)
+│   ├── p.hint
+│   └── div.tiers#tiers
+├── section.step#st-pick (lines 1911-1922)
+│   ├── div.sh (span.n, h2#lo-h)
+│   ├── p.hint#lo-hint
+│   ├── div#groups
+│   └── div.nudge#nudge (span, button[type="button"][data-tier="squad"])
+├── section.step#st-ship (lines 1923-1933)
+│   ├── div.sh (span.n, h2)
+│   ├── p.hint
+│   └── div#ships
+├── section.step#st-buffs (lines 1934-1943)
+│   ├── div.sh (span.n, h2)
+│   ├── p.hint
+│   └── div.opts#buffs
+└── section.step#st-load (lines 1944-1963)
+    ├── div.sh (span.n, h2)
+    ├── p.hint
+    ├── div.toggle#bill
+    │   ├── button#b-mo.on
+    │   └── button#b-yr
+    ├── div.bp#bp
+    ├── button.fu.wide[type="button"][data-formup]
+    └── p.fine
+
+section.card.glass#card[aria-label="Character sheet"] (lines 1966-1978)
+├── div.hd (lines 1967-1969)
+│   ├── span#chd
+│   └── span#cid
+└── div.bd (lines 1970-1977)
+    ├── canvas#patch[aria-hidden="true"]
+    ├── div.cn#cn
+    ├── div.cc#cc
+    ├── div.stats#stats
+    ├── div.party#party
+    └── div.motto (span, q#motto)
+
+div.boxart#boxart (lines 1980-1991)
+├── div
+│   ├── h1.title
+│   └── div.fp
+└── div.burst
+```
+
+### Element Classification & Script Reference Catalog
+
+| Element / Selector     | Prototype Lines | Classification                     | JS Readers / Writers (Lines) | Script Functionality & State Lifecycle                                                        |
+| :--------------------- | :-------------- | :--------------------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------- |
+| `div#seg`              | 1873–1883       | **Static Shell / Script Classes**  | 14670                        | Iterates children to toggle `.on` class matching active tier `id`.                            |
+| `b#pr`                 | 1886            | **Script-Driven**                  | 14781                        | Updates header price readout text with total and cadence suffix (`fmt(q.total) + per`).       |
+| `small#prs`            | 1886            | **Script-Driven**                  | 14782                        | Updates header cadence note text (`"fixed fee"` vs `"billed monthly"` / `"billed annually"`). |
+| `button[data-formup]`  | 1888, 1958      | **Static Markup / Script Event**   | 15077–15082                  | Click triggers guild modal opening (`openModal()`).                                           |
+| `aside#panel`          | 1892–1964       | **Static Container / Script Rect** | 2731, 14936                  | Bounding rect measured during resize/layout (`pr = $("panel").getBoundingClientRect()`).      |
+| `p#intro-p`            | 1898–1901       | **Script-Driven**                  | 14943                        | Replaced dynamically with active tier pitch string (`TIERS[id].pitch`).                       |
+| `section#st-mode`      | 1903–1910       | **Static Step / Script Visible**   | 14721                        | Step 01 container; always visible across all modes.                                           |
+| `div#tiers`            | 1909            | **Script-Driven**                  | 14663                        | Dynamic innerHTML injected with interactive tier selector cards.                              |
+| `section#st-pick`      | 1911–1922       | **Static Step / Script Visible**   | 14721, 14937                 | Step 02 container; always visible across all modes.                                           |
+| `h2#lo-h`              | 1914            | **Script-Driven**                  | 14677                        | Heading updated based on mode (`solo ? "Mission" : "Class"`).                                 |
+| `p#lo-hint`            | 1916            | **Script-Driven**                  | 14682                        | Hint updated based on mode (`solo ? "Choose your assignment..." : "Pick your class..."`).     |
+| `div#groups`           | 1917            | **Script-Driven**                  | 14688, 14706, 14716, 14930   | Injected with unit/class selection cards depending on tier mode.                              |
+| `div#nudge`            | 1918–1921       | **Script-Driven**                  | 14799                        | Toggles `.show` class if in solo mode with 2 or more extras selected.                         |
+| `section#st-ship`      | 1923–1933       | **Script-Driven Visibility**       | 14719, 14721, 14930          | Step 03 flagship container; displayed only in Full Force (raid) mode.                         |
+| `div#ships`            | 1932            | **Script-Driven**                  | 14755, 15011                 | Injected with flagship cards; click updates selected flagship.                                |
+| `section#st-buffs`     | 1934–1943       | **Script-Driven Visibility**       | 14719, 14721, 14930          | Step 04 raid buffs container; displayed only in Full Force (raid) mode.                       |
+| `div#buffs`            | 1942            | **Script-Driven**                  | 14730                        | Injected with 6 raid buff selector cards from `BUFFS` array.                                  |
+| `section#st-load`      | 1944–1963       | **Static Step / Script Visible**   | 14721                        | Step 05 summary container; always visible.                                                    |
+| `div#bill`             | 1953–1956       | **Script-Driven Visibility**       | 14780                        | Hidden when tier is one-time fixed fee (`$("bill").hidden = T.one`).                          |
+| `button#b-mo`, `#b-yr` | 1954–1955       | **Static Markup / Script Event**   | 15061–15072                  | Toggle buttons for Monthly / Annual billing with 10% discount calculation.                    |
+| `div#bp`               | 1957            | **Script-Driven**                  | 14793                        | Injected with itemized price blueprint breakdown rows.                                        |
+| `section#card`         | 1966–1978       | **Static Container / Script Rect** | 2661, 2732                   | Live character card; bounding rect measured during layout.                                    |
+| `span#chd`             | 1968            | **Script-Driven**                  | 14812                        | Card header badge text (`solo ? "Character" : "Party"`).                                      |
+| `span#cid`             | 1968            | **Script-Driven**                  | 14817                        | Level indicator text (`"LV " + lv`).                                                          |
+| `canvas#patch`         | 1971            | **Script-Driven Canvas**           | 2764, 7379                   | 2D canvas drawing procedural unit patch emblem (`drawPatch($("patch"), t)`).                  |
+| `div#cn`               | 1972            | **Script-Driven**                  | 14818                        | Character/unit name readout text.                                                             |
+| `div#cc`               | 1973            | **Script-Driven**                  | 14823                        | Class/role title text.                                                                        |
+| `div#stats`            | 1974            | **Script-Driven**                  | 14857                        | Injected with 4 stat progress bars (STR, DEF, SPD, ENG).                                      |
+| `div#party`            | 1975            | **Script-Driven**                  | 14867                        | Injected with interactive party roster member chips.                                          |
+| `q#motto`              | 1976            | **Script-Driven**                  | 14882                        | Injected with tier/role motto quotation text.                                                 |
+| `div#boxart`           | 1980–1991       | **Static Container / Script Rect** | 2733                         | Hero title art banner; bounding rect measured during layout.                                  |
