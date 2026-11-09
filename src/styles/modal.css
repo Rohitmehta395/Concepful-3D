@@ -139,6 +139,11 @@
   flex-direction: column;
   gap: 6px;
   font-size: 13px;
+  list-style-type: decimal;
+}
+
+.done ol li {
+  display: list-item;
 }
 
 /* Lines 1444-1446: Success state list bold prefixes */
