@@ -48,6 +48,11 @@ h3 {
   text-wrap: balance;
 }
 
+/* Lines 574-576: Authoritative button pointer cursor */
+button {
+  cursor: pointer;
+}
+
 /* Lines 578-581: Authoritative prototype focus-visible ring */
 :focus-visible {
   outline: 2px solid var(--pro);
