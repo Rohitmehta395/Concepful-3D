@@ -32,3 +32,48 @@ This script verifies:
 1. Every `-webkit-backdrop-filter` occurrence in `.next/static/chunks/*.css` is matched by a standard `backdrop-filter` property in the same rule block.
 2. Standard `backdrop-filter` occurrences are preceded by the vendor prefix.
 3. Exits with code 1 if any rule contains the prefix without the standard property.
+
+---
+
+## Global Computed Property Sweep & Exact Canvas Diffs
+
+To guarantee pixel-perfect visual parity and styling fidelity against `reference/Concepful_Mech_Builder.html`, all static subtrees are verified through automated Playwright automation scripts:
+
+### 1. In-Browser Exact Canvas Pixel Diffs (Tolerance 0)
+
+1. **Exact 0 Tolerance:** Every visual comparison runs via in-browser `<canvas>` pixel matching with tolerance 0.
+2. **Dimension Guards:** Diff scripts strictly fail if screenshots have any dimension mismatch (`width` or `height`).
+3. **Isolation:** WebGL canvases (`#gl, #cv`) are hidden to avoid 3D scene randomness.
+4. **Clean Execution Context:** Fresh browser context per page per viewport width with JavaScript disabled (unless testing forced interactive states).
+
+### 2. Global Computed Property Sweep Methodology
+
+The global sweep script extracts computed styles for every element in each paired subtree:
+
+1. `header.top` (`header#top`)
+2. `#intro` (`#s-intro` vs `#intro`)
+3. `#classes` (`#s-classes` vs `#classes`)
+4. `#how-it-works` (`#s-logi` vs `#how-it-works`)
+5. `#rules` (`#s-rules` vs `#rules`)
+6. `#plans` (`#s-stages` vs `#plans`)
+7. `#outro` (`#s-outro` vs `#outro`)
+8. `#build` (`#build` vs `#build`)
+9. `footer.wmark` (`footer.wmark`)
+10. `#modal` (`#modal`)
+
+Across 4 canonical viewports: **390px, 768px, 1280px, 1920px**.
+
+#### Property Comparison & Categorization
+
+All computed CSS properties (excluding custom properties `--*`) are compared in lockstep. Differences are strictly categorized into:
+
+- **Benign Reset Properties:** Universal modern framework resets that do not impact visual fidelity:
+  - `tab-size`: `4` (Tailwind preflight) vs `8` (UA default)
+  - `text-size-adjust`: `100%` vs `auto`
+  - `-webkit-font-smoothing`: `antialiased` vs `auto`
+  - `-webkit-locale`: `"en"` vs `auto`
+  - `-webkit-tap-highlight-color`: `rgba(0,0,0,0)` vs `rgba(0,0,0,0.18)`
+  - `vertical-align`: `middle` on SVG vs `baseline`
+  - Zero-width border styles (`none` vs `solid` where `border-width: 0px`)
+  - Next.js font-face fallback font family strings (`"Russo One Fallback"`, `"Inter Fallback"`)
+- **Non-Benign Differences:** Any differences in layout, geometry, margins, padding, line-height, cursor, colors, or list markers are audited, traced to prototype source lines, and reconciled.

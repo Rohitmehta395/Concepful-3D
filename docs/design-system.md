@@ -101,8 +101,10 @@ In Next.js, these are integrated via `next/font/google` in [`src/app/layout.tsx`
 | **Inter**          | `Inter`            | `latin`, weights `400, 500, 600, 700, 800` | `--font-inter`          | `--body`, `--font-body`, `--font-sans` | `system-ui, -apple-system, sans-serif` |
 | **JetBrains Mono** | `JetBrains_Mono`   | `latin`, weights `500, 700`                | `--font-jetbrains-mono` | `--mono`, `--font-mono`                | `ui-monospace, Menlo, monospace`       |
 
-> [!NOTE]
-> U+2192 in Plans tier chips renders from a system fallback on the rebuild; original used Google-hosted JetBrains Mono; decision pending.
+> [!NOTE] Resolved: U+2192 Monospace Font Fallback Configuration
+> In the original prototype, Google Fonts' `JetBrains Mono` latin subset does not include glyph U+2192 (rightwards arrow `→`). When rendering `<em>Mission → Full Crew</em>` in Plans, the prototype fell back to system monospace (`Consolas` on Windows), producing an `<em>` width of `122.265625px`.
+> In Next.js, `next/font/google` by default creates an adjusted fallback font based on proportional `Arial`, expanding the arrow glyph to `13.56px` and total `<em>` width to `129.828125px`.
+> By configuring `fallback: ["ui-monospace", "monospace"]` on `JetBrains_Mono` in `src/app/layout.tsx`, Next.js routes missing glyph fallbacks through system monospace (`Consolas`), restoring exact subpixel width parity (`122.265625px`) and 100% platform font matching (`Consolas 1 glyph`) with zero layout shift (CLS = 0).
 
 In `:root`, the font stacks reference the `next/font` CSS variables prepended to authoritative source fallbacks (lines 68–70):
 

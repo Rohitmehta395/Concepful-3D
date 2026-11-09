@@ -369,6 +369,10 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
     Measured white `#fff` text over card glass background yields **17.89:1** (passes WCAG AAA). Border (`var(--line2)`) provides boundary definition over glass.
 18. **Footer Watermark Text Contrast (Phase 8 Backlog):**
     Footer watermark copyright/disclaimer text is styled with `color: var(--muted)` (`#afb1cb`) at container `opacity: 0.6` on dark background (`--bg: #141624`), matching original design (lines 1741–1758). Analytical contrast measures at ~2.8:1 (below WCAG AA 4.5:1 for small text). Text is hidden below 900px. Logged for Phase 8 cleanup to evaluate bumping contrast (e.g. opacity 0.85 -> 4.5:1).
+19. **Modal Input Placeholder Contrast (3.78:1):**
+    Placeholder text `rgba(255, 255, 255, 0.4)` over input background `rgba(255, 255, 255, 0.04)` over `.mcard` glass evaluates to `rgb(25, 27, 39)` surface, giving **3.78:1** (below WCAG AA 4.5:1 for normal text). Matches prototype line 1409–1417. Logged for Phase 8.
+20. **Modal Submit Button Text Contrast (4.06:1):**
+    White text on `--red` (`#e83b4e`) yields **4.06:1** (passes large text >= 3.0:1 for 16px bold/all-caps; below 4.5:1 normal text). Matches prototype line 1428–1434. Logged for Phase 8.
 
 ---
 
@@ -377,7 +381,7 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
 | Dimension                      | Verification Scope                                  | Status                 | Notes                                                                            |
 | :----------------------------- | :-------------------------------------------------- | :--------------------- | :------------------------------------------------------------------------------- |
 | **Code & Build Checks**        | `pnpm lint`, `typecheck`, `format:check`, `build`   | **Verified Passing**   | All standard commands pass cleanly with exit code 0.                             |
-| **Domain Logic Tests**         | `pnpm test` (4,104 test cases)                      | **Verified Passing**   | 100% parity against original JavaScript oracle; section ID link unit tests pass. |
+| **Domain Logic Tests**         | `pnpm test` (4,108 test cases)                      | **Verified Passing**   | 100% parity against original JavaScript oracle; section ID link unit tests pass. |
 | **Repository File Integrity**  | Checksum of `reference/Concepful_Mech_Builder.html` | **Verified Passing**   | SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`.     |
 | **Visual Baseline Archive**    | 36 screenshots in `reference/baseline/`             | **Verified Passing**   | Intact across 4 viewports (Part 1.2).                                            |
 | **Document Shell Parity**      | HTML head, skip link, keyboard focus                | **Verified Passing**   | Head metadata matches, skip link focuses main, fonts verified in browser engine. |
@@ -388,3 +392,41 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
 | **Accessibility (WCAG AA)**    | Keyboard navigation, focus rings, contrast          | **In Progress**        | Skip link and header focus rings verified; full audit scheduled for Phase 8.     |
 | **Performance (60 FPS)**       | Profiling render loop & DPR governor                | **Pending Phase 9**    | Scheduled for Phase 9 profiling.                                                 |
 | **E2E Test Suite**             | Full Playwright configurator flow                   | **Pending Phase 10**   | Scheduled for Phase 10 QA.                                                       |
+
+---
+
+## 8. Phase 3 Exit Checklist (Derived from Git Log)
+
+The following 29 commits comprise the complete, verified, and audited implementation of **Phase 3: Static Page Shell**:
+
+| Commit    | Description                                                           | Scope   |
+| :-------- | :-------------------------------------------------------------------- | :------ |
+| `d7435be` | feat(shell): document shell, metadata, skip link, base styles         | Phase 3 |
+| `371acb0` | feat(shell): static header with logo and navigation                   | Phase 3 |
+| `447813c` | fix(shell): header token aliases, font parity and docs                | Phase 3 |
+| `1908068` | fix(shell): .fu base values, global focus ring, verified citations    | Phase 3 |
+| `5255871` | docs: ADR 0004 evidence and accessibility backlog                     | Phase 3 |
+| `91f9f76` | feat(story): static hero section                                      | Phase 3 |
+| `fb34812` | fix(hero): size card to fit heading                                   | Phase 3 |
+| `df1b1b6` | refactor(hero): single source for heading size, evidence docs         | Phase 3 |
+| `d2ce7aa` | fix(docs): line-accurate citations, CTA interaction evidence, backlog | Phase 3 |
+| `0dd19c3` | feat(story): static classes and rules sections                        | Phase 3 |
+| `efca537` | docs: measured beat contrast                                          | Phase 3 |
+| `8c0d26e` | fix(story): classes card parity, citations, docs corrections          | Phase 3 |
+| `8c3ebfa` | docs: citation fixes, requirements audit, mobile residual evidence    | Phase 3 |
+| `074f85b` | docs: derive requirements facts from content                          | Phase 3 |
+| `d1ecdde` | feat(story): static mission log section                               | Phase 3 |
+| `51eb869` | chore: ignore scratch scripts                                         | Phase 3 |
+| `0885209` | fix(story): mission log slide parity                                  | Phase 3 |
+| `012a93e` | test: guard backdrop-filter declaration order                         | Phase 3 |
+| `ed63120` | feat(story): static plans and outro sections                          | Phase 3 |
+| `184028e` | docs: part 3.6 evidence, outro rule cleanup                           | Phase 3 |
+| `d6b9c90` | fix(hero): scope heading-fit width to the hero section                | Phase 3 |
+| `19ff9a2` | docs: part 3.6 follow-ups                                             | Phase 3 |
+| `311aaa0` | feat(shell): build section skeleton and footer                        | Phase 3 |
+| `81f21d9` | docs: part 3.7 evidence and logo extraction                           | Phase 3 |
+| `fc0ffe6` | feat(shell): static guild modal (hidden)                              | Phase 3 |
+| `f8ed60b` | fix(base): restore button cursor                                      | Phase 3 |
+| `8007a12` | fix(modal): restore ordered list numbering                            | Phase 3 |
+| `1b32504` | fix(styles): restore mobile 1-column form grid and input line-heights | Phase 3 |
+| `4df8a84` | fix(fonts): jetbrains mono fallback                                   | Phase 3 |

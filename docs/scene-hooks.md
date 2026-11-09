@@ -387,3 +387,41 @@ div.modal#modal[hidden] (lines 2208-2283)
 | `#co` input             | 15075–15078  | Input on company field updates `company = e.target.value.trim(); repaint();`.                                                                    |
 | `#pilot` submit         | 15079–15087  | Intercepts submit, hides `#m-form`, unhides `#m-done`, updates `#d-h` greeting with company name, logs system audio callout.                     |
 | `drawPatch` render loop | 7376, 7380   | If `!$("modal").hidden`, runs `drawPatch($("patch2"), t)` each frame.                                                                            |
+
+### Form-Up Delay & Modal Trigger Discovery (Lines 15024–15050)
+
+In `reference/Concepful_Mech_Builder.html`, the guild modal is opened via `openModal()` called exclusively from `formUp()`:
+
+1. **Trigger Call Sites:**
+   - Fixed configurator header CTA button: `<button class="fu" type="button" data-formup>Start</button>` (line 1888).
+   - Configurator panel review card CTA button: `<button class="fu wide" type="button" data-formup>Start</button>` (line 1958).
+2. **Event Delegation (lines 15024–15028):**
+   ```javascript
+   if (b.hasAttribute("data-formup")) {
+     formUp();
+     return;
+   }
+   ```
+3. **Execution & Cinematic Delay (lines 15029–15046):**
+   ```javascript
+   function formUp() {
+     const n = performance.now();
+     if (!reduce) {
+       formT = n;
+       if (tier === "solo") A.veh = n;
+       else if (tier === "combine") A.ship = n;
+       else units().forEach((id, i) => (A[id] = n + i * 90));
+     }
+     call(
+       tier === "solo"
+         ? "Mission start. Good hunting."
+         : tier === "squad"
+           ? "Ready check passed. Everyone is ready."
+           : "Raid launched. All units aboard.",
+       "sys"
+     );
+     setTimeout(openModal, reduce ? 0 : 1900);
+   }
+   ```
+4. **Cinematic Rationale:**
+   When the user initiates the build launch via either `[data-formup]` CTA, the Three.js 3D scene engine triggers unit departure animations (`formT = n; A.ship = n; ...`). The `1900ms` delay (`0ms` if `prefers-reduced-motion: reduce`) allows the mechas to complete their departure choreography across the canvas before `openModal()` unhides `#modal` and focuses the company name input (`$("co").focus()`).
