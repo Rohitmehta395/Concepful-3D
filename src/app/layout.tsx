@@ -26,6 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["500", "700"],
   variable: "--font-jetbrains-mono",
   display: "swap",
+  fallback: ["ui-monospace", "monospace"],
 });
 
 // Original line 2198: "© 2026 Concepful · Creative Department-as-a-Service"
