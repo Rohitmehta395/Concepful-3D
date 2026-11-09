@@ -104,6 +104,7 @@
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 14px;
+  line-height: normal;
   width: 100%;
 }
 
@@ -118,7 +119,15 @@
 .fld input[type="file"] {
   padding: 8px;
   font-size: 12px;
+  line-height: normal;
   color: var(--muted);
+}
+
+.fld input[type="file"]::file-selector-button {
+  padding: revert;
+  border: revert;
+  margin: revert;
+  font: revert;
 }
 
 /* Lines 1428-1434: Full-width primary submit CTA */
@@ -127,6 +136,7 @@
   margin-top: 4px;
   padding: 13px;
   font-size: 16px;
+  line-height: normal;
   border-radius: 12px;
 }
 
@@ -167,4 +177,11 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--pro);
+}
+
+@media (max-width: 900px) {
+  /* Lines 1486-1488: Mobile single-column form grid */
+  .form {
+    grid-template-columns: 1fr;
+  }
 }
