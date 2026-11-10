@@ -6,18 +6,18 @@ This document records the verification history, approved milestones, and live st
 
 ## 1. Overall Progress Summary
 
-|    Phase     | Title                                 | Parts  |             Status              |                                                                                                         Approval Date                                                                                                          |
-| :----------: | :------------------------------------ | :----: | :-----------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
-| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
+|    Phase     | Title                                 | Parts  |              Status              |                     Approval Date                     |
+| :----------: | :------------------------------------ | :----: | :------------------------------: | :---------------------------------------------------: |
+| **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |           **Approved**           |                     Oct 30, 2026                      |
+| **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |           **Approved**           |                     Oct 30, 2026                      |
 | **Phase 3**  | **Static Page Shell**                 | 8 / 8  | **In Review (Pending Sign-Off)** | Part 3.1–3.8 static shell built; verification ongoing |
-| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |             Pending             |                                                                                                               —                                                                                                                |
-| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |             Pending             |                                                                                                               —                                                                                                                |
+| **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |             Pending              |                           —                           |
+| **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |             Pending              |                           —                           |
+| **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |             Pending              |                           —                           |
+| **Phase 7**  | **2D Overlay, Callouts, and Patch**   | 0 / 4  |             Pending              |                           —                           |
+| **Phase 8**  | **Responsive & Accessibility Pass**   | 0 / 5  |             Pending              |                           —                           |
+| **Phase 9**  | **Performance & Optimization**        | 0 / 4  |             Pending              |                           —                           |
+| **Phase 10** | **Production, QA, and Deployment**    | 0 / 5  |             Pending              |                           —                           |
 
 ---
 
@@ -338,7 +338,7 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    Under the composited surface model where element opacity $o = 0.5$ applies to the entire beat element:
    - Dim state (`opacity: 0.5`): Title **4.91:1** (passes WCAG AA Normal Text >= 4.5:1), Description **2.90:1** (below 4.5:1 normal text).
    - Active state (`.on`, `opacity: 1`): Title **15.33:1** (passes WCAG AAA), Description **7.28:1** (passes WCAG AA).
-   Confirmed by script on both reference and rebuild; logged for Phase 8 accessibility pass.
+     Confirmed by script on both reference and rebuild; logged for Phase 8 accessibility pass.
 9. **mobile Classes card 1-unit channel residual: probe 0.2 findings:**
    Classes mobile diff caused by original .wmark overlay; re-measure after the footer is built (Part 3.7).
    Variant (c) (hiding canvases and setting flat html/body background) left 1,096 diff pixels at 390px and 1,097 at 768px. In-depth DOM layer probe identified that 1,072 of these pixels are caused by the fixed watermark footer (`.wmark`, lines 1741–1785 / 2196–2206) in the reference prototype, which sits at `position: fixed; z-index: 5; bottom: calc(8px + var(--sb)); right: calc(var(--gr) + 2px)` and overlays the bottom-right corner of the sticky card at viewports `<= 900px`. When `.wmark` is hidden (Variant d), the Classes card diff drops from 1,096 to **24 pixels** at 390px and from 1,097 to **25 pixels** at 768px, which are pure subpixel glyph-edge rasterization differences.
