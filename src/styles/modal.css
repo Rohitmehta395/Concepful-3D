@@ -108,6 +108,10 @@
   width: 100%;
 }
 
+.fld input::placeholder {
+  color: revert;
+}
+
 /* Lines 1418-1422: Form focus ring */
 .fld input:focus,
 .fld select:focus {
