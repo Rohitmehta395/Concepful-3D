@@ -433,7 +433,7 @@ The following commits comprise the complete, verified, and audited implementatio
 
 ## 8. Phase 3 Exit Sign-Off & Repository Inventory
 
-Phase 3 is complete with **36 commits** in `main` spanning domain logic, section components, responsive styles, fonts, and verification harnesses.
+Phase 3 verification and static section rebuilds are complete as of commit `a1deafa` in `main`.
 
 ### 8.1 Repository Source Files & Hashes
 
@@ -500,7 +500,7 @@ Phase 3 is complete with **36 commits** in `main` spanning domain logic, section
 
 1. **Footer Watermark Small Text Contrast**: ~2.8:1 analytical ratio (prototype line 1754). Text hidden under 900px.
 2. **Modal Placeholder Contrast**: 3.67:1 measured composited ratio over `--glass2` / `.mcard` stack (prototype line 1409).
-3. **Modal Submit CTA Normal Text Contrast**: 4.06:1 on `--red` (`#e83b4e`) (passes large text >= 3.0:1; prototype line 1428).
+3. **Modal Submit CTA Normal Text Contrast**: 4.43:1 on `--red` (`#ee004e`) (passes large text >= 3.0:1; prototype line 1428 / 1669).
 
 ### 8.3 Quality Gates Sign-Off
 
