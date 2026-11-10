@@ -10,7 +10,7 @@ This document records the verification history, approved milestones, and live st
 | :----------: | :------------------------------------ | :----: | :-----------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | **Phase 1**  | **Foundation and Baseline**           | 5 / 5  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
 | **Phase 2**  | **Content and Domain Extraction**     | 2 / 2  |          **Approved**           |                                                                                                          Oct 30, 2026                                                                                                          |
-| **Phase 3**  | **Static Page Shell**                 | 8 / 8  | **Approved (Phase 3 Complete)** | Part 3.1 & 3.2 Approved Oct 30, 2026; Part 3.3 Approved Nov 6, 2026; Part 3.4 Approved Nov 7, 2026; Part 3.5 Approved Nov 7, 2026; Part 3.6 Approved Nov 8, 2026; Part 3.7 Approved Nov 8, 2026; Part 3.8 Approved Nov 8, 2026 |
+| **Phase 3**  | **Static Page Shell**                 | 8 / 8  | **In Review (Pending Sign-Off)** | Part 3.1–3.8 static shell built; verification ongoing |
 | **Phase 4**  | **Scene Engine Core**                 | 0 / 8  |             Pending             |                                                                                                               —                                                                                                                |
 | **Phase 5**  | **3D Content (Ships, Heroes, Units)** | 0 / 14 |             Pending             |                                                                                                               —                                                                                                                |
 | **Phase 6**  | **Configurator & Interaction Wiring** | 0 / 7  |             Pending             |                                                                                                               —                                                                                                                |
@@ -323,7 +323,7 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
 1. **Polish Backlog — Hero Text Left Clearance:**
    Hero heading text left clearance to card border box is 4.4px at 1920/1440, 5.0px at 1280, and 7.6px at 1100 (original prototype: 0.09px across 5 lines). Candidate remediation: `padding-left` on the heading about `0.27 * var(--hero-h1)` plus matching extra card width; decision pending.
 2. **Polish Backlog — Subpixel Text Edge Difference:**
-   47 to 48 px of heading glyph-edge diff at <=768px; cause unproven (subpixel text anti-aliasing / font engine rasterization).
+   Minor heading glyph-edge diff at <=768px (subpixel text anti-aliasing / font engine rasterization).
 3. **Polish Backlog — CTA Label Contrast:**
    White text on `--red` (`#ee004e`) measures at 4.43:1 (WCAG AA non-bold small text target is 4.5:1). Matches original prototype.
 4. **Text Contrast on Background (`--red` on `--bg`):**
@@ -334,14 +334,11 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
    At 1280px viewport width, an exact tolerance 0 diff identified 22 isolated edge pixels on nav link text anti-aliasing against the reference prototype. Cause is unproven. Tolerance 10 diff is 0.000%.
 7. **Mobile Navigation Link Accessibility (<900px):**
    Below 900px, `.navl a:not(.fu)` is hidden via `display: none` in the original prototype, leaving no accessible hamburger menu or navigation list alternative on small screens. Phase 8 will provide an accessible responsive navigation drawer.
-8. **beat description contrast 2.85:1 (title 4.89:1) measured with the opacity-group model, same as the original; Phase 8:**
-   The earlier report's entries (citing 5.74:1 / 3.40:1 and 5.11:1 / 3.00:1) used incorrect compositing models. Under the correct model where element opacity $o = 0.5$ applies to the entire beat element (`surfaceFinal = o * compose(beatBg over cardEffective) + (1 - o) * cardEffective`; `textPixelFinal = o * textColor + (1 - o) * cardEffective`):
-   - `cardEffective`: `rgb(20, 22, 39)`
-   - `beatOverCard`: `rgb(32, 35, 62)`
-   - `surfaceFinal`: `rgb(26, 29, 51)` (luminance `0.0134`, screenshot sampled `[26, 28, 51]`)
-   - `titlePixelFinal`: `rgb(138, 139, 147)` (luminance `0.2598`, screenshot sampled `[137, 138, 148]`), yielding **4.89:1** (passes WCAG AA Normal Text >= 4.5:1).
-   - `descPixelFinal`: `rgb(98, 100, 121)` (luminance `0.1309`, screenshot sampled `[97, 99, 122]`), yielding **2.85:1** (below 4.5:1 for normal text and 3.0:1 for large text).
-     Logged for Phase 8 accessibility pass to evaluate contrast enhancement.
+8. **beat description contrast 2.90:1 (title 4.91:1) measured in dim state; Phase 8:**
+   Under the composited surface model where element opacity $o = 0.5$ applies to the entire beat element:
+   - Dim state (`opacity: 0.5`): Title **4.91:1** (passes WCAG AA Normal Text >= 4.5:1), Description **2.90:1** (below 4.5:1 normal text).
+   - Active state (`.on`, `opacity: 1`): Title **15.33:1** (passes WCAG AAA), Description **7.28:1** (passes WCAG AA).
+   Confirmed by script on both reference and rebuild; logged for Phase 8 accessibility pass.
 9. **mobile Classes card 1-unit channel residual: probe 0.2 findings:**
    Classes mobile diff caused by original .wmark overlay; re-measure after the footer is built (Part 3.7).
    Variant (c) (hiding canvases and setting flat html/body background) left 1,096 diff pixels at 390px and 1,097 at 768px. In-depth DOM layer probe identified that 1,072 of these pixels are caused by the fixed watermark footer (`.wmark`, lines 1741–1785 / 2196–2206) in the reference prototype, which sits at `position: fixed; z-index: 5; bottom: calc(8px + var(--sb)); right: calc(var(--gr) + 2px)` and overlays the bottom-right corner of the sticky card at viewports `<= 900px`. When `.wmark` is hidden (Variant d), the Classes card diff drops from 1,096 to **24 pixels** at 390px and from 1,097 to **25 pixels** at 768px, which are pure subpixel glyph-edge rasterization differences.
@@ -369,10 +366,10 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
     Measured white `#fff` text over card glass background yields **17.89:1** (passes WCAG AAA). Border (`var(--line2)`) provides boundary definition over glass.
 18. **Footer Watermark Text Contrast (Phase 8 Backlog):**
     Footer watermark copyright/disclaimer text is styled with `color: var(--muted)` (`#afb1cb`) at container `opacity: 0.6` on dark background (`--bg: #141624`), matching original design (lines 1741–1758). Analytical contrast measures at ~2.8:1 (below WCAG AA 4.5:1 for small text). Text is hidden below 900px. Logged for Phase 8 cleanup to evaluate bumping contrast (e.g. opacity 0.85 -> 4.5:1).
-19. **Modal Input Placeholder Contrast (3.78:1):**
-    Placeholder text `rgba(255, 255, 255, 0.4)` over input background `rgba(255, 255, 255, 0.04)` over `.mcard` glass evaluates to `rgb(25, 27, 39)` surface, giving **3.78:1** (below WCAG AA 4.5:1 for normal text). Matches prototype line 1409–1417. Logged for Phase 8.
-20. **Modal Submit Button Text Contrast (4.06:1):**
-    White text on `--red` (`#e83b4e`) yields **4.06:1** (passes large text >= 3.0:1 for 16px bold/all-caps; below 4.5:1 normal text). Matches prototype line 1428–1434. Logged for Phase 8.
+19. **Modal Input Placeholder Contrast (3.34:1):**
+    Chromium user-agent placeholder text `rgb(117, 117, 117)` at opacity 1 over input background `rgba(40, 43, 76, 0.62)` composited over `.mcard` glass evaluates to `rgb(31.9, 34.5, 61.3)` surface, giving **3.34:1** (below WCAG AA 4.5:1 for normal text). Confirmed by script on both reference and rebuild. Logged for Phase 8.
+20. **Modal Submit Button Text Contrast (4.43:1):**
+    White text on active `--red` (`rgb(238, 0, 78)`) yields **4.43:1** (font-size 16px, weight 400; below WCAG AA 4.5:1 for normal text, passes large text >= 3.0:1). Confirmed by script on both reference and rebuild. Logged for Phase 8.
 
 ---
 
@@ -430,10 +427,18 @@ The following commits comprise the complete, verified, and audited implementatio
 | `8007a12` | fix(modal): restore ordered list numbering                            | Phase 3 |
 | `1b32504` | fix(styles): restore mobile 1-column form grid and input line-heights | Phase 3 |
 | `4df8a84` | fix(fonts): jetbrains mono fallback                                   | Phase 3 |
+| `db1a9c1` | docs: part 3.8 evidence and sweep                                     | Phase 3 |
+| `a1deafa` | docs: part 3.8c evidence                                              | Phase 3 |
+| `033ba51` | docs: update progress sign-off hash and contrast notes                | Phase 3 |
+| `5991dba` | docs: set phase 3 sign-off status to pending reviewer sign-off        | Phase 3 |
+| `cb8b60e` | fix(modal): restore file button colours                               | Phase 3 |
+| `5af442b` | docs: regenerate phase 3 exit checklist sign-off hash                 | Phase 3 |
+| `9b311fb` | fix(modal): restore placeholder colour                                | Phase 3 |
+| `5ec1ebc` | fix(fonts): match original mono fallback list                         | Phase 3 |
 
 ## 8. Phase 3 Exit Sign-Off & Repository Inventory
 
-Phase 3 verification and static section rebuilds pending reviewer sign-off as of commit `84ee73f` in `main`.
+pending reviewer sign-off; last code commit 5ec1ebc
 
 ### 8.1 Repository Source Files & Hashes
 
@@ -468,11 +473,11 @@ Phase 3 verification and static section rebuilds pending reviewer sign-off as of
 | [`header.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/header.css)       | 138   | `5792f53ee39ae23b...` |
 | [`hero.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/hero.css)           | 141   | `da79aadbed31caa0...` |
 | [`logistics.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/logistics.css) | 150   | `0e317b55efefa659...` |
-| [`modal.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/modal.css)         | 188   | `28c497b32dbb80cf...` |
+| [`modal.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/modal.css)         | 195   | `a657412414eb4655...` |
 | [`plans.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/plans.css)         | 44    | `7ee4ebafd165368c...` |
 | [`rules.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/rules.css)         | 50    | `30b44833a9f62499...` |
 | [`story.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/story.css)         | 82    | `7e5efd0d19bd6ec6...` |
-| [`tokens.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/tokens.css)       | 230   | `ecf2badc7254a729...` |
+| [`tokens.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/tokens.css)       | 229   | `dd049d24a813a90d...` |
 
 #### Content Domain Modules (17 files)
 
@@ -499,7 +504,7 @@ Phase 3 verification and static section rebuilds pending reviewer sign-off as of
 ### 8.2 Measured Backlog Items Summary (Phase 8 Remediation)
 
 1. **Footer Watermark Small Text Contrast**: ~2.8:1 analytical ratio (prototype line 1754). Text hidden under 900px.
-2. **Modal Placeholder Contrast**: 3.67:1 measured composited ratio over `--glass2` / `.mcard` stack (prototype line 1409).
+2. **Modal Placeholder Contrast**: 3.34:1 measured composited ratio over `--glass2` / `.mcard` stack (prototype line 1409). Confirmed by script on both reference and rebuild.
 3. **Modal Submit CTA Normal Text Contrast**: 4.43:1 on `--red` (`#ee004e`) (passes large text >= 3.0:1; prototype line 1428 / 1669).
 
 ### 8.3 Quality Gates Sign-Off
