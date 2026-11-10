@@ -397,7 +397,7 @@ The following items are tracked for remediation in Phase 8 (Responsive & Accessi
 
 ## 8. Phase 3 Exit Checklist (Derived from Git Log)
 
-The following 29 commits comprise the complete, verified, and audited implementation of **Phase 3: Static Page Shell**:
+The following commits comprise the complete, verified, and audited implementation of **Phase 3: Static Page Shell**:
 
 | Commit    | Description                                                           | Scope   |
 | :-------- | :-------------------------------------------------------------------- | :------ |
@@ -430,3 +430,83 @@ The following 29 commits comprise the complete, verified, and audited implementa
 | `8007a12` | fix(modal): restore ordered list numbering                            | Phase 3 |
 | `1b32504` | fix(styles): restore mobile 1-column form grid and input line-heights | Phase 3 |
 | `4df8a84` | fix(fonts): jetbrains mono fallback                                   | Phase 3 |
+
+## 8. Phase 3 Exit Sign-Off & Repository Inventory
+
+Phase 3 is complete with **36 commits** in `main` spanning domain logic, section components, responsive styles, fonts, and verification harnesses.
+
+### 8.1 Repository Source Files & Hashes
+
+#### Section & Shell Components (14 files)
+
+| Component File                                                                                | Lines | SHA-256 Checksum      |
+| :-------------------------------------------------------------------------------------------- | :---- | :-------------------- |
+| [`.gitkeep`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/.gitkeep)             | 1     | `e3b0c44298fc1c14...` |
+| [`Build.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Build.tsx)           | 21    | `b709384912c53c7f...` |
+| [`Classes.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Classes.tsx)       | 45    | `0b3489ae8c4d4370...` |
+| [`Hero.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Hero.tsx)             | 53    | `fce9e793fd1f211f...` |
+| [`Logistics.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Logistics.tsx)   | 43    | `fcadb4b49f0b90d5...` |
+| [`Outro.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Outro.tsx)           | 47    | `000b1248b68287d1...` |
+| [`Plans.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Plans.tsx)           | 46    | `7a787f549eb457af...` |
+| [`Rules.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/story/Rules.tsx)           | 39    | `b94b7f50ee59db91...` |
+| [`.gitkeep`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/.gitkeep)             | 1     | `e3b0c44298fc1c14...` |
+| [`Footer.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/Footer.tsx)         | 27    | `299a10a1400d28e9...` |
+| [`GuildModal.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/GuildModal.tsx) | 108   | `539f274f2065bc23...` |
+| [`Header.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/Header.tsx)         | 23    | `46f8649dd4bacd61...` |
+| [`Logo.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/Logo.tsx)             | 73    | `5c04c713d1a4f144...` |
+| [`SkipLink.tsx`](file:///D:/Projects/Pete/Concepful-3D/src/components/shell/SkipLink.tsx)     | 13    | `62cdde11771d6ce3...` |
+
+#### Stylesheets (13 files)
+
+| Stylesheet File                                                                   | Lines | SHA-256 Checksum      |
+| :-------------------------------------------------------------------------------- | :---- | :-------------------- |
+| [`.gitkeep`](file:///D:/Projects/Pete/Concepful-3D/src/styles/.gitkeep)           | 1     | `e3b0c44298fc1c14...` |
+| [`base.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/base.css)           | 61    | `5dcef899c0fc819f...` |
+| [`build.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/build.css)         | 10    | `5cedd88323a207cc...` |
+| [`classes.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/classes.css)     | 164   | `eebcb764af2a3dec...` |
+| [`footer.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/footer.css)       | 65    | `5f8927dbed0f2088...` |
+| [`header.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/header.css)       | 138   | `5792f53ee39ae23b...` |
+| [`hero.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/hero.css)           | 141   | `da79aadbed31caa0...` |
+| [`logistics.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/logistics.css) | 150   | `0e317b55efefa659...` |
+| [`modal.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/modal.css)         | 188   | `28c497b32dbb80cf...` |
+| [`plans.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/plans.css)         | 44    | `7ee4ebafd165368c...` |
+| [`rules.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/rules.css)         | 50    | `30b44833a9f62499...` |
+| [`story.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/story.css)         | 82    | `7e5efd0d19bd6ec6...` |
+| [`tokens.css`](file:///D:/Projects/Pete/Concepful-3D/src/styles/tokens.css)       | 230   | `ecf2badc7254a729...` |
+
+#### Content Domain Modules (17 files)
+
+| Content File                                                                       | Lines | SHA-256 Checksum      |
+| :--------------------------------------------------------------------------------- | :---- | :-------------------- |
+| [`.gitkeep`](file:///D:/Projects/Pete/Concepful-3D/src/content/.gitkeep)           | 1     | `e3b0c44298fc1c14...` |
+| [`a11y.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/a11y.ts)             | 6     | `5f5d020807ea69e3...` |
+| [`assets.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/assets.ts)         | 14    | `db05b8844e9f0fa6...` |
+| [`buffs.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/buffs.ts)           | 58    | `84ef6206d5d5f1fb...` |
+| [`callouts.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/callouts.ts)     | 143   | `379fb383662a36e1...` |
+| [`classes.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/classes.ts)       | 41    | `7bc5ebbf27585b9f...` |
+| [`gear.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/gear.ts)             | 31    | `6490b785cc1c560e...` |
+| [`index.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/index.ts)           | 21    | `eb138949970645cf...` |
+| [`modal.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/modal.ts)           | 120   | `99b924b4c1fb3aab...` |
+| [`objectives.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/objectives.ts) | 43    | `7e0f6316892c4db9...` |
+| [`quests.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/quests.ts)         | 81    | `0d97db9643710a2b...` |
+| [`roles.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/roles.ts)           | 39    | `cb552cea532424bf...` |
+| [`roster.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/roster.ts)         | 29    | `aa67268658f03ba6...` |
+| [`sections.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/sections.ts)     | 26    | `483ec7dfa3bb3c46...` |
+| [`story.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/story.ts)           | 314   | `681468654ab55fdc...` |
+| [`tiers.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/tiers.ts)           | 48    | `74d24ecae452f1a9...` |
+| [`types.ts`](file:///D:/Projects/Pete/Concepful-3D/src/content/types.ts)           | 210   | `4f79cdeaac6f1c90...` |
+
+### 8.2 Measured Backlog Items Summary (Phase 8 Remediation)
+
+1. **Footer Watermark Small Text Contrast**: ~2.8:1 analytical ratio (prototype line 1754). Text hidden under 900px.
+2. **Modal Placeholder Contrast**: 3.67:1 measured composited ratio over `--glass2` / `.mcard` stack (prototype line 1409).
+3. **Modal Submit CTA Normal Text Contrast**: 4.06:1 on `--red` (`#e83b4e`) (passes large text >= 3.0:1; prototype line 1428).
+
+### 8.3 Quality Gates Sign-Off
+
+- **TypeScript strict**: Passed (`pnpm typecheck` clean)
+- **ESLint**: Passed (`pnpm lint` clean)
+- **Prettier**: Passed (`pnpm format:check` clean)
+- **Vitest unit tests**: 4,108 passed across 6 test suites
+- **Prefix order guard**: Passed (`node scripts/check-compiled-css.mjs` clean)
+- **Reference file integrity**: SHA-256 `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (verified)
