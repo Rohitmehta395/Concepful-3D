@@ -124,6 +124,9 @@
 }
 
 .fld input[type="file"]::file-selector-button {
+  appearance: auto;
+  background-color: revert;
+  color: revert;
   padding: revert;
   border: revert;
   margin: revert;
