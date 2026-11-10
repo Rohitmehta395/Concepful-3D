@@ -102,8 +102,7 @@
   /* Line 69: Body font family with next/font variable and source fallbacks */
   --body: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
   /* Line 70: Monospace font family with next/font variable and source fallbacks */
-  --mono:
-    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --mono: var(--font-jetbrains-mono);
 
   /* ==========================================================================
      Typography: Letter Spacing / Tracking (Direct values from prototype CSS)
