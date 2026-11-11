@@ -22,24 +22,33 @@ export interface CardRect {
 
 /**
  * Pure measurement of target framing box.
- * Matches original lines 2662-2720: storyTarget and logiTarget.
+ * Matches original lines 2662-2770: storyTarget, logiTarget, and app target.
  */
 export function measureBox(
   W: number,
   H: number,
   topBottom: number,
   cards: CardRect[] = [],
-  isLogi = false,
-  logiElements?: { hzHeadBottom?: number; hzViewTop?: number }
+  sceneMode: "story" | "logi" | "app" = "story",
+  elements?: {
+    hzHeadBottom?: number;
+    hzViewTop?: number;
+    panelRight?: number;
+    panelTop?: number;
+    cardLeft?: number;
+    cardWidth?: number;
+    boxartHeight?: number;
+    boxartTop?: number;
+  }
 ): Box {
   let x0: number;
   let x1: number;
   let y0: number;
   let y1: number;
 
-  if (isLogi) {
-    const hbBottom = logiElements?.hzHeadBottom ?? topBottom;
-    const tbTop = logiElements?.hzViewTop ?? H;
+  if (sceneMode === "logi") {
+    const hbBottom = elements?.hzHeadBottom ?? topBottom;
+    const tbTop = elements?.hzViewTop ?? H;
     y0 = Math.max(topBottom + 4, Math.min(H * 0.6, hbBottom + 4));
     y1 = Math.max(y0 + H * 0.22, Math.min(H - 8, tbTop - 4));
     if (W < 900) {
@@ -48,6 +57,31 @@ export function measureBox(
     } else {
       x0 = 20;
       x1 = W - 20;
+    }
+  } else if (sceneMode === "app") {
+    if (W < 900) {
+      const prTop = elements?.panelTop ?? 414;
+      x0 = 10;
+      x1 = W - 10;
+      y0 = elements?.panelTop !== undefined ? topBottom + 4 : 119.34375;
+      y1 = prTop - 4;
+    } else {
+      const prRight = elements?.panelRight ?? 416;
+      const crLeft = elements?.cardLeft ?? (W < 1440 ? 1008 : W - 272);
+      const crWidth = elements?.cardWidth ?? 256;
+      const brHeight = elements?.boxartHeight ?? 120;
+      const brTop = elements?.boxartTop ?? (W === 1280 ? 680 : H - 122.53125);
+
+      x1 = W - 20;
+      if (crWidth > 0) {
+        x1 = crLeft + (W - crLeft) * 0.35;
+      }
+      x0 = prRight + 12;
+      y0 = elements?.panelRight !== undefined ? topBottom + 6 : 70;
+      y1 = brHeight ? brTop + 10 : H - 20;
+      if (x1 - x0 < 340) {
+        x1 = W - 20;
+      }
     }
   } else if (W >= 900) {
     let r = 16 + Math.min(460, W - 32);

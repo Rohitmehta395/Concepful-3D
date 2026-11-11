@@ -63,6 +63,7 @@ export function createEngine(
 
   // Framing box & scroll driver
   const scrollDriver = createScrollDriver();
+  let previousActiveScene = "";
   let currentBox: Box = {
     x0: 0,
     x1: width,
@@ -101,15 +102,64 @@ export function createEngine(
       };
     });
 
-    const isLogi = scrollDriver.getState().activeScene === "logi";
-    currentBox = measureBox(w, h, topBottom, cards, isLogi);
+    const activeScene = scrollDriver.getState().activeScene;
+    const sceneMode: "story" | "logi" | "app" =
+      activeScene === "logi"
+        ? "logi"
+        : activeScene === "app" || activeScene === "build"
+          ? "app"
+          : "story";
+
+    const hh = document.querySelector(".hz-head");
+    const tk = document.querySelector(".hz-view");
+    const panel = document.getElementById("panel");
+    const card = document.getElementById("card");
+    const boxart = document.getElementById("boxart");
+
+    const elements = {
+      hzHeadBottom: hh ? hh.getBoundingClientRect().bottom : undefined,
+      hzViewTop: tk ? tk.getBoundingClientRect().top : undefined,
+      panelRight: panel ? panel.getBoundingClientRect().right : undefined,
+      panelTop: panel ? panel.getBoundingClientRect().top : undefined,
+      cardLeft: card ? card.getBoundingClientRect().left : undefined,
+      cardWidth: card ? card.getBoundingClientRect().width : undefined,
+      boxartHeight: boxart ? boxart.getBoundingClientRect().height : undefined,
+      boxartTop: boxart ? boxart.getBoundingClientRect().top : undefined,
+    };
+
+    currentBox = measureBox(w, h, topBottom, cards, sceneMode, elements);
     applyCameraOffset(camera, currentBox, w, h);
   }
 
   function renderFrame(time = performance.now()): void {
     if (isDisposed) return;
     frameCount++;
-    scrollDriver.update(time);
+    const state = scrollDriver.update(time);
+
+    // Update beats and clock in active section DOM (reference lines 11987-12000)
+    if (typeof document !== "undefined") {
+      const activeEl = document.querySelector(
+        `[data-scene="${state.activeScene}"]`
+      );
+      if (activeEl) {
+        const bs = activeEl.querySelector("[data-beats]");
+        if (bs) {
+          const n = bs.children.length;
+          const idx = Math.min(
+            n - 1,
+            Math.floor(state.activeProgress * n * 1.05)
+          );
+          Array.from(bs.children).forEach((c, i) => {
+            c.classList.toggle("on", i === idx);
+          });
+        }
+      }
+    }
+
+    if (state.activeScene !== previousActiveScene) {
+      previousActiveScene = state.activeScene;
+      updateFraming();
+    }
     renderer.render(scene, camera);
   }
 
@@ -208,9 +258,19 @@ export function createEngine(
     if (isDisposed) return;
     // Reduced motion: recompute on scroll
     if (motionQuery && motionQuery.matches) {
-      scrollDriver.update(performance.now());
       renderFrame(performance.now());
     }
+  }
+
+  let resizeRAFId: number | null = null;
+  function scheduleResize(): void {
+    if (isDisposed) return;
+    if (resizeRAFId !== null) return;
+    resizeRAFId = requestAnimationFrame(() => {
+      resizeRAFId = null;
+      if (isDisposed) return;
+      resize();
+    });
   }
 
   if (typeof document !== "undefined") {
@@ -219,7 +279,7 @@ export function createEngine(
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("resize", scheduleResize, { passive: true });
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
         if (!isDisposed) {
@@ -239,7 +299,7 @@ export function createEngine(
   let resizeObserver: ResizeObserver | null = null;
   if (typeof ResizeObserver !== "undefined") {
     resizeObserver = new ResizeObserver(() => {
-      resize();
+      scheduleResize();
     });
     if (canvas.parentElement) {
       resizeObserver.observe(canvas.parentElement);
@@ -250,6 +310,7 @@ export function createEngine(
 
   // Initial measurement and sizing
   scrollDriver.measureSections();
+  previousActiveScene = scrollDriver.getState().activeScene;
   resize();
 
   function dispose(): void {
@@ -257,13 +318,18 @@ export function createEngine(
     isDisposed = true;
     stop();
 
+    if (resizeRAFId !== null) {
+      cancelAnimationFrame(resizeRAFId);
+      resizeRAFId = null;
+    }
+
     if (typeof document !== "undefined") {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     }
 
     if (typeof window !== "undefined") {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", scheduleResize);
     }
 
     if (motionQuery) {

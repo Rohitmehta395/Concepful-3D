@@ -3,20 +3,23 @@
  */
 
 /**
- * Checks whether WebGL rendering context is available and functional.
- * Verifies that WebGL can be acquired and shader precision queries succeed,
- * which guards against broken/headless GPU environments where getShaderPrecisionFormat
- * returns null.
+ * Probes whether WebGL is functional using a detached canvas,
+ * and immediately releases the context with WEBGL_lose_context
+ * so no resources or contexts leak.
+ * SceneHost must not pre-create a context on the real #gl canvas.
  */
-export function hasWebGL(targetCanvas?: HTMLCanvasElement | null): boolean {
+export function hasWebGL(): boolean {
   if (typeof window === "undefined") {
     return false;
   }
   try {
-    const canvas = targetCanvas ?? document.createElement("canvas");
     if (!window.WebGLRenderingContext) {
       return false;
     }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
 
     const gl = (canvas.getContext("webgl2") ||
       canvas.getContext("webgl") ||
@@ -27,9 +30,7 @@ export function hasWebGL(targetCanvas?: HTMLCanvasElement | null): boolean {
       return false;
     }
 
-    // Three.js WebGLCapabilities queries getShaderPrecisionFormat.
-    // If the driver or virtualization returns null, Three.js WebGLRenderer throws:
-    // TypeError: Cannot read properties of null (reading 'precision')
+    // Verify shader precision format (guards against virtualized/headless null return)
     if (typeof gl.getShaderPrecisionFormat === "function") {
       const vPrec = gl.getShaderPrecisionFormat(
         gl.VERTEX_SHADER,
@@ -42,6 +43,12 @@ export function hasWebGL(targetCanvas?: HTMLCanvasElement | null): boolean {
       if (!vPrec || !fPrec || typeof vPrec.precision !== "number") {
         return false;
       }
+    }
+
+    // Immediately release the context on the detached probe canvas
+    const loseContext = gl.getExtension("WEBGL_lose_context");
+    if (loseContext) {
+      loseContext.loseContext();
     }
 
     return true;

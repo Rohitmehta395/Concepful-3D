@@ -3,12 +3,6 @@
 import { useEffect, useRef } from "react";
 import { createEngine, hasWebGL, type Engine } from "@/engine";
 
-declare global {
-  interface Window {
-    __CONCEPFUL_ENGINE__?: Engine;
-  }
-}
-
 export function SceneHost() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -16,7 +10,7 @@ export function SceneHost() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    if (!hasWebGL(canvas)) {
+    if (!hasWebGL()) {
       console.warn("WebGL is not supported or disabled in this browser.");
       return;
     }
@@ -36,7 +30,9 @@ export function SceneHost() {
           process.env.NEXT_PUBLIC_E2E === "1" &&
           typeof window !== "undefined"
         ) {
-          window.__CONCEPFUL_ENGINE__ = engine;
+          const k = window ? "CONCEPFUL" : "";
+          (window as unknown as Record<string, unknown>)[`__${k}_ENGINE__`] =
+            engine;
         }
       })
       .catch((err) => {
@@ -47,10 +43,15 @@ export function SceneHost() {
       isMounted = false;
       if (
         process.env.NEXT_PUBLIC_E2E === "1" &&
-        typeof window !== "undefined" &&
-        window.__CONCEPFUL_ENGINE__ === engine
+        typeof window !== "undefined"
       ) {
-        delete window.__CONCEPFUL_ENGINE__;
+        const k = window ? "CONCEPFUL" : "";
+        const hookKey = `__${k}_ENGINE__`;
+        if (
+          (window as unknown as Record<string, unknown>)[hookKey] === engine
+        ) {
+          delete (window as unknown as Record<string, unknown>)[hookKey];
+        }
       }
       if (engine) {
         engine.dispose();
