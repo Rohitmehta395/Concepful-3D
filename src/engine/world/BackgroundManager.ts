@@ -17,6 +17,7 @@ export interface BackgroundManager {
     renderer: THREE.WebGLRenderer
   ): void;
   setMode(mode: BackgroundMode): void;
+  setVisible(visible: boolean): void;
   update(scrollState: ScrollState, dt: number, time?: number): void;
   dispose(): void;
 }
@@ -80,6 +81,18 @@ export function createBackgroundManager(
       if (planet) planet.group.visible = true;
       if (starfield) starfield.mesh.visible = true;
       if (cosmosLayer) cosmosLayer.group.visible = true;
+    }
+  }
+
+  function setVisible(visible: boolean): void {
+    if (!visible) {
+      if (bubbles) bubbles.points.visible = false;
+      if (clouds) clouds.group.visible = false;
+      if (planet) planet.group.visible = false;
+      if (starfield) starfield.mesh.visible = false;
+      if (cosmosLayer) cosmosLayer.group.visible = false;
+    } else {
+      setMode(currentMode);
     }
   }
 
@@ -243,6 +256,7 @@ export function createBackgroundManager(
     },
     build,
     setMode,
+    setVisible,
     update,
     dispose,
   };

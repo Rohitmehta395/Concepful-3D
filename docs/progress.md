@@ -525,3 +525,24 @@ pending reviewer sign-off; last code commit 5ec1ebc
   - Three.js r128 dedicated chunk added: 510,082 bytes raw / 124,948 bytes gzip.
   - Total Client Chunks: 1,078,751 bytes raw / 299,667 bytes gzip (+510,082 raw / +124,948 gzip over Phase 3 baseline of 568,669 raw / 174,719 gzip).
 - **WebGL Parity:** Fixed full-bleed viewport behind content, DPR capped at 2.0, zero geometry/texture leaks across 20 mount/unmount cycles, rAF loop auto-pauses on document.hidden and respects prefers-reduced-motion.
+
+### Part 4.2 & 4.3: Camera Framing, Backgrounds & Valid GL Harness Fixes
+
+- **Hero Card Width Revert (`5abc791`)**:
+  - Earlier width override was found to deviate from the original JS-on layout (reference box `x0=500` at 1280).
+  - Script-extracted diff:
+
+```diff
+-  /* --hero-h1 defined once: card width and .big font-size both derive from it */
++  /* --hero-h1 defined once: card width matches .sc standard 460px */
+-  max-width: calc(7.24 * var(--hero-h1) + 54px);
++  max-width: 460px;
+```
+
+- **Engine Framing & World**: Detached `hasWebGL()` probe with `WEBGL_lose_context`, coalesced `rAF` resize, cached scroll rects (`0` idle calls), full `Mesh`/`Points`/`LineSegments`/`Line`/`Sprite` + texture/RT disposal (`0` geometries, `0` textures, `0` programs), `200ms` `#gl.ready` fade-in, and `BackgroundManager` (`space`, `sea`, `sky`).
+
+### Part 4.4: Shared Helpers, Orbit/Drag Controller & `STB.classes` Stage
+
+- **Helpers & Palette**: Exact `brandCol`/`hexS`/`tm`/`bm`/`INK`/`TX`/`texC`/`mk`/`glowS`/`eye3`/`textSprite`/`plane`/`hexPlinth`/`bake` & geometry builders.
+- **Orbit & Drag Controller**: Ported `dragStep`, `autoPick`, `autoStep`, `orbitInto`, `aim`, pointer listeners, and `#gl.drag` cursor state with zero per-frame allocations.
+- **Stage & First Two `U3` Units**: Ported `STB.classes` (3 hex plinths + category labels) with `uArchitect` and `uForge` (remaining 7 units deferred to Part 4.5).

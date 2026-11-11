@@ -5,6 +5,15 @@ import {
   createBackgroundManager,
   type BackgroundManager,
 } from "./world/BackgroundManager";
+import {
+  createMaterialRegistry,
+  type MaterialRegistry,
+} from "./world/materials";
+import {
+  createOrbitController,
+  type OrbitController,
+} from "./camera/orbitController";
+import { createClassesStage, type ClassesStage } from "./stages/classesStage";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -17,6 +26,9 @@ export interface Engine {
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer: THREE.WebGLRenderer;
   readonly backgroundManager: BackgroundManager;
+  readonly orbitController: OrbitController;
+  readonly classesStage: ClassesStage;
+  readonly materials: MaterialRegistry;
   start: () => void;
   stop: () => void;
   resize: () => void;
@@ -64,11 +76,18 @@ export function createEngine(
   let isRunning = false;
   let rAFId: number | null = null;
   let frameCount = 0;
+  let snap = true;
+  let wasInClasses = false;
   const clock = new three.Clock(false);
 
-  // Background Manager (Space, Sea, Sky)
+  // Material registry + Background Manager + Stages + Orbit controller
+  const materials = createMaterialRegistry(three);
   const backgroundManager = createBackgroundManager(three);
   backgroundManager.build(scene, camera, renderer);
+  const classesStage = createClassesStage(three, scene, materials);
+  const orbitController = createOrbitController(three, canvas, () =>
+    renderFrame(performance.now())
+  );
 
   // Framing box & scroll driver
   const scrollDriver = createScrollDriver();
@@ -167,10 +186,53 @@ export function createEngine(
 
     if (state.activeScene !== previousActiveScene) {
       previousActiveScene = state.activeScene;
+      snap = true;
       updateFraming();
     }
-    const delta = clock.getDelta();
-    backgroundManager.update(state, delta * 1000, time);
+
+    const reduceMotion = !!(motionQuery && motionQuery.matches);
+    const dtMs = clock.getDelta() * 1000;
+    const viewportH =
+      typeof window !== "undefined" && window.innerHeight
+        ? window.innerHeight
+        : canvas.clientHeight || 1;
+
+    orbitController.dragStep(dtMs, reduceMotion);
+    if (snap) orbitController.autoPick(true, time);
+    orbitController.autoStep(time, dtMs, reduceMotion);
+    const kk = reduceMotion || snap ? 1 : Math.min(1, dtMs / 220);
+    snap = false;
+
+    if (state.activeScene === "classes") {
+      if (!wasInClasses) {
+        backgroundManager.setVisible(false);
+        classesStage.setVisible(true);
+        scene.background = classesStage.backgroundTexture;
+        scene.fog = null;
+        wasInClasses = true;
+      }
+      classesStage.update(
+        time,
+        dtMs,
+        state.activeProgress,
+        kk,
+        orbitController,
+        camera,
+        currentBox,
+        viewportH,
+        reduceMotion
+      );
+    } else {
+      if (wasInClasses) {
+        classesStage.setVisible(false);
+        backgroundManager.setVisible(true);
+        camera.position.set(0, 1, 14);
+        camera.lookAt(0, 0, 0);
+        wasInClasses = false;
+      }
+      backgroundManager.update(state, dtMs, time);
+    }
+
     renderer.render(scene, camera);
     if (frameCount === 1 && canvas.classList) {
       canvas.classList.add("ready");
@@ -463,7 +525,10 @@ export function createEngine(
       }
     }
 
+    orbitController.dispose();
+    classesStage.dispose();
     backgroundManager.dispose();
+    materials.dispose();
 
     renderer.dispose();
     renderer.forceContextLoss();
@@ -474,6 +539,9 @@ export function createEngine(
     camera,
     renderer,
     backgroundManager,
+    orbitController,
+    classesStage,
+    materials,
     start,
     stop,
     resize,

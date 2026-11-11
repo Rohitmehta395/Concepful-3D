@@ -242,10 +242,15 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
           createLinearGradient: () => ({ addColorStop: () => {} }),
           createRadialGradient: () => ({ addColorStop: () => {} }),
           fillRect: () => {},
+          strokeRect: () => {},
           beginPath: () => {},
           moveTo: () => {},
           lineTo: () => {},
           fill: () => {},
+          stroke: () => {},
+          measureText: () => ({ width: 100 }),
+          strokeText: () => {},
+          fillText: () => {},
         }),
       }),
       querySelector: (sel: string) => {
@@ -289,10 +294,12 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
         }
       },
       PerspectiveCamera: class {
-        position = { set: () => {}, length: () => 10 };
+        position = new THREE.Vector3(0, 1, 14);
+        fov = 30;
         aspect = 1;
         setViewOffset() {}
         updateProjectionMatrix() {}
+        lookAt() {}
       },
       Scene: class {
         background = null;
