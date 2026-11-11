@@ -54,12 +54,6 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
         iterations++;
         // Construct a realistic sequential section layout
         const sectionBounds: SectionBounds[] = [];
-        const originalSections: {
-          scene: string;
-          top: number;
-          bottom: number;
-          height: number;
-        }[] = [];
 
         let currentY = 0;
         for (let i = 0; i < sceneIds.length; i++) {
