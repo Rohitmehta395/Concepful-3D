@@ -31,9 +31,9 @@
  * Scope: .sc.hero only; the shared .sc rule is unchanged.
  */
 #intro .sc.hero {
-  /* --hero-h1 defined once: card width and .big font-size both derive from it */
+  /* --hero-h1 defined once: card width matches .sc standard 460px */
   --hero-h1: clamp(36px, 5vw, 66px);
-  max-width: calc(7.24 * var(--hero-h1) + 54px);
+  max-width: 460px;
 }
 
 /* Lines 190-200, 1680-1683: Display heading with skewed styling and active drop shadow */
