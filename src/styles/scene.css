@@ -1,0 +1,32 @@
+/**
+ * Concepful Mech Builder — 3D Scene Viewport (#gl) and 2D Overlay (#cv)
+ * Source of truth: reference/Concepful_Mech_Builder.html
+ *
+ * Line references cite reference/Concepful_Mech_Builder.html.
+ */
+
+/* Lines 582-589: Fixed full-bleed viewport behind content */
+#gl,
+#cv {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Lines 590-592: Overlay ignores pointer events */
+#cv {
+  pointer-events: none;
+}
+
+/* Lines 593-596: WebGL canvas touch action and grab cursor */
+#gl {
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+/* Lines 603-605: Active dragging cursor state */
+#gl.drag {
+  cursor: grabbing;
+}
