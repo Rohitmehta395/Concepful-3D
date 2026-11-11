@@ -20,10 +20,22 @@
   pointer-events: none;
 }
 
-/* Lines 593-596: WebGL canvas touch action and grab cursor */
+/* Lines 593-596: WebGL canvas touch action, grab cursor, and 200ms post-hydration fade-in */
 #gl {
   touch-action: pan-y;
   cursor: grab;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+#gl.ready {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #gl {
+    transition: none;
+  }
 }
 
 /* Lines 603-605: Active dragging cursor state */

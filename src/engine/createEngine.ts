@@ -172,6 +172,9 @@ export function createEngine(
     const delta = clock.getDelta();
     backgroundManager.update(state, delta * 1000, time);
     renderer.render(scene, camera);
+    if (frameCount === 1 && canvas.classList) {
+      canvas.classList.add("ready");
+    }
   }
 
   function tick(time: number): void {
@@ -354,22 +357,113 @@ export function createEngine(
       resizeObserver = null;
     }
 
-    backgroundManager.dispose();
-
-    scene.traverse((obj) => {
-      if (obj instanceof three.Mesh) {
-        if (obj.geometry) {
-          obj.geometry.dispose();
+    const disposeMaterial = (mat: THREE.Material) => {
+      const m = mat as unknown as Record<string, unknown>;
+      const mapKeys = [
+        "map",
+        "alphaMap",
+        "emissiveMap",
+        "aoMap",
+        "bumpMap",
+        "displacementMap",
+        "envMap",
+        "lightMap",
+        "metalnessMap",
+        "normalMap",
+        "roughnessMap",
+        "specularMap",
+        "gradientMap",
+      ];
+      for (const k of mapKeys) {
+        const tex = m[k];
+        if (
+          tex &&
+          typeof (tex as { dispose?: () => void }).dispose === "function"
+        ) {
+          (tex as { dispose: () => void }).dispose();
         }
-        if (obj.material) {
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((m) => m.dispose());
+      }
+      mat.dispose();
+    };
+
+    // Release Three.js r128 internal WebGLBackground planeMesh/boxMesh quad before renderLists.dispose()
+    if (
+      renderer.renderLists &&
+      typeof renderer.renderLists.get === "function"
+    ) {
+      const rl = (
+        renderer.renderLists as unknown as {
+          get: (s: THREE.Scene, depth: number) => unknown;
+        }
+      ).get(scene, 0) as {
+        opaque?: {
+          geometry?: THREE.BufferGeometry | null;
+          material?: THREE.Material | null;
+        }[];
+      } | null;
+      if (rl && Array.isArray(rl.opaque)) {
+        for (const item of rl.opaque) {
+          if (item.geometry) item.geometry.dispose();
+          if (item.material) disposeMaterial(item.material);
+        }
+      }
+    }
+
+    // Traverse all renderable object types (Mesh, Points, LineSegments, Line, Sprite) before backgroundManager removes them
+    scene.traverse((obj) => {
+      const renderable = obj as unknown as {
+        isMesh?: boolean;
+        isPoints?: boolean;
+        isLineSegments?: boolean;
+        isLine?: boolean;
+        isSprite?: boolean;
+        geometry?: THREE.BufferGeometry;
+        material?: THREE.Material | THREE.Material[];
+      };
+      if (
+        renderable.isMesh ||
+        renderable.isPoints ||
+        renderable.isLineSegments ||
+        renderable.isLine ||
+        renderable.isSprite ||
+        obj instanceof three.Mesh ||
+        obj instanceof three.Points ||
+        obj instanceof three.LineSegments ||
+        obj instanceof three.Line ||
+        obj instanceof three.Sprite
+      ) {
+        if (renderable.geometry) {
+          renderable.geometry.dispose();
+        }
+        if (renderable.material) {
+          if (Array.isArray(renderable.material)) {
+            renderable.material.forEach(disposeMaterial);
           } else {
-            obj.material.dispose();
+            disposeMaterial(renderable.material);
           }
         }
       }
     });
+
+    if (
+      scene.background &&
+      (scene.background as { isTexture?: boolean }).isTexture
+    ) {
+      (scene.background as THREE.Texture).dispose();
+      scene.background = null;
+    }
+
+    if (typeof renderer.getRenderTarget === "function") {
+      const rt = renderer.getRenderTarget() as unknown as {
+        dispose?: () => void;
+      } | null;
+      if (rt && typeof rt.dispose === "function") {
+        rt.dispose();
+        renderer.setRenderTarget(null);
+      }
+    }
+
+    backgroundManager.dispose();
 
     renderer.dispose();
     renderer.forceContextLoss();

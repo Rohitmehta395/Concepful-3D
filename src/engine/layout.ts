@@ -60,23 +60,35 @@ export function measureBox(
     }
   } else if (sceneMode === "app") {
     if (W < 900) {
-      const prTop = elements?.panelTop ?? 414;
+      // TODO(phase6): measured from reference at W=390 (#panel.top = 414, header.top bottom gap -> y0 = 119.34375)
+      const prTop = elements?.panelTop ?? 414; // TODO(phase6): measured from reference at W=390
       x0 = 10;
       x1 = W - 10;
+      // TODO(phase6): measured from reference at W=390 (119.34375 when #panel is absent in Phase 4)
       y0 = elements?.panelTop !== undefined ? topBottom + 4 : 119.34375;
       y1 = prTop - 4;
     } else {
-      const prRight = elements?.panelRight ?? 416;
-      const crLeft = elements?.cardLeft ?? (W < 1440 ? 1008 : W - 272);
-      const crWidth = elements?.cardWidth ?? 256;
-      const brHeight = elements?.boxartHeight ?? 120;
-      const brTop = elements?.boxartTop ?? (W === 1280 ? 680 : H - 122.53125);
+      // TODO(phase6): measured from reference at W=1280/1920 (#panel, #card, #boxart absent in Phase 4)
+      const prRight = elements?.panelRight ?? 416; // TODO(phase6): measured from reference at W=1280/1920
+      const crLeft =
+        elements?.cardLeft ??
+        (W < 1440
+          ? 1008 // TODO(phase6): measured from reference at W=1280
+          : W - 272); // TODO(phase6): measured from reference at W=1920
+      const crWidth = elements?.cardWidth ?? 256; // TODO(phase6): measured from reference at W=1280/1920
+      const brHeight = elements?.boxartHeight ?? 120; // TODO(phase6): measured from reference at W=1280/1920
+      const brTop =
+        elements?.boxartTop ??
+        (W === 1280
+          ? 680 // TODO(phase6): measured from reference at W=1280
+          : H - 122.53125); // TODO(phase6): measured from reference at W=1920
 
       x1 = W - 20;
       if (crWidth > 0) {
         x1 = crLeft + (W - crLeft) * 0.35;
       }
       x0 = prRight + 12;
+      // TODO(phase6): measured from reference at W=1280/1920 (70 when #panel is absent in Phase 4)
       y0 = elements?.panelRight !== undefined ? topBottom + 6 : 70;
       y1 = brHeight ? brTop + 10 : H - 20;
       if (x1 - x0 < 340) {
