@@ -515,3 +515,13 @@ pending reviewer sign-off; last code commit 5ec1ebc
 - **Vitest unit tests**: 4,108 passed across 6 test suites
 - **Prefix order guard**: Passed (`node scripts/check-compiled-css.mjs` clean)
 - **Reference file integrity**: SHA-256 `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (verified)
+
+## Phase 4: 3D Scene Reconstruction
+
+### Part 4.1: Engine Skeleton & SceneHost
+
+- **Status:** Complete
+- **Client JS Bundle Impact:**
+  - Three.js r128 dedicated chunk added: 510,082 bytes raw / 124,948 bytes gzip.
+  - Total Client Chunks: 1,078,751 bytes raw / 299,667 bytes gzip (+510,082 raw / +124,948 gzip over Phase 3 baseline of 568,669 raw / 174,719 gzip).
+- **WebGL Parity:** Fixed full-bleed viewport behind content, DPR capped at 2.0, zero geometry/texture leaks across 20 mount/unmount cycles, rAF loop auto-pauses on document.hidden and respects prefers-reduced-motion.
