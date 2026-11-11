@@ -1,4 +1,6 @@
-import * as THREE from "three";
+import type * as THREE from "three";
+import { measureBox, applyCameraOffset, type Box } from "./layout";
+import { createScrollDriver, type ScrollState } from "./scroll";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -16,17 +18,20 @@ export interface Engine {
   render: () => void;
   dispose: () => void;
   getFrameCount: () => number;
+  getScrollState: () => ScrollState;
+  getBox: () => Box;
 }
 
 export function createEngine(
   canvas: HTMLCanvasElement,
+  three: typeof THREE,
   options: EngineOptions = {}
 ): Engine {
   const antialias = options.antialias ?? true;
   const maxPixelRatio = options.maxPixelRatio ?? 2;
 
   // Reference line 7391: const R3 = new THREE.WebGLRenderer({ canvas: $("gl"), antialias: true });
-  const renderer = new THREE.WebGLRenderer({
+  const renderer = new three.WebGLRenderer({
     canvas,
     antialias,
     ...(options.powerPreference
@@ -44,17 +49,30 @@ export function createEngine(
   // Reference lines 7393: const CAM = new THREE.PerspectiveCamera(30, W / H, 0.1, 600);
   const width = canvas.clientWidth || window.innerWidth || 1;
   const height = canvas.clientHeight || window.innerHeight || 1;
-  const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 600);
+  const camera = new three.PerspectiveCamera(30, width / height, 0.1, 600);
   camera.position.set(0, 1, 14);
 
   // Empty scene
-  const scene = new THREE.Scene();
+  const scene = new three.Scene();
 
   let isDisposed = false;
   let isRunning = false;
   let rAFId: number | null = null;
   let frameCount = 0;
-  const clock = new THREE.Clock(false);
+  const clock = new three.Clock(false);
+
+  // Framing box & scroll driver
+  const scrollDriver = createScrollDriver();
+  let currentBox: Box = {
+    x0: 0,
+    x1: width,
+    y0: 0,
+    y1: height,
+    w: width,
+    h: height,
+    cx: width / 2,
+    cy: height / 2,
+  };
 
   // Reference line 2646: const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const motionQuery =
@@ -62,13 +80,40 @@ export function createEngine(
       ? window.matchMedia("(prefers-reduced-motion: reduce)")
       : null;
 
-  function renderFrame(): void {
+  function updateFraming(): void {
+    if (isDisposed || typeof document === "undefined") return;
+    const w = window.innerWidth || canvas.clientWidth || 1;
+    const h = window.innerHeight || canvas.clientHeight || 1;
+
+    const topHeader = document.querySelector("header.top");
+    const topBottom = topHeader ? topHeader.getBoundingClientRect().bottom : 52;
+
+    const cardElements = document.querySelectorAll(".story .sc");
+    const cards = Array.from(cardElements).map((el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      };
+    });
+
+    const isLogi = scrollDriver.getState().activeScene === "logi";
+    currentBox = measureBox(w, h, topBottom, cards, isLogi);
+    applyCameraOffset(camera, currentBox, w, h);
+  }
+
+  function renderFrame(time = performance.now()): void {
     if (isDisposed) return;
     frameCount++;
+    scrollDriver.update(time);
     renderer.render(scene, camera);
   }
 
-  function tick(): void {
+  function tick(time: number): void {
     if (isDisposed || !isRunning) return;
 
     // Check visibility: document.hidden pauses loop
@@ -77,11 +122,10 @@ export function createEngine(
       return;
     }
 
-    renderFrame();
+    renderFrame(time);
 
     // Respect prefers-reduced-motion:
     // Original line 15142: if (!reduce) requestAnimationFrame(loop);
-    // When reduce is true, do not schedule continuous loop
     if (motionQuery && motionQuery.matches) {
       isRunning = false;
       rAFId = null;
@@ -98,7 +142,7 @@ export function createEngine(
 
     // If prefers-reduced-motion is true, render exactly one frame and pause
     if (motionQuery && motionQuery.matches) {
-      renderFrame();
+      renderFrame(performance.now());
       isRunning = false;
       return;
     }
@@ -124,12 +168,11 @@ export function createEngine(
     if (isDisposed) return;
     const w = canvas.clientWidth || window.innerWidth || 1;
     const h = canvas.clientHeight || window.innerHeight || 1;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    // Reference line 2761: R3.setSize(W, H, false);
     renderer.setSize(w, h, false);
+    scrollDriver.measureSections();
+    updateFraming();
     if (!isRunning) {
-      renderFrame();
+      renderFrame(performance.now());
     }
   }
 
@@ -155,14 +198,36 @@ export function createEngine(
     if (isDisposed) return;
     if (motionQuery && motionQuery.matches) {
       stop();
-      renderFrame();
+      renderFrame(performance.now());
     } else {
       start();
     }
   }
 
+  function handleScroll(): void {
+    if (isDisposed) return;
+    // Reduced motion: recompute on scroll
+    if (motionQuery && motionQuery.matches) {
+      scrollDriver.update(performance.now());
+      renderFrame(performance.now());
+    }
+  }
+
   if (typeof document !== "undefined") {
     document.addEventListener("visibilitychange", handleVisibilityChange);
+  }
+
+  if (typeof window !== "undefined") {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", resize, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (!isDisposed) {
+          scrollDriver.measureSections();
+          updateFraming();
+        }
+      });
+    }
   }
 
   if (motionQuery) {
@@ -183,7 +248,8 @@ export function createEngine(
     }
   }
 
-  // Initial sizing
+  // Initial measurement and sizing
+  scrollDriver.measureSections();
   resize();
 
   function dispose(): void {
@@ -193,6 +259,11 @@ export function createEngine(
 
     if (typeof document !== "undefined") {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }
+
+    if (typeof window !== "undefined") {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", resize);
     }
 
     if (motionQuery) {
@@ -206,9 +277,8 @@ export function createEngine(
       resizeObserver = null;
     }
 
-    // Traverse scene and dispose meshes, geometries, materials, textures
     scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
+      if (obj instanceof three.Mesh) {
         if (obj.geometry) {
           obj.geometry.dispose();
         }
@@ -233,8 +303,10 @@ export function createEngine(
     start,
     stop,
     resize,
-    render: renderFrame,
+    render: () => renderFrame(performance.now()),
     dispose,
     getFrameCount: () => frameCount,
+    getScrollState: () => scrollDriver.getState(),
+    getBox: () => currentBox,
   };
 }
