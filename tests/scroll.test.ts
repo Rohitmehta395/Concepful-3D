@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { computeScroll, type SectionBounds, createScrollDriver } from "@/engine/scroll";
+import {
+  computeScroll,
+  type SectionBounds,
+  createScrollDriver,
+} from "@/engine/scroll";
 
 // Original storyScan algorithm extracted directly from reference lines 11953-11970
 function originalStoryScan(
@@ -25,7 +29,15 @@ function originalStoryScan(
 
 describe("Task 4: computeScroll Differential Unit Tests", () => {
   it("compares computeScroll against original storyScan on 1,000 randomized layouts and edge cases", () => {
-    const sceneIds = ["intro", "classes", "logi", "rules", "stages", "outro", "app"];
+    const sceneIds = [
+      "intro",
+      "classes",
+      "logi",
+      "rules",
+      "stages",
+      "outro",
+      "app",
+    ];
     const viewports = [390, 768, 1080, 1280, 1920];
 
     // Seeded pseudo-random generator for 100% reproducible fixtures
@@ -42,7 +54,12 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
         iterations++;
         // Construct a realistic sequential section layout
         const sectionBounds: SectionBounds[] = [];
-        const originalSections: { scene: string; top: number; bottom: number; height: number }[] = [];
+        const originalSections: {
+          scene: string;
+          top: number;
+          bottom: number;
+          height: number;
+        }[] = [];
 
         let currentY = 0;
         for (let i = 0; i < sceneIds.length; i++) {
@@ -84,7 +101,9 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
           const actual = computeScroll(sectionBounds, scrollY, H);
 
           expect(actual.activeScene).toBe(expected.key);
-          expect(Math.abs(actual.activeProgress - expected.p)).toBeLessThan(1e-9);
+          expect(Math.abs(actual.activeProgress - expected.p)).toBeLessThan(
+            1e-9
+          );
         }
       }
     }
@@ -96,16 +115,25 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
     const driver = createScrollDriver();
 
     // Mock DOM getBoundingClientRect
-    const fakeRect = { top: 100, bottom: 600, height: 500, left: 0, right: 300, width: 300 };
+    const fakeRect = {
+      top: 100,
+      bottom: 600,
+      height: 500,
+      left: 0,
+      right: 300,
+      width: 300,
+    };
     const spy = vi.fn().mockReturnValue(fakeRect);
 
     const fakeElements = [
       {
-        getAttribute: (attr: string) => (attr === "data-scene" ? "intro" : null),
+        getAttribute: (attr: string) =>
+          attr === "data-scene" ? "intro" : null,
         getBoundingClientRect: spy,
       },
       {
-        getAttribute: (attr: string) => (attr === "data-scene" ? "classes" : null),
+        getAttribute: (attr: string) =>
+          attr === "data-scene" ? "classes" : null,
         getBoundingClientRect: spy,
       },
     ];
