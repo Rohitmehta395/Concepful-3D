@@ -1,6 +1,10 @@
 import type * as THREE from "three";
 import { measureBox, applyCameraOffset, type Box } from "./layout";
 import { createScrollDriver, type ScrollState } from "./scroll";
+import {
+  createBackgroundManager,
+  type BackgroundManager,
+} from "./world/BackgroundManager";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -12,6 +16,7 @@ export interface Engine {
   readonly scene: THREE.Scene;
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer: THREE.WebGLRenderer;
+  readonly backgroundManager: BackgroundManager;
   start: () => void;
   stop: () => void;
   resize: () => void;
@@ -60,6 +65,10 @@ export function createEngine(
   let rAFId: number | null = null;
   let frameCount = 0;
   const clock = new three.Clock(false);
+
+  // Background Manager (Space, Sea, Sky)
+  const backgroundManager = createBackgroundManager(three);
+  backgroundManager.build(scene, camera, renderer);
 
   // Framing box & scroll driver
   const scrollDriver = createScrollDriver();
@@ -160,6 +169,8 @@ export function createEngine(
       previousActiveScene = state.activeScene;
       updateFraming();
     }
+    const delta = clock.getDelta();
+    backgroundManager.update(state, delta * 1000, time);
     renderer.render(scene, camera);
   }
 
@@ -343,6 +354,8 @@ export function createEngine(
       resizeObserver = null;
     }
 
+    backgroundManager.dispose();
+
     scene.traverse((obj) => {
       if (obj instanceof three.Mesh) {
         if (obj.geometry) {
@@ -366,6 +379,7 @@ export function createEngine(
     scene,
     camera,
     renderer,
+    backgroundManager,
     start,
     stop,
     resize,
