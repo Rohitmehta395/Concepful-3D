@@ -546,3 +546,29 @@ pending reviewer sign-off; last code commit 5ec1ebc
 - **Helpers & Palette**: Exact `brandCol`/`hexS`/`tm`/`bm`/`INK`/`TX`/`texC`/`mk`/`glowS`/`eye3`/`textSprite`/`plane`/`hexPlinth`/`bake` & geometry builders.
 - **Orbit & Drag Controller**: Ported `dragStep`, `autoPick`, `autoStep`, `orbitInto`, `aim`, pointer listeners, and `#gl.drag` cursor state with zero per-frame allocations.
 - **Stage & First Two `U3` Units**: Ported `STB.classes` (3 hex plinths + category labels) with `uArchitect` and `uForge` (remaining 7 units deferred to Part 4.5).
+
+### Part 4.5: Deterministic Harness, Leak Checks & Remaining 7 `U3` Units
+
+- **Deterministic Harness (Task 0)**: Froze `performance.now`, `Date.now`, and `requestAnimationFrame` timestamps via `window.__tick(ms)` + seeded `Math.random` + `preserveDrawingBuffer: true` against production `NEXT_PUBLIC_E2E=1` build on port `3008`.
+  - Noise floor: `REF vs REF = 0/312000` (390) & `0/1024000` (1280); `REB vs REB = 0/312000` (390) & `0/1024000` (1280).
+  - 20 in-page engine mount/dispose cycles: `geometries=0, textures=0, programs=0, isContextLost=true` on every cycle (`usedJSHeapSize` `12.37 MB` -> `37.74 MB`).
+  - 20 React `StrictMode` mount/unmount cycles: `geometries=0, textures=0, programs=0, isContextLost=true` on every cycle (`usedJSHeapSize` `12.50 MB` -> `13.11 MB`).
+- **Remaining 7 `U3` Units (Task 1)**: Ported `uPrism`, `uMarshal`, `uRonin`, `uFresco` (pre-allocated `base` Vector3 for `0` per-frame allocations), `uKraken` (`KLB` pod labels, `big = id === "gtm"` scale `0.5`, `x = -1.6`, `z = -1.2`), `uHerald`, `uDolly`, plus `flame3`/`flick`.
+  - Dead code note: `SC.party` and `SC.crew` are dead code in the reference (zero call sites) and are intentionally NOT ported.
+- **Full `STB.classes` Acceptance (9 Units, No Hiding)**:
+  - `390x800`: `angle_0_neutral` `3111/312000 (1.00%)`, `angle_1_left_up` `2212/312000 (0.71%)`, `angle_2_right_down` `5754/312000 (1.84%)`.
+  - `1280x800`: `angle_0_neutral` `15161/1024000 (1.48%)`, `angle_1_left_up` `53919/1024000 (5.27%)`, `angle_2_right_down` `6690/1024000 (0.65%)`.
+  - Per-unit bisect @ `1280x800` (1 unit visible at a time, plinths/labels hidden): `0:uiux` `1.52%`, `1:web` `1.61%`, `2:3d` `1.62%`, `3:dir` `1.65%`, `4:brand` `1.77%`, `5:illus` `1.79%`, `6:gtm` `1.82%`, `7:decks` `1.76%`, `8:motion` `1.82%`.
+  - Positive controls @ `1280x800`: camera shift (`x += 0.02`) `76015/1024000`, hide unit 0 `23610/1024000`, material colour `+1` step `4162/1024000`.
+  - Pointer drag (`#gl pointer-events=auto`): `16446/1024000 (1.61%)`; console/page errors: `0`; JS on/off layout & static parity deltas: `0.0px` across `header`, `hero`, `classes`, `plans` at `390` and `1280`.
+- **7-Scene Background Comparison @ `1280x800`** (after `brandCol` fix; unported scenes still differ due to per-stage background textures, camera `aim()`, and `planet3`):
+
+| Scene     |       Diff Pixels |    Diff % | Mean Ref RGB             | Mean Reb RGB            |
+| --------- | ----------------: | --------: | ------------------------ | ----------------------- |
+| `intro`   | `1023997/1024000` | `100.00%` | `[49.41, 44.65, 77.88]`  | `[65.39, 48.6, 89.47]`  |
+| `classes` |   `15144/1024000` |   `1.48%` | `[45.88, 38.24, 66.45]`  | `[45.9, 38.32, 66.4]`   |
+| `logi`    | `1024000/1024000` | `100.00%` | `[37.87, 27.82, 52.76]`  | `[64.28, 50.58, 87.89]` |
+| `rules`   | `1023952/1024000` | `100.00%` | `[46.35, 45.89, 81.24]`  | `[44.94, 49.67, 83.58]` |
+| `stages`  | `1024000/1024000` | `100.00%` | `[37.7, 34.16, 64.88]`   | `[56.17, 50.92, 85.68]` |
+| `outro`   | `1024000/1024000` | `100.00%` | `[108.75, 19.06, 66.05]` | `[69.32, 46.09, 89.13]` |
+| `build`   | `1023994/1024000` | `100.00%` | `[75.52, 50.79, 82.12]`  | `[49.32, 45.99, 78.68]` |
