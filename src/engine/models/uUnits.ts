@@ -1515,7 +1515,7 @@ export function uLancer(
   const r = new three.Group();
   r.position.set(0.1, b.shY - 0.25, 0.75);
   g.add(r);
-  const G3 = mats.tm(HX.dark);
+  const G3 = mats.tm(HX.gun);
   mk(three, mats, r, Bx(three, 2.8, 0.14, 0.16), G3, [0.4, 0, 0]);
   mk(three, mats, r, Bx(three, 0.6, 0.2, 0.16), G3, [-0.9, -0.12, 0]);
   mk(three, mats, r, Bx(three, 0.7, 0.16, 0.16), G3, [0.4, 0.18, 0]);

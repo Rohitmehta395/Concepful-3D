@@ -149,7 +149,7 @@ export function createLogiStage(ctx: StageBuildContext): Stage {
     mats,
     stamp,
     Cy(three, 0.12, 0.14, 0.9, 6),
-    mats.tm(HX.dark),
+    mats.tm(HX.gun),
     [0, 0.65, 0]
   );
   mk(three, mats, stamp, Ic(three, 0.26, 1), mats.tm(HX.bone), [0, 1.2, 0]);
@@ -280,7 +280,7 @@ export function createLogiStage(ctx: StageBuildContext): Stage {
     mats,
     g4,
     rbx(three, 2.2, 1.0, 1.6, 0.12),
-    mats.tm(HX.dark),
+    mats.tm(HX.gun),
     [0, 0.5, -0.6]
   );
 
@@ -293,7 +293,7 @@ export function createLogiStage(ctx: StageBuildContext): Stage {
   frame.position.set(-2.4, 2.6, 0.6);
   frame.rotation.y = 0.5;
   g4.add(frame);
-  mk(three, mats, frame, rbx(three, 2.4, 1.5, 0.12, 0.04), mats.tm(HX.dark));
+  mk(three, mats, frame, rbx(three, 2.4, 1.5, 0.12, 0.04), mats.tm(HX.gun));
   plane(three, frame, 2.2, 1.3, mats.TX("chart"), [0, 0, 0.07]);
 
   const chk = new three.Group();

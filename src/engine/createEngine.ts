@@ -115,6 +115,7 @@ export function createEngine(
   // Framing box & scroll driver
   const scrollDriver = createScrollDriver();
   let previousActiveScene = "";
+  let lastFramingScrollY = -1;
   let currentBox: Box = {
     x0: 0,
     x1: width,
@@ -207,9 +208,16 @@ export function createEngine(
       }
     }
 
-    if (state.activeScene !== previousActiveScene) {
-      previousActiveScene = state.activeScene;
-      snap = true;
+    const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
+    if (
+      state.activeScene !== previousActiveScene ||
+      scrollY !== lastFramingScrollY
+    ) {
+      if (state.activeScene !== previousActiveScene) {
+        previousActiveScene = state.activeScene;
+        snap = true;
+      }
+      lastFramingScrollY = scrollY;
       updateFraming();
     }
 

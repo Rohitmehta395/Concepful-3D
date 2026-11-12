@@ -25,7 +25,7 @@ export function createPlanet(
 
   // Planet body
   const bodyGeo = new three.IcosahedronGeometry(r, 1);
-  const bodyMat = new three.MeshBasicMaterial({
+  const bodyMat = new three.MeshToonMaterial({
     color: brandCol(col, three),
   });
   const bodyMesh = new three.Mesh(bodyGeo, bodyMat);
