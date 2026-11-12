@@ -621,3 +621,20 @@ pending reviewer sign-off; last code commit 5ec1ebc
   - Full scene: `390` `1.47%` / `1.50%` / `1.34%`; `1280` `1.95%` / `1.98%` / `1.52%`; positive controls `camera.x+=0.02` `72789`, hide unit 0 `749`, material `+1` `6139`.
   - Transition `intro -> classes -> intro` (`refY=400, rebY=400`): snaps at `+0px` (`1.93%` -> `1.53%` -> `1.95%`); pointer drag `2.20%`; `0.0px` static parity; `0` console/page errors.
   - 20-cycle `--expose-gc` leak check (all 3 stages): in-page `17.15 -> 17.32 MB` (`+0.17 MB`, `geo=0, tex=0, prog=0, lost=true`); StrictMode `17.15 -> 17.39 MB` (`+0.24 MB`).
+
+### Part 4.9: Structural Diff Tool, `uFresco` Fix, `STB.stages` & `STB.outro`
+
+- **Structural Scene Diff Tool (Task 0)**:
+  - Traversal-order scene graph comparator (`task0_struct_diff.mjs`) identified 3 missing primitives in `uUnits.ts` `head === "dome"` (`Cy(0.02,0.02,0.24,4)`, `Ic(0.05)`, `tbox(0.3,0.36,0.1,0.36,0.4)`, reference lines `13475-13477`) and a missing `cosmosLayer.update(t, reduceMotion)` call in `introStage.ts`.
+  - After fix: `uFresco (illus)` structural diff `71` vs `71` entries = `0` differing entries; model bench `u3:illus` pixel diff dropped from `1156/1076/1133` px to `0/2/2` px out of `640000` (`0.000%`).
+- **`STB.stages` & `STB.outro` Port (Task 1)**:
+  - Ported `sSub` (`9794-9891`) and `sStar` (`9983-10083`) in [hVehiclesC.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/hVehiclesC.ts), [stagesStage.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/stages/stagesStage.ts) (`11848-11901`), and [outroStage.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/stages/outroStage.ts) (`11902-11940`), and wired both into `StageManager` in [createEngine.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/createEngine.ts).
+  - Object counts: `stagesStage` `totalChildren: 10, unitCount: 4, Group: 28, Points: 3, Mesh: 201, Sprite: 17, LineSegments: 1`; `outroStage` `totalChildren: 11, unitCount: 9, Group: 47, Points: 3, Mesh: 386, LineSegments: 10, Sprite: 33`.
+  - Per-frame allocations over 120 frames across all 5 stages (`intro`, `classes`, `rules`, `stages`, `outro`): `{ Vector3: 0, Matrix4: 0, Color: 0 }`.
+- **Acceptance & 5-Stage Leak Checks (Task 2, Frozen-Time Production `NEXT_PUBLIC_E2E=1` on port `3008`)**:
+  - Noise floor (`stages` & `outro`): `REF vs REF = 0`, `REB vs REB = 0`.
+  - `stages` isolation: background `0.00%` (`0/312000`, `0/1024000`); foreground `0.92%` (`2866/312000` @ `390`), `6.41%` (`65623/1024000` @ `1280`). Full scene: `390` `0.92%` / `0.50%`; `1280` `6.41%` / `13.39%`; positive controls `camera.x+=0.02` `53024`, hide unit 0 `16070`.
+  - `outro` isolation: background `0.00%` (`0/312000`, `0/1024000`); foreground `5.31%` (`16579/312000` @ `390`), `4.48%` (`45911/1024000` @ `1280`). Full scene: `390` `5.31%` / `4.82%`; `1280` `4.48%` / `4.29%`; positive controls `camera.x+=0.02` `120443`, hide unit 0 `4852`.
+  - Transition `stages -> outro -> stages` (`refY=8400, rebY=8400`): snaps at `+0px` (`5.47%` -> `4.04%` -> `5.47%`); pointer drag `0.85%` (`#plans`), `1.49%` (`#outro`); `0.0px` JS on/off & static parity; `0` console/page errors.
+  - Regression: `intro` foreground `0.17%` (`390` & `1280`), full scene `1.47%/1.50%/1.34%` (`390`), `1.95%/1.98%/1.52%` (`1280`); `classes` `0.99%/0.69%/1.82%` (`390`), `1.46%/5.27%/0.61%` (`1280`); `rules` `0.03%/0.04%/0.01%` (`390`), `0.02%/0.03%/0.02%` (`1280`).
+  - 20-cycle `--expose-gc` leak check (`typeof window.gc: function`, all 5 stages): in-page `17.66 -> 21.87 MB` (`geo=0, tex=0, prog=0, lost=true`); StrictMode (after polling `__CONCEPFUL_ENGINE__` in [SceneHost.tsx](file:///d:/Projects/Pete/Concepful-3D/src/components/scene/SceneHost.tsx)) `17.36 -> 17.58 MB` (`geo=0, tex=0, prog=0, lost=true`).
