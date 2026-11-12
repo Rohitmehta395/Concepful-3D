@@ -604,3 +604,20 @@ pending reviewer sign-off; last code commit 5ec1ebc
 - **Regression & Leak Check (Task 4)**:
   - `classes` & `rules` full-scene diffs, pointer drag (`0.30%`), and `0.0px` static parity unchanged; `0` console/page errors.
   - 20-cycle `--expose-gc` leak test including 10 vehicles built/disposed per cycle: `geometries=0, textures=0, programs=0, isContextLost=true` on all 20 in-page (`14.76 -> 18.47 MB`, `12.43 -> 11.67 MB` run 1) and 20 StrictMode cycles (`17.34 -> 15.19 MB`).
+
+### Part 4.8: Residual Investigation, `sMother` & `STB.intro` Stage
+
+- **Residual Investigation (Task 2, 3 Hypotheses)**:
+  - (a) `uFresco.upd` math matches verbatim; bench diff is `0.181%` (`1156` px), while 8/9 `classes` `U3` units are `0–6` px (`0.000–0.001%`).
+  - (b) In-scene `uiux` isolation at real Plinth 0 position: `0/1024000 (0.0000%)` neutral, `2` px (`0.0002%`) `angle_1`, `6` px (`0.0006%`) `angle_2`; lights (`AmbientLight 0xa9acda 0.6`, `DirectionalLight 0xffffff 0.62 [-4,8,10]`, `DirectionalLight 0xff7fa6 0.22 [6,-2,-6]`), `fog: null`, `spritesCount: 37`, `renderOrder: 0`, `depthWrite: false`, `transparent: true` all match.
+  - (c) `renderer.info.render.calls = 161` on both pages.
+- **`STB.intro` Port (Task 3)**:
+  - Added `planet3` to [geometry.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/world/geometry.ts), `sMother` to [hVehiclesC.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/hVehiclesC.ts), and [introStage.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/stages/introStage.ts) (`bgTex("#0F1218", "#2E3442")`, `cosmos("intro")`, `streakField(170)`, `2` `glowS`, `planet3(9, [16,-11,-32], 0x6e7e92, true)`, `sMother`, `6` crew `U3` units, `4` `mJet`s, `3` `H3` vehicles).
+  - `introStage` object counts: `totalChildren: 11, unitCount: 13, Group: 86, Points: 3, Mesh: 618, Sprite: 37, LineSegments: 1, Object3D: 1`.
+  - Per-frame allocations over 120 frames (`intro` + `classes` + `rules`): `{ Vector3: 0, Matrix4: 0, Color: 0 }`.
+- **`intro` Acceptance & Leak Check (Task 4)**:
+  - Noise floor: `REF vs REF = 0`, `REB vs REB = 0`.
+  - Isolation: `390x800` foreground `0.17%` (`540/312000`), background `1.62%` (`5040/312000`); `1280x800` foreground `0.17%` (`1703/1024000`), background `2.15%` (`22005/1024000`).
+  - Full scene: `390` `1.47%` / `1.50%` / `1.34%`; `1280` `1.95%` / `1.98%` / `1.52%`; positive controls `camera.x+=0.02` `72789`, hide unit 0 `749`, material `+1` `6139`.
+  - Transition `intro -> classes -> intro` (`refY=400, rebY=400`): snaps at `+0px` (`1.93%` -> `1.53%` -> `1.95%`); pointer drag `2.20%`; `0.0px` static parity; `0` console/page errors.
+  - 20-cycle `--expose-gc` leak check (all 3 stages): in-page `17.15 -> 17.32 MB` (`+0.17 MB`, `geo=0, tex=0, prog=0, lost=true`); StrictMode `17.15 -> 17.39 MB` (`+0.24 MB`).
