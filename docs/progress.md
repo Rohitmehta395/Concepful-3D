@@ -572,3 +572,20 @@ pending reviewer sign-off; last code commit 5ec1ebc
 | `stages`  | `1024000/1024000` | `100.00%` | `[37.7, 34.16, 64.88]`   | `[56.17, 50.92, 85.68]` |
 | `outro`   | `1024000/1024000` | `100.00%` | `[108.75, 19.06, 66.05]` | `[69.32, 46.09, 89.13]` |
 | `build`   | `1023994/1024000` | `100.00%` | `[75.52, 50.79, 82.12]`  | `[49.32, 45.99, 78.68]` |
+
+### Part 4.6: Stage Framework, `classesStage` Refactor & `rulesStage` Port
+
+- **Stage Framework (`types.ts`, `StageManager.ts`)**:
+  - `Stage` interface (`key`, `group`, `backgroundTexture`, `fog`, `units?`, `setVisible`, `update`, `dispose`) and `StageManager` with lazy `STS` cache semantics, `select(key)`, `clearActive()`, and full `dispose()`.
+  - `classesStage` refactored to `Stage` with `glowS([0, 4, -30], 30, 0x8f0030)` matching `STB.classes`.
+- **`rulesStage` (`STB.rules` lines 14284-14439)**:
+  - Ported ship interior (`room` deck, `GridHelper(22, 22)`, melon trim, back wall windows, side bulkheads, roof beams), holo table + `TX("bp")` SOW blueprint + scan beam + holo icosahedron + pulsing melon ring, and 6 seated biped crew members.
+  - `rulesStage` object counts: `totalChildren: 3, unitCount: 6, Group: 59, Points: 3, LineSegments: 4, Sprite: 26, Mesh: 247, GridHelper: 1`.
+  - Per-frame allocations over 120 update frames (`classes` + `rules`): `{ Vector3: 0, Matrix4: 0, Color: 0 }`.
+- **Isolation & Full-Scene Acceptance (Frozen-Time Production `NEXT_PUBLIC_E2E=1` on port `3008`)**:
+  - `classes` isolation: foreground `0.98%` (`390`) / `1.44%` (`1280`); background `0.00%` (`0/312000`, `0/1024000`).
+  - `rules` isolation: foreground `0.08%` (`243/312000` @ `390`, `785/1024000` @ `1280`); background `0.05%` (`151/312000` @ `390`, `0.06%` `574/1024000` @ `1280`).
+  - `classes` full scene: `390` `0.98%` / `0.70%` / `1.81%`; `1280` `1.44%` / `5.28%` / `0.62%`.
+  - `rules` full scene: `390` `0.10%` / `0.13%` / `0.08%`; `1280` `0.10%` / `0.11%` / `0.10%`; noise floor `0` (`REF vs REF = 0`, `REB vs REB = 0`).
+  - Transition boundary (`refY=5680, rebY=5680`): WebGL snaps immediately at `+0px` (`892/1024000 = 0.09%`); pointer drag (`rules`) `3107/1024000 (0.30%)`; `0` console/page errors; `0.0px` JS on/off & static parity deltas.
+  - 20-cycle leak check with `--expose-gc`: in-page (`classes` + `rules`) `geometries=0, textures=0, programs=0, isContextLost=true`, drops to `8.71 MB` on major GC; `StrictMode` `10.18 MB -> 10.45 MB` (`+0.27 MB`).
