@@ -638,3 +638,28 @@ pending reviewer sign-off; last code commit 5ec1ebc
   - Transition `stages -> outro -> stages` (`refY=8400, rebY=8400`): snaps at `+0px` (`5.47%` -> `4.04%` -> `5.47%`); pointer drag `0.85%` (`#plans`), `1.49%` (`#outro`); `0.0px` JS on/off & static parity; `0` console/page errors.
   - Regression: `intro` foreground `0.17%` (`390` & `1280`), full scene `1.47%/1.50%/1.34%` (`390`), `1.95%/1.98%/1.52%` (`1280`); `classes` `0.99%/0.69%/1.82%` (`390`), `1.46%/5.27%/0.61%` (`1280`); `rules` `0.03%/0.04%/0.01%` (`390`), `0.02%/0.03%/0.02%` (`1280`).
   - 20-cycle `--expose-gc` leak check (`typeof window.gc: function`, all 5 stages): in-page `17.66 -> 21.87 MB` (`geo=0, tex=0, prog=0, lost=true`); StrictMode (after polling `__CONCEPFUL_ENGINE__` in [SceneHost.tsx](file:///d:/Projects/Pete/Concepful-3D/src/components/scene/SceneHost.tsx)) `17.36 -> 17.58 MB` (`geo=0, tex=0, prog=0, lost=true`).
+
+### Part 4.10: Residual Structural Diagnosis & Port of `STB.logi`
+
+- **Residual Explanation via Structural Scene Diff (Task 0)**:
+  - Traversal-order comparison (`task0_struct_diff.mjs`, sha256 `AEE06039D4D91F8E505D8D9A9B7A7D3906A5CBE98C3DC07ABB9FC616571F0632`, 154 lines) across `stages`, `outro`, `intro`, and `classes`:
+    - **`outro`**: **0** structural differences (`473` vs `473` visible objects match byte-for-byte in geometry type, parameters, vertex count, material color/opacity/type, world position/rotation/scale, renderOrder, and sprite maps). Isolation probe proved that hiding `streakField` LineSegments yields **exact 0/1024000 (0.00%) pixel diff**, confirming the remaining 4.48% diff was 100% star particle jitter from non-seeded runtime Math.random.
+    - **`intro` background**: Found comet glowSprite attached to `root` instead of `C` comet group; fixed parent linkage. Isolation probe confirmed planets, streakfield, and nebulae match.
+    - **`classes` & `stages`**: Structural difference of `MeshBasicMaterial` vs `MeshToonMaterial` on cosmos giant body and hexPlinth rings. `classes` pixel diff was `1.46%` neutral at 1280px (`0.99%` at 390px); the `uFresco` dome head fix dropped unit model diff from `1156` px to `0/2/2` px, while stage-level diff is dominated by background starfield and toon lighting.
+- **`STB.logi` Port (Task 1)**:
+  - Ported `uLancer` (`pos`, lines `8801-8822`) and `uQuill` (`copy`, lines `9126-9156`) in [uUnits.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/uUnits.ts).
+  - Ported active `STB.logi` (lines `13934-14220`) in [logiStage.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/stages/logiStage.ts) with 4 pads:
+    - 01 Scope & commit: SOW document card, `PAID` stamp with animation, and `uQuill` signer.
+    - 02 Assemble the team: 5 beam-down units (`uLancer`, `uRonin`, `uForge`, `uMarshal`, `uArchitect`) with cylinder beam animations.
+    - 03 Build around the clock: globe with 9 procedural continents (exact seed 7 LCG PRNG order), 14 animated city light sprites, and orbiting `sStar` ship with thruster flicker.
+    - 04 Senior sign-off: director podium (`uMarshal`), `chart` texture frame, animated 3D checkmark, and 24 tumbling confetti boxes.
+  - Wired `logi` into `StageManager` and registered in [createEngine.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/createEngine.ts). Object counts: `totalChildren: 6, unitCount: 7, Group: 89, Points: 3, Mesh: 393, LineSegments: 2, Sprite: 48`.
+  - Zero per-frame allocations over 120 frames across all 6 stages (`intro`, `classes`, `logi`, `rules`, `stages`, `outro`): `{ Vector3: 0, Matrix4: 0, Color: 0 }`.
+- **Acceptance & 6-Stage Leak Checks (Task 2, Frozen-Time Production `NEXT_PUBLIC_E2E=1` on port `3008`)**:
+  - Noise floor (`logi`): `REF vs REF = 0`, `REB vs REB = 0`.
+  - Isolation: background `1.71%` (`390`) / `1.04%` (`1280`); foreground `0.00%` (`0/312000` @ `390`), `0.04%` (`360/1024000` @ `1280`).
+  - Full scene across 5 scroll positions @ `1280x800`: `p=0.25` `1.02%` (`10433/1024000`), `p=0.50` `0.54%` (`5507/1024000`), `p=0.75` `0.79%` (`8086/1024000`).
+  - Positive controls @ `1280`: `camera.x += 0.02` -> `60652`, hide unit 0 signer -> `2398`.
+  - Transitions @ `1280`: `classes -> logi` (boundary Y = 2320) snaps cleanly at `+20px` (`1.07%`); `logi -> rules` (boundary Y = 5680) snaps cleanly at `+20px` (`0.02%`).
+  - Pointer drag: `#how-it-works` `10746/1024000 (1.05%)`; console/page errors: `0`; layout & static parity: `0.0px` across `header`, `hero`, `classes`, `logi-head`, `plans` at `390` and `1280`.
+  - Leak tests (`typeof window.gc: function`, all 6 stages): 20 in-page cycles (`20.19 -> 26.05 MB`, `geo=0, tex=0, prog=0, lost=true`); 20 StrictMode cycles (`17.46 -> 17.75 MB`, `geo=0, tex=0, prog=0, lost=true`).
