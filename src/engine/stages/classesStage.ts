@@ -1,10 +1,9 @@
 import type * as THREE from "three";
-import type { Box } from "../layout";
-import type { OrbitController } from "../camera/orbitController";
 import { bgTex, type MaterialRegistry } from "../world/materials";
-import { hexPlinth, textSprite } from "../world/geometry";
+import { glowS, hexPlinth, textSprite } from "../world/geometry";
 import { createCosmos, type CosmosLayer } from "../world/cosmos";
 import { createStreakField, type StreakField } from "../world/streakField";
+import type { Stage, StageBuildContext, StageUpdateParams } from "./types";
 import {
   uArchitect,
   uDolly,
@@ -33,23 +32,8 @@ const UNIT_BUILDERS: Record<
   motion: uDolly,
 };
 
-export interface ClassesStage {
-  readonly group: THREE.Group;
-  readonly backgroundTexture: THREE.CanvasTexture;
+export interface ClassesStage extends Stage {
   readonly units: UnitHandle[];
-  setVisible(visible: boolean): void;
-  update(
-    t: number,
-    dt: number,
-    p: number,
-    kk: number,
-    orbitCtrl: OrbitController,
-    camera: THREE.PerspectiveCamera,
-    box: Box,
-    viewportH: number,
-    reduceMotion: boolean
-  ): void;
-  dispose(): void;
 }
 
 interface PlinthSpec {
@@ -65,15 +49,11 @@ const PLINTH_SPECS: PlinthSpec[] = [
 
 /**
  * Faithful port of reference STB.classes (lines 11660-11708):
- * 3 hex plinths, cosmos("classes"), streakField(110), category textSprites,
- * and the first 2 U3 biped units (uArchitect, uForge). Remaining 7 U3 units
- * are deferred to Part 4.5.
+ * 3 hex plinths, cosmos("classes"), streakField(110), glowS, category textSprites,
+ * and all 9 U3 units.
  */
-export function createClassesStage(
-  three: typeof THREE,
-  parentScene: THREE.Scene,
-  mats: MaterialRegistry
-): ClassesStage {
+export function createClassesStage(ctx: StageBuildContext): ClassesStage {
+  const { three, scene: parentScene, mats, camera, orbitCtrl } = ctx;
   const group = new three.Group();
   group.visible = false;
   parentScene.add(group);
@@ -87,6 +67,7 @@ export function createClassesStage(
     [80, 30, 30],
     2
   );
+  glowS(three, mats, group, [0, 4, -30], 30, 0x8f0030);
 
   const plinthGroups: THREE.Group[] = [];
   const units: UnitHandle[] = [];
@@ -123,17 +104,8 @@ export function createClassesStage(
     group.visible = visible;
   }
 
-  function update(
-    t: number,
-    dt: number,
-    p: number,
-    kk: number,
-    orbitCtrl: OrbitController,
-    camera: THREE.PerspectiveCamera,
-    box: Box,
-    viewportH: number,
-    reduceMotion: boolean
-  ): void {
+  function update(params: StageUpdateParams): void {
+    const { t, dt, p, kk, box, viewportH, reduceMotion } = params;
     stars.update(dt, 1, reduceMotion);
 
     for (let i = 0; i < plinthGroups.length; i++) {
@@ -174,8 +146,10 @@ export function createClassesStage(
   }
 
   return {
+    key: "classes",
     group,
     backgroundTexture,
+    fog: null,
     units,
     setVisible,
     update,

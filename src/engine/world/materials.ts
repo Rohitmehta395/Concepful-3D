@@ -183,7 +183,7 @@ export function createGlowTexture(three: typeof THREE): THREE.CanvasTexture {
 }
 
 export type TXKey =
-  "chart" | "haz" | "ui" | "name" | "ctx" | "flag" | "hull" | "disc";
+  "chart" | "haz" | "ui" | "name" | "ctx" | "flag" | "hull" | "disc" | "bp";
 
 export interface MaterialRegistry {
   readonly TG: THREE.DataTexture;
@@ -391,6 +391,110 @@ export function createMaterialRegistry(three: typeof THREE): MaterialRegistry {
           x.textAlign = "center";
           x.textBaseline = "middle";
           x.fillText("CS-99  Context", w / 2, h / 2 + 4);
+        },
+        three
+      );
+    } else if (name === "bp") {
+      tex = texC(
+        1024,
+        640,
+        (x, w, h) => {
+          x.fillStyle = "#161935";
+          x.fillRect(0, 0, w, h);
+          x.strokeStyle = "rgba(140,147,230,.18)";
+          x.lineWidth = 1;
+          for (let i = 0; i <= w; i += 32) {
+            x.beginPath();
+            x.moveTo(i, 0);
+            x.lineTo(i, h);
+            x.stroke();
+          }
+          for (let j = 0; j <= h; j += 32) {
+            x.beginPath();
+            x.moveTo(0, j);
+            x.lineTo(w, j);
+            x.stroke();
+          }
+          x.strokeStyle = "rgba(184,194,255,.9)";
+          x.lineWidth = 3;
+          x.strokeRect(24, 24, w - 48, h - 48);
+          x.lineWidth = 4;
+          x.beginPath();
+          x.moveTo(250, 320);
+          x.lineTo(330, 230);
+          x.lineTo(690, 220);
+          x.lineTo(790, 320);
+          x.lineTo(690, 420);
+          x.lineTo(330, 410);
+          x.closePath();
+          x.stroke();
+          x.lineWidth = 2;
+          (
+            [
+              [380, 260, 120, 120],
+              [520, 250, 120, 140],
+              [660, 280, 70, 80],
+            ] as const
+          ).forEach((r) => x.strokeRect(r[0], r[1], r[2], r[3]));
+          x.beginPath();
+          x.moveTo(250, 320);
+          x.lineTo(790, 320);
+          x.setLineDash([10, 8]);
+          x.stroke();
+          x.setLineDash([]);
+          x.lineWidth = 1.5;
+          x.beginPath();
+          x.moveTo(250, 470);
+          x.lineTo(790, 470);
+          x.moveTo(250, 460);
+          x.lineTo(250, 480);
+          x.moveTo(790, 460);
+          x.lineTo(790, 480);
+          x.stroke();
+          x.font = '700 22px "JetBrains Mono", monospace';
+          x.fillStyle = "rgba(184,194,255,.95)";
+          x.textAlign = "center";
+          x.fillText("FIXED SCOPE", 440, 250);
+          x.fillText("ONE LEAD", 580, 240);
+          x.fillText("SLA", 695, 272);
+          x.fillText("TIMELINE IN THE SOW", 520, 500);
+          x.textAlign = "left";
+          x.font = "400 30px " + F;
+          x.fillStyle = "#FFFFFF";
+          x.fillText("STATEMENT OF WORK", 52, 80);
+          x.font = '700 18px "JetBrains Mono", monospace';
+          x.fillStyle = "rgba(184,194,255,.8)";
+          x.fillText("REV 01 · NDA FIRST · IP TRANSFERS ON DELIVERY", 52, 110);
+          x.strokeStyle = "rgba(184,194,255,.9)";
+          x.lineWidth = 2;
+          x.strokeRect(w - 300, h - 150, 252, 102);
+          x.beginPath();
+          x.moveTo(w - 300, h - 110);
+          x.lineTo(w - 48, h - 110);
+          x.stroke();
+          x.fillStyle = "#FFFFFF";
+          x.font = '700 18px "JetBrains Mono", monospace';
+          x.fillText("CONCEPFUL", w - 286, h - 122);
+          x.fillStyle = "rgba(184,194,255,.8)";
+          x.fillText("PRICE: FIXED", w - 286, h - 86);
+          x.fillText("CHANGE ORDERS: NONE", w - 286, h - 60);
+          x.strokeStyle = "#EE004E";
+          x.lineWidth = 4;
+          (
+            [
+              [440, 320, 46],
+              [690, 320, 30],
+            ] as const
+          ).forEach(([cx, cy, r]) => {
+            x.beginPath();
+            x.arc(cx, cy, r, 0, Math.PI * 2);
+            x.stroke();
+          });
+          x.beginPath();
+          x.moveTo(486, 320);
+          x.lineTo(560, 360);
+          x.lineTo(610, 360);
+          x.stroke();
         },
         three
       );

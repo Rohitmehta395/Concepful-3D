@@ -13,7 +13,9 @@ import {
   createOrbitController,
   type OrbitController,
 } from "./camera/orbitController";
-import { createClassesStage, type ClassesStage } from "./stages/classesStage";
+import { createStageManager, type StageManager } from "./stages/StageManager";
+import { createClassesStage } from "./stages/classesStage";
+import { createRulesStage } from "./stages/rulesStage";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -27,7 +29,7 @@ export interface Engine {
   readonly renderer: THREE.WebGLRenderer;
   readonly backgroundManager: BackgroundManager;
   readonly orbitController: OrbitController;
-  readonly classesStage: ClassesStage;
+  readonly stageManager: StageManager;
   readonly materials: MaterialRegistry;
   start: () => void;
   stop: () => void;
@@ -77,16 +79,29 @@ export function createEngine(
   let rAFId: number | null = null;
   let frameCount = 0;
   let snap = true;
-  let wasInClasses = false;
+  let wasInPortedStage = false;
   const clock = new three.Clock(false);
 
-  // Material registry + Background Manager + Stages + Orbit controller
+  // Material registry + Background Manager + Orbit controller + Stage Manager
   const materials = createMaterialRegistry(three);
   const backgroundManager = createBackgroundManager(three);
   backgroundManager.build(scene, camera, renderer);
-  const classesStage = createClassesStage(three, scene, materials);
   const orbitController = createOrbitController(three, canvas, () =>
     renderFrame(performance.now())
+  );
+  const stageManager = createStageManager(
+    scene,
+    {
+      three,
+      scene,
+      mats: materials,
+      camera,
+      orbitCtrl: orbitController,
+    },
+    {
+      classes: createClassesStage,
+      rules: createRulesStage,
+    }
   );
 
   // Framing box & scroll driver
@@ -203,32 +218,28 @@ export function createEngine(
     const kk = reduceMotion || snap ? 1 : Math.min(1, dtMs / 220);
     snap = false;
 
-    if (state.activeScene === "classes") {
-      if (!wasInClasses) {
+    const stage = stageManager.select(state.activeScene);
+    if (stage) {
+      if (!wasInPortedStage) {
         backgroundManager.setVisible(false);
-        classesStage.setVisible(true);
-        scene.background = classesStage.backgroundTexture;
-        scene.fog = null;
-        wasInClasses = true;
+        wasInPortedStage = true;
       }
-      classesStage.update(
-        time,
-        dtMs,
-        state.activeProgress,
+      stage.update({
+        t: time,
+        dt: dtMs,
+        p: state.activeProgress,
         kk,
-        orbitController,
-        camera,
-        currentBox,
+        box: currentBox,
         viewportH,
-        reduceMotion
-      );
+        reduceMotion,
+      });
     } else {
-      if (wasInClasses) {
-        classesStage.setVisible(false);
+      if (wasInPortedStage) {
+        stageManager.clearActive();
         backgroundManager.setVisible(true);
         camera.position.set(0, 1, 14);
         camera.lookAt(0, 0, 0);
-        wasInClasses = false;
+        wasInPortedStage = false;
       }
       backgroundManager.update(state, dtMs, time);
     }
@@ -526,7 +537,7 @@ export function createEngine(
     }
 
     orbitController.dispose();
-    classesStage.dispose();
+    stageManager.dispose();
     backgroundManager.dispose();
     materials.dispose();
 
@@ -540,7 +551,7 @@ export function createEngine(
     renderer,
     backgroundManager,
     orbitController,
-    classesStage,
+    stageManager,
     materials,
     start,
     stop,

@@ -1244,3 +1244,244 @@ export function uPrism(
     },
   };
 }
+
+/**
+ * Unit in STB.rules (pm).
+ * Source: reference lines 9522-9591.
+ */
+export function uNexus(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+
+  const legConfigs: [number, number][] = [
+    [-1.3, 1],
+    [-1.3, -1],
+    [1.3, 1],
+    [1.3, -1],
+  ];
+  const legs = legConfigs.map(([x, z]) => {
+    const k = mk(three, mats, g, Cy(three, 0.09, 0.09, 1.1, 4), G3);
+    const f = mk(three, mats, g, Cy(three, 0.08, 0.05, 1.9, 4), B3);
+    return { x, z, k, f };
+  });
+
+  mk(three, mats, g, Bx(three, 3.4, 0.7, 1.4), B3, [0, 2.0, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 3.42, 0.12, 1.42),
+    mats.tm(HX.teal),
+    [0, 1.85, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Bx(three, 0.8, 0.75, 1.2), B3, [1.95, 2.15, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 0.05, 0.4, 0.9),
+    mats.tm(HX.glass),
+    [2.36, 2.25, 0],
+    null,
+    null,
+    false
+  );
+  eye3(three, mats, g, [2.37, 1.95, 0.35], 0.06);
+  [HX.teal, HX.yel, HX.bone, HX.blu, HX.red].forEach((c, i) =>
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.58, 0.42 + (i % 2) * 0.12, 1.1),
+      mats.tm(c),
+      [-1.35 + i * 0.62, 2.6 + (i % 2) * 0.06, 0]
+    )
+  );
+
+  return {
+    g,
+    w: 4.4,
+    h: 3.0,
+    upd: (t: number) => {
+      legs.forEach((l, i) => {
+        const ph = Math.sin(t / 260 + i * 1.6) * 0.12;
+        const hx = l.x * 0.9;
+        const hy = 1.8;
+        const kx = l.x * 1.25;
+        const ky = 2.35 + ph;
+        const fx = l.x * 1.45;
+        const fy = 0;
+        l.k.position.set((hx + kx) / 2, (hy + ky) / 2, l.z * 0.8);
+        l.k.rotation.set(0, 0, Math.atan2(ky - hy, kx - hx) - Math.PI / 2);
+        l.f.position.set((kx + fx) / 2, (ky + fy) / 2, l.z * 0.9);
+        l.f.rotation.set(0, 0, Math.atan2(fy - ky, fx - kx) - Math.PI / 2);
+      });
+    },
+  };
+}
+
+/**
+ * Unit in STB.rules (ws).
+ * Source: reference lines 9592-9654.
+ */
+export function uHub(three: typeof THREE, mats: MaterialRegistry): UnitHandle {
+  const g = new three.Group();
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+
+  mk(three, mats, g, Bx(three, 3.0, 0.3, 1.4), G3, [0, 0.55, 0]);
+  const body = new three.Mesh(Bx(three, 2.0, 1.5, 1.4), [
+    B3,
+    B3,
+    B3,
+    B3,
+    new three.MeshBasicMaterial({ map: mats.TX("ctx") }),
+    B3,
+  ]);
+  body.position.set(-0.5, 1.45, 0);
+  g.add(body);
+  const o = new three.Mesh(body.geometry, mats.INK);
+  o.scale.set(1.04, 1.05, 1.06);
+  body.add(o);
+
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 2.02, 0.12, 1.42),
+    mats.tm(HX.teal),
+    [-0.5, 0.8, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Bx(three, 1.0, 1.1, 1.4), B3, [1.0, 1.25, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 0.05, 0.5, 1.1),
+    mats.tm(HX.glass),
+    [1.52, 1.45, 0],
+    null,
+    null,
+    false
+  );
+  [-1.0, 0.1, 1.0].forEach((x) =>
+    mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.38, 0.38, 0.3, 10),
+      mats.tm(HX.dark),
+      [x, 0.38, 0.6],
+      [Math.PI / 2, 0, 0]
+    )
+  );
+  mk(three, mats, g, Cy(three, 0.04, 0.04, 0.9, 4), G3, [-1.2, 2.6, 0]);
+  const dish = mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.4, 0.08, 0.14, 8),
+    B3,
+    [-1.2, 3.1, 0],
+    [0.7, 0, 0]
+  );
+  const bc = eye3(three, mats, g, [0.9, 1.9, 0], 0.07);
+
+  return {
+    g,
+    w: 3.4,
+    h: 3.4,
+    upd: (t: number) => {
+      dish.rotation.y = t / 600;
+      bc.visible = Math.sin(t / 260) > 0;
+    },
+  };
+}
+
+/**
+ * Unit in STB.rules (cmd).
+ * Source: reference lines 9655-9703.
+ */
+export function uWatch(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+
+  const legCoords: [number, number][] = [
+    [-1, 0.6],
+    [1, 0.6],
+    [0, -0.9],
+  ];
+  legCoords.forEach(([x, z]) => {
+    const m = mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.08, 0.06, 3.4, 4),
+      z < 0 ? B3 : G3
+    );
+    m.position.set(x * 0.5, 1.6, z * 0.5);
+    m.rotation.set(-z * 0.33, 0, x * 0.3);
+  });
+  mk(three, mats, g, Bx(three, 1.3, 0.8, 1.1), B3, [0, 3.4, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 1.32, 0.12, 1.12),
+    mats.tm(HX.teal),
+    [0, 3.2, 0],
+    null,
+    null,
+    false
+  );
+  eye3(three, mats, g, [0.3, 3.45, 0.57], 0.1);
+  mk(three, mats, g, Cy(three, 0.06, 0.06, 0.6, 4), G3, [0, 4.05, 0]);
+  const dish = new three.Group();
+  dish.position.set(0, 4.5, 0);
+  g.add(dish);
+  mk(three, mats, dish, Cy(three, 1.0, 0.2, 0.35, 8), B3, null, [1.1, 0, 0]);
+  mk(
+    three,
+    mats,
+    dish,
+    Cy(three, 0.04, 0.04, 0.7, 4),
+    G3,
+    [0, 0.1, 0.3],
+    [1.1, 0, 0]
+  );
+  const cone = new three.Mesh(
+    Co(three, 0.8, 4, 8),
+    new three.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.07,
+      depthWrite: false,
+    })
+  );
+  cone.position.set(1.8, 3.4, 0.6);
+  cone.rotation.z = Math.PI / 2 + 0.2;
+  g.add(cone);
+
+  return {
+    g,
+    w: 2.4,
+    h: 5.4,
+    upd: (t: number) => {
+      dish.rotation.y = t / 650;
+    },
+  };
+}

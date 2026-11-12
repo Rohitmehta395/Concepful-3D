@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import * as THREE from "three";
 import { brandCol, createMaterialRegistry } from "@/engine/world/materials";
 import { createOrbitController } from "@/engine/camera/orbitController";
+import { createStageManager } from "@/engine/stages/StageManager";
 import { createClassesStage } from "@/engine/stages/classesStage";
+import { createRulesStage } from "@/engine/stages/rulesStage";
 
 describe("Part 4.4: materials, orbit controller, and classesStage", () => {
   it("matches original brandCol colour mapping across navy ramp, reds, and highlights", () => {
@@ -25,8 +27,10 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
           fillRect: () => {},
           strokeRect: () => {},
           beginPath: () => {},
+          closePath: () => {},
           moveTo: () => {},
           lineTo: () => {},
+          setLineDash: () => {},
           arc: () => {},
           save: () => {},
           restore: () => {},
@@ -75,7 +79,31 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
 
     const mats = createMaterialRegistry(trackedThree);
     const orbit = createOrbitController(trackedThree, canvas, () => {});
-    const stage = createClassesStage(trackedThree, scene, mats);
+    const mgr = createStageManager(
+      scene,
+      {
+        three: trackedThree,
+        scene,
+        mats,
+        camera: cam,
+        orbitCtrl: orbit,
+      },
+      {
+        classes: createClassesStage,
+        rules: createRulesStage,
+      }
+    );
+
+    // Lazy build check (STS semantics)
+    expect(mgr.getBuiltStage("classes")).toBeUndefined();
+    expect(mgr.getBuiltStage("rules")).toBeUndefined();
+
+    const classesStage = mgr.select("classes")!;
+    const rulesStage = mgr.select("rules")!;
+    expect(mgr.getBuiltStage("classes")).toBe(classesStage);
+    expect(mgr.getBuiltStage("rules")).toBe(rulesStage);
+    expect(mgr.select("intro")).toBeNull();
+
     const box = {
       x0: 500,
       x1: 1260,
@@ -96,20 +124,42 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
       const t = 1000 + f * 16.67;
       orbit.dragStep(16.67, false);
       orbit.autoStep(t, 16.67, false);
-      stage.update(t, 16.67, 0.5, 0.1, orbit, cam, box, 800, false);
+      classesStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
+      rulesStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
     }
 
-    console.log("Per-frame allocations over 120 update frames:", {
-      Vector3: vec3Alloc,
-      Matrix4: mat4Alloc,
-      Color: colorAlloc,
-    });
+    console.log(
+      "Per-frame allocations over 120 update frames (classes + rules):",
+      {
+        Vector3: vec3Alloc,
+        Matrix4: mat4Alloc,
+        Color: colorAlloc,
+      }
+    );
 
     expect(vec3Alloc).toBe(0);
     expect(mat4Alloc).toBe(0);
     expect(colorAlloc).toBe(0);
 
-    stage.dispose();
+    mgr.dispose();
+    expect(mgr.getBuiltStage("classes")).toBeUndefined();
+    expect(mgr.getBuiltStage("rules")).toBeUndefined();
     orbit.dispose();
     mats.dispose();
     vi.unstubAllGlobals();
