@@ -524,3 +524,32 @@ export function flick(fl: THREE.Group[], t: number, amp = 0.15): void {
     f.scale.y = 1 - amp + amp * Math.sin(t / 38 + i * 1.7);
   });
 }
+
+export function planet3(
+  three: typeof THREE,
+  mats: MaterialRegistry,
+  sc: THREE.Object3D,
+  r: number,
+  p: Vec3Tuple,
+  col: number,
+  ring: boolean
+): THREE.Group {
+  const g = new three.Group();
+  g.position.set(p[0], p[1], p[2]);
+  sc.add(g);
+  mk(three, mats, g, Ic(three, r, 1), mats.tm(col), null, null, null, false);
+  if (ring) {
+    mk(
+      three,
+      mats,
+      g,
+      Tor(three, r * 1.5, r * 0.03, 3, 32),
+      mats.bm(0xece6d6, 0.35),
+      null,
+      [1.25, 0.2, 0],
+      null,
+      false
+    );
+  }
+  return g;
+}

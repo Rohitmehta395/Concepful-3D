@@ -1,6 +1,17 @@
 import type * as THREE from "three";
 import { HX, type MaterialRegistry } from "../world/materials";
-import { Bx, Co, Cy, Ex, Ic, Tor, eye3, flame3, mk } from "../world/geometry";
+import {
+  Bx,
+  Co,
+  Cy,
+  Ex,
+  Ic,
+  Tor,
+  eye3,
+  flame3,
+  mk,
+  plane,
+} from "../world/geometry";
 import {
   mDolphin,
   mHawk,
@@ -219,3 +230,166 @@ export const H3: Record<
   fab: mBeetle,
   ai: mDrone,
 };
+
+export interface MothershipHandle {
+  readonly g: THREE.Group;
+  readonly len: number;
+  readonly h: number;
+  readonly fl: THREE.Group[];
+  readonly crew: THREE.Group;
+  upd(t: number): void;
+}
+
+/**
+ * Mothership flagship (sMother).
+ * Source: reference lines 10084-10195.
+ */
+export function sMother(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): MothershipHandle {
+  const g = new three.Group();
+  const fl: THREE.Group[] = [];
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [7.6, 0.2],
+        [6.2, -1.7],
+        [-6.2, -1.7],
+        [-7.6, -0.8],
+        [-7.6, 0.2],
+      ],
+      4.2
+    ),
+    G3
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [7.8, 0.2],
+        [7.1, 1.05],
+        [-6.9, 1.05],
+        [-7.6, 0.2],
+      ],
+      4.2
+    ),
+    B3
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 15.2, 0.14, 4.0),
+    mats.tm(HX.dark),
+    [0, 1.12, 0]
+  );
+  for (let x = -6; x < 7; x += 0.9) {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.45, 0.03, 0.12),
+      mats.tm(HX.yel),
+      [x, 1.2, 0],
+      null,
+      null,
+      false
+    );
+  }
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 15.2, 0.16, 4.24),
+    mats.tm(HX.red),
+    [0.1, 0.25, 0],
+    null,
+    null,
+    false
+  );
+  for (let x = -6.5; x < 7; x += 0.55) {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.3, 0.12, 0.05),
+      mats.bm(HX.holo, 0.9, true),
+      [x, 0.6, 2.12],
+      null,
+      null,
+      false
+    );
+  }
+  plane(three, g, 7.5, 0.7, mats.TX("hull"), [0, -0.75, 2.13]);
+  mk(three, mats, g, Bx(three, 1.5, 2.3, 1.0), B3, [-4.6, 2.3, -1.3]);
+  for (let i = 0; i < 3; i++) {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.28, 0.2, 0.05),
+      mats.tm(HX.glass),
+      [-5.0 + i * 0.4, 2.9, -0.78],
+      null,
+      null,
+      false
+    );
+  }
+  mk(three, mats, g, Cy(three, 0.05, 0.05, 0.8, 4), G3, [-4.6, 3.8, -1.3]);
+  const dish = mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.5, 0.1, 0.18, 8),
+    B3,
+    [-4.6, 4.3, -1.3],
+    [0.7, 0, 0]
+  );
+  (
+    [
+      [0.9, 1.2],
+      [0.9, -1.2],
+      [-0.6, 1.2],
+      [-0.6, -1.2],
+    ] as const
+  ).forEach(([y, z]) =>
+    fl.push(flame3(three, mats, g, [-7.7, y - 0.3, z], 3.0, 0.4, "x-"))
+  );
+  const crew = new three.Group();
+  crew.position.set(0, 1.2, 0);
+  g.add(crew);
+
+  (
+    [
+      [4.8, 1.6],
+      [6.0, 1.0],
+    ] as const
+  ).forEach(([x, z]) => {
+    const j = mJet(three, mats);
+    j.g.scale.setScalar(0.45);
+    j.g.position.set(x, 1.4, z);
+    g.add(j.g);
+  });
+
+  return {
+    g,
+    len: 15.6,
+    h: 6.5,
+    fl,
+    crew,
+    upd: (t: number) => {
+      dish.rotation.y = t / 600;
+    },
+  };
+}

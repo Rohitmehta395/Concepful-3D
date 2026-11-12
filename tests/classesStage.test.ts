@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { brandCol, createMaterialRegistry } from "@/engine/world/materials";
 import { createOrbitController } from "@/engine/camera/orbitController";
 import { createStageManager } from "@/engine/stages/StageManager";
+import { createIntroStage } from "@/engine/stages/introStage";
 import { createClassesStage } from "@/engine/stages/classesStage";
 import { createRulesStage } from "@/engine/stages/rulesStage";
 
@@ -89,20 +90,24 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
         orbitCtrl: orbit,
       },
       {
+        intro: createIntroStage,
         classes: createClassesStage,
         rules: createRulesStage,
       }
     );
 
     // Lazy build check (STS semantics)
+    expect(mgr.getBuiltStage("intro")).toBeUndefined();
     expect(mgr.getBuiltStage("classes")).toBeUndefined();
     expect(mgr.getBuiltStage("rules")).toBeUndefined();
 
+    const introStage = mgr.select("intro")!;
     const classesStage = mgr.select("classes")!;
     const rulesStage = mgr.select("rules")!;
+    expect(mgr.getBuiltStage("intro")).toBe(introStage);
     expect(mgr.getBuiltStage("classes")).toBe(classesStage);
     expect(mgr.getBuiltStage("rules")).toBe(rulesStage);
-    expect(mgr.select("intro")).toBeNull();
+    expect(mgr.select("logi")).toBeNull();
 
     const box = {
       x0: 500,
@@ -124,6 +129,15 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
       const t = 1000 + f * 16.67;
       orbit.dragStep(16.67, false);
       orbit.autoStep(t, 16.67, false);
+      introStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
       classesStage.update({
         t,
         dt: 16.67,
@@ -145,7 +159,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
     }
 
     console.log(
-      "Per-frame allocations over 120 update frames (classes + rules):",
+      "Per-frame allocations over 120 update frames (intro + classes + rules):",
       {
         Vector3: vec3Alloc,
         Matrix4: mat4Alloc,
@@ -158,6 +172,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
     expect(colorAlloc).toBe(0);
 
     mgr.dispose();
+    expect(mgr.getBuiltStage("intro")).toBeUndefined();
     expect(mgr.getBuiltStage("classes")).toBeUndefined();
     expect(mgr.getBuiltStage("rules")).toBeUndefined();
     orbit.dispose();

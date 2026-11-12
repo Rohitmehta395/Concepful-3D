@@ -14,6 +14,7 @@ import {
   type OrbitController,
 } from "./camera/orbitController";
 import { createStageManager, type StageManager } from "./stages/StageManager";
+import { createIntroStage } from "./stages/introStage";
 import { createClassesStage } from "./stages/classesStage";
 import { createRulesStage } from "./stages/rulesStage";
 
@@ -99,6 +100,7 @@ export function createEngine(
       orbitCtrl: orbitController,
     },
     {
+      intro: createIntroStage,
       classes: createClassesStage,
       rules: createRulesStage,
     }
