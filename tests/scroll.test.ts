@@ -235,6 +235,7 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
       cancelAnimationFrame: (id: number) => clearTimeout(id),
     });
 
+    vi.stubGlobal("Path2D", class {});
     vi.stubGlobal("document", {
       hidden: false,
       createElement: () => ({
@@ -246,6 +247,11 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
           beginPath: () => {},
           moveTo: () => {},
           lineTo: () => {},
+          arc: () => {},
+          save: () => {},
+          restore: () => {},
+          translate: () => {},
+          scale: () => {},
           fill: () => {},
           stroke: () => {},
           measureText: () => ({ width: 100 }),

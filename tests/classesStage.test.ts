@@ -16,6 +16,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
   });
 
   it("performs 0 Vector3 / Matrix4 / Color allocations per frame in the update path", () => {
+    vi.stubGlobal("Path2D", class {});
     vi.stubGlobal("document", {
       createElement: () => ({
         getContext: () => ({
@@ -26,6 +27,11 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
           beginPath: () => {},
           moveTo: () => {},
           lineTo: () => {},
+          arc: () => {},
+          save: () => {},
+          restore: () => {},
+          translate: () => {},
+          scale: () => {},
           fill: () => {},
           stroke: () => {},
           measureText: () => ({ width: 100 }),

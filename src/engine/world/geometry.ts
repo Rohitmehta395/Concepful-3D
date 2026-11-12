@@ -480,3 +480,47 @@ export function hexPlinth(
   );
   return P;
 }
+
+export function flame3(
+  three: typeof THREE,
+  mats: MaterialRegistry,
+  par: THREE.Object3D,
+  p: Vec3Tuple,
+  len: number,
+  r: number,
+  dir?: "x-"
+): THREE.Group {
+  const g = new three.Group();
+  g.position.set(p[0], p[1], p[2]);
+  par.add(g);
+  mk(
+    three,
+    mats,
+    g,
+    Co(three, r, len, 6),
+    mats.bm(0xff8a3d, 0.8, true),
+    [0, -len / 2, 0],
+    [Math.PI, 0, 0],
+    null,
+    false
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Co(three, r * 0.5, len * 0.6, 6),
+    mats.bm(0xfff2c8, 0.95, true),
+    [0, -len * 0.3, 0],
+    [Math.PI, 0, 0],
+    null,
+    false
+  );
+  if (dir === "x-") g.rotation.z = -Math.PI / 2;
+  return g;
+}
+
+export function flick(fl: THREE.Group[], t: number, amp = 0.15): void {
+  fl.forEach((f, i) => {
+    f.scale.y = 1 - amp + amp * Math.sin(t / 38 + i * 1.7);
+  });
+}

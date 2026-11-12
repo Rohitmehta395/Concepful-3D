@@ -5,7 +5,33 @@ import { bgTex, type MaterialRegistry } from "../world/materials";
 import { hexPlinth, textSprite } from "../world/geometry";
 import { createCosmos, type CosmosLayer } from "../world/cosmos";
 import { createStreakField, type StreakField } from "../world/streakField";
-import { uArchitect, uForge, type UnitHandle } from "../models/uUnits";
+import {
+  uArchitect,
+  uDolly,
+  uForge,
+  uFresco,
+  uHerald,
+  uKraken,
+  uMarshal,
+  uPrism,
+  uRonin,
+  type UnitHandle,
+} from "../models/uUnits";
+
+const UNIT_BUILDERS: Record<
+  string,
+  (three: typeof THREE, mats: MaterialRegistry) => UnitHandle
+> = {
+  "3d": uPrism,
+  gtm: uKraken,
+  dir: uMarshal,
+  brand: uRonin,
+  illus: uFresco,
+  uiux: uArchitect,
+  decks: uHerald,
+  web: uForge,
+  motion: uDolly,
+};
 
 export interface ClassesStage {
   readonly group: THREE.Group;
@@ -72,16 +98,18 @@ export function createClassesStage(
     hexPlinth(three, mats, pg, 4.2);
 
     spec.ids.forEach((id, j) => {
-      let u: UnitHandle | null = null;
-      if (id === "uiux") u = uArchitect(three, mats);
-      else if (id === "web") u = uForge(three, mats);
-
-      if (u) {
-        u.g.scale.setScalar(0.85);
-        u.g.position.set((j - 1) * 2.5, 0, j === 1 ? -0.6 : 0.5);
-        pg.add(u.g);
-        units.push(u);
-      }
+      const builder = UNIT_BUILDERS[id];
+      if (!builder) return;
+      const u = builder(three, mats);
+      const big = id === "gtm";
+      u.g.scale.setScalar(big ? 0.5 : 0.85);
+      u.g.position.set(
+        big ? -1.6 : (j - 1) * 2.5,
+        0,
+        big ? -1.2 : j === 1 ? -0.6 : 0.5
+      );
+      pg.add(u.g);
+      units.push(u);
     });
 
     const lb = textSprite(three, spec.label, "#FFFFFF", 0.55);

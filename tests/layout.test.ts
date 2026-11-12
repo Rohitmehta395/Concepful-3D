@@ -61,6 +61,7 @@ describe("layout framing box measurement", () => {
       boxart: { height: 100, top: 600 } as DOMRect,
     };
 
+    vi.stubGlobal("Path2D", class {});
     vi.stubGlobal("document", {
       hidden: false,
       createElement: () => ({
@@ -72,6 +73,11 @@ describe("layout framing box measurement", () => {
           beginPath: () => {},
           moveTo: () => {},
           lineTo: () => {},
+          arc: () => {},
+          save: () => {},
+          restore: () => {},
+          translate: () => {},
+          scale: () => {},
           fill: () => {},
           stroke: () => {},
           measureText: () => ({ width: 100 }),

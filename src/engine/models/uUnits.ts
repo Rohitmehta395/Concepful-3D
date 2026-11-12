@@ -2,11 +2,18 @@ import type * as THREE from "three";
 import { HX, type MaterialRegistry } from "../world/materials";
 import {
   Bx,
+  Co,
   Cy,
+  Ex,
+  Hemi,
   Ic,
+  Tor,
   bake,
   eye3,
+  flame3,
+  flick,
   glowS,
+  holoEdges,
   mir,
   mk,
   plane,
@@ -14,6 +21,7 @@ import {
   slabXY,
   slabYZ,
   tbox,
+  textSprite,
   type Vec2Tuple,
   type Vec3Tuple,
 } from "../world/geometry";
@@ -675,6 +683,564 @@ export function uForge(
     upd: (t: number) => {
       (mz.material as THREE.SpriteMaterial).opacity =
         0.6 + 0.4 * Math.sin(t / 160);
+    },
+  };
+}
+
+const KLB = ["SEO", "SOCIAL", "PAID", "EMAIL", "PR", "EVENTS"] as const;
+
+export interface KrakenOptions {
+  boss?: boolean;
+}
+
+/**
+ * Unit in STB.classes (gtm - Plinth 0 "POSITIONING & LAUNCH").
+ * Source: reference lines 8824-8915.
+ */
+export function uKraken(
+  three: typeof THREE,
+  mats: MaterialRegistry,
+  opt: KrakenOptions = {}
+): UnitHandle & { readonly eyeRef: THREE.Object3D } {
+  const g = new three.Group();
+  const top = new three.Group();
+  g.add(top);
+  const eyeRef = new three.Object3D();
+  eyeRef.position.set(0, 2.9, 1.08);
+  top.add(eyeRef);
+
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+  mk(three, mats, top, Cy(three, 1.35, 1.05, 0.45, 8), G3, [0, 1.9, 0]);
+  mk(
+    three,
+    mats,
+    top,
+    Hemi(three, 1.3, 8, 3),
+    B3,
+    [0, 2.1, 0],
+    null,
+    [1, 1.55, 1]
+  );
+  mk(
+    three,
+    mats,
+    top,
+    Tor(three, 1.32, 0.08, 3, 8),
+    mats.tm(HX.blu),
+    [0, 2.45, 0],
+    [Math.PI / 2, 0, 0]
+  );
+  eye3(three, mats, top, [0, 2.9, 1.08], opt.boss ? 0.42 : 0.24);
+  if (!opt.boss) {
+    eye3(three, mats, top, [-0.6, 3.15, 0.85], 0.08);
+    eye3(three, mats, top, [0.6, 3.15, 0.85], 0.08);
+  } else {
+    mk(
+      three,
+      mats,
+      top,
+      Tor(three, 1.32, 0.08, 3, 8),
+      mats.tm(HX.red),
+      [0, 2.2, 0],
+      [Math.PI / 2, 0, 0]
+    );
+  }
+
+  const T = [
+    { x: -0.5, a: 200, c: -7 },
+    { x: -0.85, a: 170, c: -8 },
+    { x: -1.0, a: 140, c: -3 },
+    { x: 0.5, a: -20, c: 7 },
+    { x: 0.85, a: 10, c: 8 },
+    { x: 1.0, a: 40, c: 3 },
+  ].map((o, i) => {
+    const ch: THREE.Mesh[] = [];
+    for (let k = 0; k < 10; k++) {
+      ch.push(
+        mk(
+          three,
+          mats,
+          g,
+          Cy(three, 0.15 - k * 0.009, 0.15 - k * 0.009, 0.46, 5),
+          k % 2 ? G3 : B3
+        )
+      );
+    }
+    const pod = new three.Group();
+    g.add(pod);
+    mk(three, mats, pod, Bx(three, 0.75, 0.45, 0.55), B3);
+    mk(
+      three,
+      mats,
+      pod,
+      Bx(three, 0.77, 0.08, 0.57),
+      mats.tm(HX.blu),
+      [0, -0.05, 0],
+      null,
+      null,
+      false
+    );
+    eye3(three, mats, pod, [0.2, 0.05, 0.3], 0.05);
+    [-0.18, 0.08].forEach((x) =>
+      mk(three, mats, pod, Ic(three, 0.1), B3, [x, 0.32, 0.05])
+    );
+    const lb = textSprite(three, KLB[i]!, "#FFFFFF", 0.38);
+    lb.position.set(0, 0.62, 0);
+    pod.add(lb);
+    if (opt.boss) pod.visible = false;
+    return { ...o, ch, pod, z: ((i % 3) - 1) * 0.3 };
+  });
+
+  return {
+    g,
+    eyeRef,
+    w: 7,
+    h: 5.4,
+    upd: (t: number) => {
+      top.position.y = Math.sin(t / 900) * 0.12;
+      T.forEach((o, i) => {
+        let x = o.x;
+        let y = 1.75 + top.position.y;
+        let ang = o.a;
+        o.ch.forEach((m, k) => {
+          ang += -o.c * -1 + Math.sin(t / 650 + i * 1.3 + k * 0.45) * 5 * 0.4;
+          const r = (ang * Math.PI) / 180;
+          const nx = x + Math.cos(r) * 0.44;
+          const ny = y - Math.sin(r) * 0.44;
+          m.position.set((x + nx) / 2, (y + ny) / 2, o.z);
+          m.rotation.set(0, 0, Math.atan2(ny - y, nx - x) - Math.PI / 2);
+          x = nx;
+          y = ny;
+        });
+        o.pod.position.set(x, y + 0.2, o.z);
+      });
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes (dir - Plinth 0 "POSITIONING & LAUNCH").
+ * Source: reference lines 8916-8956.
+ */
+export function uMarshal(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.blu,
+    torso: [1.05, 1.1, 0.65],
+    stance: 0.18,
+  });
+  const g = b.g;
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [-0.55, 0],
+        [0.55, 0],
+        [0.75, -1.6],
+        [0, -1.85],
+        [-0.75, -1.6],
+      ],
+      0.05
+    ),
+    mats.tm(HX.blu),
+    [0, b.shY + 0.05, -0.36]
+  );
+  b.arms[1]!.rotation.set(-0.3, 0, 0.35);
+  b.arms[0]!.rotation.set(0, 0, -0.5);
+  const pole = new three.Group();
+  pole.position.set(1.05, 0, 0.25);
+  g.add(pole);
+  mk(
+    three,
+    mats,
+    pole,
+    Cy(three, 0.05, 0.05, 4.6, 5),
+    mats.tm(HX.gun),
+    [0, 2.3, 0]
+  );
+  const flag = plane(three, pole, 1.5, 1.05, mats.TX("flag"), [0.78, 4.0, 0]);
+  mk(three, mats, pole, Ic(three, 0.12), mats.tm(HX.yel), [0, 4.65, 0]);
+  return {
+    g,
+    w: 2.8,
+    h: 4.8,
+    upd: (t: number) => {
+      flag.rotation.y = Math.sin(t / 400) * 0.35;
+      flag.position.x = 0.78 * Math.cos(flag.rotation.y);
+      flag.position.z = -0.78 * Math.sin(flag.rotation.y);
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes (brand - Plinth 1 "BRAND & IDENTITY").
+ * Source: reference lines 9044-9075.
+ */
+export function uRonin(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.red,
+    torso: [0.85, 1.0, 0.55],
+    stance: 0.24,
+  });
+  const g = b.g;
+  b.arms[1]!.rotation.set(0, 0, 2.5);
+  b.arms[0]!.rotation.set(-0.4, 0, -0.35);
+  const bl = new three.Group();
+  bl.position.set(0, -1.25, 0);
+  b.arms[1]!.add(bl);
+  mk(three, mats, bl, Bx(three, 0.32, 0.08, 0.32), mats.tm(HX.yel));
+  mk(
+    three,
+    mats,
+    bl,
+    Bx(three, 0.09, 2.6, 0.18),
+    mats.bm(0xffe3e6),
+    [0, -1.35, 0],
+    null,
+    null,
+    false
+  );
+  [-0.6, -1.4, -2.2].forEach((y) =>
+    glowS(three, mats, bl, [0, y, 0], 1.0, HX.red)
+  );
+  return {
+    g,
+    w: 2.4,
+    h: 4.6,
+    upd: (t: number) => {
+      b.arms[1]!.rotation.z = 2.5 + Math.sin(t / 900) * 0.08;
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes (decks - Plinth 1 "BRAND & IDENTITY").
+ * Source: reference lines 9100-9125.
+ */
+export function uHerald(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.red,
+    torso: [1.0, 1.05, 0.65],
+    stance: 0.16,
+  });
+  const g = b.g;
+  b.arms[0]!.rotation.set(-0.5, 0, -0.2);
+  b.arms[1]!.rotation.set(-0.5, 0, 0.2);
+  const G3 = mats.tm(HX.gun);
+  [-0.45, 0.45].forEach((x) =>
+    mk(three, mats, g, Cy(three, 0.04, 0.04, 1.5, 4), G3, [
+      x,
+      b.shY + 0.75,
+      -0.4,
+    ])
+  );
+  const bb = new three.Group();
+  bb.position.set(0, b.shY + 1.9, -0.45);
+  g.add(bb);
+  mk(three, mats, bb, Bx(three, 2.7, 1.55, 0.12), G3);
+  plane(three, bb, 2.5, 1.38, mats.TX("chart"), [0, 0, 0.07]);
+  return {
+    g,
+    w: 2.8,
+    h: 5.2,
+    upd: (t: number) => {
+      bb.rotation.z = Math.sin(t / 800) * 0.03;
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes (illus - Plinth 1 "BRAND & IDENTITY").
+ * Source: reference lines 9157-9234.
+ * Note: `base` Vector3 is hoisted outside `upd` for zero per-frame allocations.
+ */
+export function uFresco(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.red,
+    legH: 0.85,
+    torso: [1.05, 0.95, 0.75],
+    stance: 0.2,
+    head: "dome",
+  });
+  const g = b.g;
+  mk(three, mats, g, Cy(three, 0.3, 0.3, 1.0, 8), mats.tm(HX.yel), [
+    -0.25,
+    b.ty + 0.1,
+    -0.6,
+  ]);
+  b.arms[1]!.rotation.set(-1.4, 0, 0.6);
+  const nz = new three.Group();
+  nz.position.set(0, -1.3, 0);
+  b.arms[1]!.add(nz);
+  mk(
+    three,
+    mats,
+    nz,
+    Cy(three, 0.07, 0.1, 0.5, 5),
+    mats.tm(HX.gun),
+    [0, -0.2, 0]
+  );
+  const cols = [HX.red, HX.yel, HX.blu, HX.teal] as const;
+  const dots: THREE.Mesh[] = [];
+  for (let k = 0; k < 14; k++) {
+    dots.push(
+      mk(
+        three,
+        mats,
+        g,
+        Ic(three, 0.08 + (k % 3) * 0.03),
+        mats.bm(cols[k % 4]!),
+        [0, 0, 0],
+        null,
+        null,
+        false
+      )
+    );
+  }
+  const groundSplatters: [number, number, number, number][] = [
+    [-0.9, 0.02, 0.3, 0],
+    [0.9, 0.02, 0.5, 1],
+    [0, 0.02, 1.0, 2],
+  ];
+  groundSplatters.forEach(([x, y, z, c]) =>
+    mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.32, 0.32, 0.02, 8),
+      mats.bm(cols[c]!),
+      [x, y, z],
+      null,
+      null,
+      false
+    )
+  );
+  const torsoSplatters: [number, number, number, number][] = [
+    [-0.2, b.ty, 0.39, 0],
+    [0.25, b.ty - 0.25, 0.39, 2],
+  ];
+  torsoSplatters.forEach(([x, y, z, c]) =>
+    mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.1, 0.1, 0.02, 6),
+      mats.bm(cols[c]!),
+      [x, y, z],
+      [Math.PI / 2, 0, 0],
+      null,
+      false
+    )
+  );
+
+  const base = new three.Vector3();
+  return {
+    g,
+    w: 2.6,
+    h: 3.2,
+    upd: (t: number) => {
+      nz.getWorldPosition(base);
+      g.worldToLocal(base);
+      dots.forEach((d, k) => {
+        const u = (t / 650 + k / 14) % 1;
+        d.position.set(
+          base.x + u * 2.2,
+          base.y + 0.1 + u * 0.9 - u * u * 1.6,
+          base.z + u * 0.8
+        );
+        d.scale.setScalar(1 - u * 0.5);
+      });
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes (motion - Plinth 2 "PRODUCT & INTERFACE").
+ * Source: reference lines 9288-9354.
+ */
+export function uDolly(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+  const wh = new three.Group();
+  wh.position.set(0, 0.72, 0);
+  g.add(wh);
+  mk(three, mats, wh, Cy(three, 0.72, 0.72, 0.26, 12), mats.tm(HX.dark), null, [
+    Math.PI / 2,
+    0,
+    0,
+  ]);
+  mk(three, mats, wh, Cy(three, 0.45, 0.45, 0.3, 8), G3, null, [
+    Math.PI / 2,
+    0,
+    0,
+  ]);
+  mk(three, mats, wh, Bx(three, 0.85, 0.08, 0.34), B3, null, null, null, false);
+  [-1, 1].forEach((s) =>
+    mk(three, mats, g, Bx(three, 0.08, 1.0, 0.08), G3, [s * 0.2, 1.3, 0])
+  );
+  mk(three, mats, g, Bx(three, 0.8, 0.8, 0.55), B3, [0, 2.15, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 0.82, 0.12, 0.57),
+    mats.tm(HX.yel),
+    [0, 1.95, 0],
+    null,
+    null,
+    false
+  );
+  [-1, 1].forEach((s) => {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.14, 0.5, 0.14),
+      G3,
+      [s * 0.52, 2.0, 0.1],
+      [0, 0, s * 0.3]
+    );
+  });
+  mk(three, mats, g, Bx(three, 0.9, 0.6, 0.6), G3, [0, 2.9, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.24, 0.28, 0.5, 8),
+    G3,
+    [0, 2.9, 0.5],
+    [Math.PI / 2, 0, 0]
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.2, 0.2, 0.04, 10),
+    mats.tm(HX.glass),
+    [0, 2.9, 0.77],
+    [Math.PI / 2, 0, 0],
+    null,
+    false
+  );
+  glowS(three, mats, g, [0.06, 2.96, 0.8], 0.3, 0xffffff);
+  const reels = [-0.25, 0.25].map((x) => {
+    const r = new three.Group();
+    r.position.set(x, 3.5, 0);
+    g.add(r);
+    mk(three, mats, r, Cy(three, 0.3, 0.3, 0.1, 10), G3, null, [
+      Math.PI / 2,
+      0,
+      0,
+    ]);
+    mk(three, mats, r, Bx(three, 0.5, 0.06, 0.12), B3, null, null, null, false);
+    return r;
+  });
+  const rec = eye3(three, mats, g, [-0.35, 3.1, 0.32], 0.06);
+  return {
+    g,
+    w: 1.9,
+    h: 3.9,
+    upd: (t: number) => {
+      wh.rotation.z = -t / 300;
+      reels.forEach((r) => (r.rotation.z = -t / 200));
+      rec.visible = Math.sin(t / 300) > 0;
+      g.rotation.z = Math.sin(t / 700) * 0.04;
+    },
+  };
+}
+
+/**
+ * Unit in STB.classes ("3d" - Plinth 2 "PRODUCT & INTERFACE").
+ * Source: reference lines 9355-9410.
+ */
+export function uPrism(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const body = new three.Group();
+  g.add(body);
+  const fl: THREE.Group[] = [];
+  const G3 = mats.tm(HX.gun);
+  const B3 = mats.tm(HX.bone);
+  mk(
+    three,
+    mats,
+    body,
+    Co(three, 0.5, 0.7, 6),
+    G3,
+    [0, 1.0, 0],
+    [Math.PI, 0, 0]
+  );
+  fl.push(flame3(three, mats, body, [0, 0.65, 0], 0.9, 0.22));
+  mk(three, mats, body, Bx(three, 0.9, 1.0, 0.6), B3, [0, 1.85, 0]);
+  mk(
+    three,
+    mats,
+    body,
+    Bx(three, 0.92, 0.12, 0.62),
+    mats.tm(HX.yel),
+    [0, 1.6, 0],
+    null,
+    null,
+    false
+  );
+  [-1, 1].forEach((s) => {
+    mk(
+      three,
+      mats,
+      body,
+      Bx(three, 0.18, 0.6, 0.2),
+      B3,
+      [s * 0.55, 1.9, 0.25],
+      [-0.9, 0, 0]
+    );
+  });
+  mk(three, mats, body, Bx(three, 0.42, 0.36, 0.4), B3, [0, 2.55, 0]);
+  eye3(three, mats, body, [0, 2.57, 0.21], 0.055);
+  const cube = new three.Group();
+  cube.position.set(0, 3.4, 0.3);
+  body.add(cube);
+  holoEdges(three, cube, Bx(three, 0.6, 0.6, 0.6));
+  holoEdges(three, cube, Ic(three, 0.42));
+  const beam = new three.Mesh(
+    Co(three, 0.45, 0.8, 6),
+    new three.MeshBasicMaterial({
+      color: HX.holo,
+      transparent: true,
+      opacity: 0.15,
+      depthWrite: false,
+    })
+  );
+  beam.position.set(0, 2.95, 0.3);
+  body.add(beam);
+  return {
+    g,
+    w: 1.9,
+    h: 4,
+    upd: (t: number) => {
+      body.position.y = Math.sin(t / 700) * 0.15;
+      cube.rotation.set(t / 1400, t / 900, 0);
+      flick(fl, t);
     },
   };
 }

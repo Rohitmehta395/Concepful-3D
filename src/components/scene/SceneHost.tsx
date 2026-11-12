@@ -25,14 +25,49 @@ export function SceneHost() {
         engine = createEngine(canvasRef.current, three);
         engine.start();
 
-        // Gated test hook: exposed only when NEXT_PUBLIC_E2E === "1"
+        // Gated test hooks: exposed only when NEXT_PUBLIC_E2E === "1"
         if (
           process.env.NEXT_PUBLIC_E2E === "1" &&
           typeof window !== "undefined"
         ) {
           const k = window ? "CONCEPFUL" : "";
-          (window as unknown as Record<string, unknown>)[`__${k}_ENGINE__`] =
-            engine;
+          const win = window as unknown as Record<string, unknown>;
+          win[`__${k}_ENGINE__`] = engine;
+          win[`__${k}_CREATE__`] = (c: HTMLCanvasElement) =>
+            createEngine(c, three);
+          win[`__${k}_STRICT_CYCLE__`] = async () => {
+            const [{ StrictMode, createElement }, { createRoot }] =
+              await Promise.all([import("react"), import("react-dom/client")]);
+            const host = document.createElement("div");
+            host.style.cssText =
+              "position:fixed;inset:0;width:1280px;height:800px;pointer-events:none;opacity:0;";
+            document.body.appendChild(host);
+            const root = createRoot(host);
+            root.render(
+              createElement(StrictMode, null, createElement(SceneHost))
+            );
+            await new Promise((r) => setTimeout(r, 60));
+            const activeEng = win[`__${k}_ENGINE__`] as Engine | undefined;
+            const pre = activeEng
+              ? {
+                  geometries: activeEng.renderer.info.memory.geometries,
+                  textures: activeEng.renderer.info.memory.textures,
+                }
+              : null;
+            root.unmount();
+            host.remove();
+            const post = activeEng
+              ? {
+                  isContextLost: activeEng.renderer
+                    .getContext()
+                    .isContextLost(),
+                  geometries: activeEng.renderer.info.memory.geometries,
+                  textures: activeEng.renderer.info.memory.textures,
+                  programs: activeEng.renderer.info.programs?.length ?? -1,
+                }
+              : null;
+            return { pre, post };
+          };
         }
       })
       .catch((err) => {
