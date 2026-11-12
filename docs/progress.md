@@ -589,3 +589,18 @@ pending reviewer sign-off; last code commit 5ec1ebc
   - `rules` full scene: `390` `0.10%` / `0.13%` / `0.08%`; `1280` `0.10%` / `0.11%` / `0.10%`; noise floor `0` (`REF vs REF = 0`, `REB vs REB = 0`).
   - Transition boundary (`refY=5680, rebY=5680`): WebGL snaps immediately at `+0px` (`892/1024000 = 0.09%`); pointer drag (`rules`) `3107/1024000 (0.30%)`; `0` console/page errors; `0.0px` JS on/off & static parity deltas.
   - 20-cycle leak check with `--expose-gc`: in-page (`classes` + `rules`) `geometries=0, textures=0, programs=0, isContextLost=true`, drops to `8.71 MB` on major GC; `StrictMode` `10.18 MB -> 10.45 MB` (`+0.27 MB`).
+
+### Part 4.7: Runtime Usage Map, Model Bench & `H3` Hero Vehicles
+
+- **Runtime Usage Map (Task 1)**: Instrumented `STB`, `U3`, `H3`, `S3`, `ENCD` across all 7 scenes (`390` / `1280`) and `solo` / `squad` / `combine` modes.
+  - Active `STB` definitions: `intro` (`11588`), `classes` (`11660`), `logi` (`13934`), `rules` (`14284`), `stages` (`11848`), `outro` (`11902`). Earlier `10869–10899`, `11709`, `11782` definitions are dead.
+  - All 9 `H3` vehicles (`brand`, `web`, `uiux`, `decks`, `copy`, `motion`, `3d`, `fab`, `ai`) and `mJet` are actively used (`STB.intro`, `STB.stages`, `STB.outro`, `solo`).
+- **Model Bench (Task 2, `800x800`, `lights(sc)`, `0x12161e`, `0/90/180` deg)**:
+  - `classes` `U3` units: 8/9 units `0–6/640000` px (`0.000–0.001%`); `u3:illus` (`uFresco`) `1156/1076/1133` px (`0.168–0.181%`); `hexPlinth(4.2)` `1/0/1` px; `textSprite` `9/9/9` px.
+- **`H3` Hero Vehicles + `mJet` (Task 3)**:
+  - Ported in [hVehiclesA.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/hVehiclesA.ts) (`mDolphin`, `mManta`, `mOwl`, `mHawk`), [hVehiclesB.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/hVehiclesB.ts) (`mJelly`, `mDragonfly`, `mTurtle`, `mBeetle`), and [hVehiclesC.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/models/hVehiclesC.ts) (`mDrone`, `mJet`, `H3`).
+  - Per-frame allocations over 120 frames (all 10 vehicles): `{ Vector3: 0, Matrix4: 0, Color: 0 }`.
+  - Model bench (`t=0.0s` & `t=1.7s` across `0/90/180` deg): 59/60 renders `0–6/640000` px (`0.000–0.001%`); `h3:brand` `t=1.7s` `0/0/0`.
+- **Regression & Leak Check (Task 4)**:
+  - `classes` & `rules` full-scene diffs, pointer drag (`0.30%`), and `0.0px` static parity unchanged; `0` console/page errors.
+  - 20-cycle `--expose-gc` leak test including 10 vehicles built/disposed per cycle: `geometries=0, textures=0, programs=0, isContextLost=true` on all 20 in-page (`14.76 -> 18.47 MB`, `12.43 -> 11.67 MB` run 1) and 20 StrictMode cycles (`17.34 -> 15.19 MB`).
