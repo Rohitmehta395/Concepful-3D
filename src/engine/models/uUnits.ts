@@ -439,6 +439,16 @@ export function mechParts(
       false
     );
     eye3(three, mats, head, [0.07, 0.04, 0.27], 0.06);
+    mk(three, mats, head, Cy(three, 0.02, 0.02, 0.24, 4), N, [0.1, 0.38, 0]);
+    mk(three, mats, head, Ic(three, 0.05), A, [0.1, 0.5, 0]);
+    mk(
+      three,
+      mats,
+      head,
+      tbox(three, 0.3, 0.36, 0.1, 0.36, 0.4),
+      N,
+      [0, -0.2, 0]
+    );
   } else {
     mk(
       three,

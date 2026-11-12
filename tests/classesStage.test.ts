@@ -6,6 +6,8 @@ import { createStageManager } from "@/engine/stages/StageManager";
 import { createIntroStage } from "@/engine/stages/introStage";
 import { createClassesStage } from "@/engine/stages/classesStage";
 import { createRulesStage } from "@/engine/stages/rulesStage";
+import { createStagesStage } from "@/engine/stages/stagesStage";
+import { createOutroStage } from "@/engine/stages/outroStage";
 
 describe("Part 4.4: materials, orbit controller, and classesStage", () => {
   it("matches original brandCol colour mapping across navy ramp, reds, and highlights", () => {
@@ -93,6 +95,8 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
         intro: createIntroStage,
         classes: createClassesStage,
         rules: createRulesStage,
+        stages: createStagesStage,
+        outro: createOutroStage,
       }
     );
 
@@ -100,13 +104,19 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
     expect(mgr.getBuiltStage("intro")).toBeUndefined();
     expect(mgr.getBuiltStage("classes")).toBeUndefined();
     expect(mgr.getBuiltStage("rules")).toBeUndefined();
+    expect(mgr.getBuiltStage("stages")).toBeUndefined();
+    expect(mgr.getBuiltStage("outro")).toBeUndefined();
 
     const introStage = mgr.select("intro")!;
     const classesStage = mgr.select("classes")!;
     const rulesStage = mgr.select("rules")!;
+    const stagesStage = mgr.select("stages")!;
+    const outroStage = mgr.select("outro")!;
     expect(mgr.getBuiltStage("intro")).toBe(introStage);
     expect(mgr.getBuiltStage("classes")).toBe(classesStage);
     expect(mgr.getBuiltStage("rules")).toBe(rulesStage);
+    expect(mgr.getBuiltStage("stages")).toBe(stagesStage);
+    expect(mgr.getBuiltStage("outro")).toBe(outroStage);
     expect(mgr.select("logi")).toBeNull();
 
     const box = {
@@ -156,10 +166,28 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
         viewportH: 800,
         reduceMotion: false,
       });
+      stagesStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
+      outroStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
     }
 
     console.log(
-      "Per-frame allocations over 120 update frames (intro + classes + rules):",
+      "Per-frame allocations over 120 update frames (all 5 stages):",
       {
         Vector3: vec3Alloc,
         Matrix4: mat4Alloc,
@@ -173,6 +201,8 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
 
     mgr.dispose();
     expect(mgr.getBuiltStage("intro")).toBeUndefined();
+    expect(mgr.getBuiltStage("stages")).toBeUndefined();
+    expect(mgr.getBuiltStage("outro")).toBeUndefined();
     expect(mgr.getBuiltStage("classes")).toBeUndefined();
     expect(mgr.getBuiltStage("rules")).toBeUndefined();
     orbit.dispose();

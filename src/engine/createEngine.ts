@@ -17,6 +17,8 @@ import { createStageManager, type StageManager } from "./stages/StageManager";
 import { createIntroStage } from "./stages/introStage";
 import { createClassesStage } from "./stages/classesStage";
 import { createRulesStage } from "./stages/rulesStage";
+import { createStagesStage } from "./stages/stagesStage";
+import { createOutroStage } from "./stages/outroStage";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -103,6 +105,8 @@ export function createEngine(
       intro: createIntroStage,
       classes: createClassesStage,
       rules: createRulesStage,
+      stages: createStagesStage,
+      outro: createOutroStage,
     }
   );
 

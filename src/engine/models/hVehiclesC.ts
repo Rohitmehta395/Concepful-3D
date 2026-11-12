@@ -9,6 +9,7 @@ import {
   Tor,
   eye3,
   flame3,
+  glowS,
   mk,
   plane,
 } from "../world/geometry";
@@ -391,5 +392,288 @@ export function sMother(
     upd: (t: number) => {
       dish.rotation.y = t / 600;
     },
+  };
+}
+
+export interface FlagshipHandle {
+  readonly g: THREE.Group;
+  readonly len: number;
+  readonly h: number;
+  readonly fl: THREE.Group[];
+  upd(t: number): void;
+}
+
+/**
+ * Startup submarine flagship (sSub).
+ * Source: reference lines 9794-9891.
+ */
+export function sSub(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): FlagshipHandle {
+  const g = new three.Group();
+  const fl: THREE.Group[] = [];
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  mk(three, mats, g, Cy(three, 1.0, 1.0, 6.4, 8), B3, [0, 0, 0], [0, 0, AX]);
+  mk(three, mats, g, Co(three, 1.0, 1.7, 8), B3, [4.05, 0, 0], [0, 0, AX]);
+  mk(three, mats, g, Co(three, 1.0, 1.4, 8), B3, [-3.9, 0, 0], [0, 0, -AX]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 6.6, 0.16, 2.06),
+    mats.tm(HX.red),
+    [0, -0.35, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Bx(three, 1.8, 1.3, 0.6), B3, [0.6, 1.4, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 1.82, 0.12, 0.62),
+    mats.tm(HX.red),
+    [0.6, 1.2, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Cy(three, 0.05, 0.05, 0.8, 4), G3, [1.1, 2.4, 0]);
+  mk(three, mats, g, Bx(three, 0.3, 0.14, 0.14), G3, [1.2, 2.8, 0]);
+
+  for (let i = 0; i < 6; i++) {
+    mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.12, 0.12, 0.06, 8),
+      mats.tm(HX.dark),
+      [-2.2 + i * 0.85, 0.15, 0.98],
+      [Math.PI / 2, 0, 0],
+      null,
+      false
+    );
+    glowS(three, mats, g, [-2.2 + i * 0.85, 0.15, 1.0], 0.35, HX.holo);
+  }
+
+  [-1, 1].forEach((s) =>
+    mk(
+      three,
+      mats,
+      g,
+      Ex(
+        three,
+        [
+          [0, 0],
+          [-0.8, 0],
+          [-1.2, 1.1],
+          [-0.9, 1.1],
+        ],
+        0.08
+      ),
+      mats.tm(HX.red),
+      [-3.1, 0, s * 0.2],
+      [(s * Math.PI) / 2, 0, 0]
+    )
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [0, 0],
+        [-0.8, 0],
+        [-1.2, 1.0],
+        [-0.9, 1.0],
+      ],
+      0.08
+    ),
+    mats.tm(HX.red),
+    [-3.1, 0.4, 0]
+  );
+
+  const prop = new three.Group();
+  prop.position.set(-4.75, 0, 0);
+  g.add(prop);
+  for (let k = 0; k < 3; k++) {
+    mk(
+      three,
+      mats,
+      prop,
+      Bx(three, 0.08, 1.1, 0.25),
+      mats.tm(HX.chrome),
+      null,
+      [k * 2.09, 0, 0]
+    );
+  }
+  eye3(three, mats, g, [4.6, 0.1, 0.3], 0.09);
+
+  const light = new three.Mesh(
+    Co(three, 1.6, 6, 8),
+    new three.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.06,
+      depthWrite: false,
+    })
+  );
+  light.position.set(7.8, 0, 0);
+  light.rotation.z = Math.PI / 2;
+  g.add(light);
+
+  return {
+    g,
+    len: 9.5,
+    h: 3.5,
+    fl,
+    upd: (t: number) => {
+      prop.rotation.x = t / 120;
+    },
+  };
+}
+
+/**
+ * SMB starcruiser flagship (sStar).
+ * Source: reference lines 9983-10083.
+ */
+export function sStar(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): FlagshipHandle {
+  const g = new three.Group();
+  const fl: THREE.Group[] = [];
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [5.6, 0],
+        [3.6, 0.95],
+        [-3.6, 1.5],
+        [-5.6, 1.1],
+        [-5.6, -0.7],
+        [-4.6, -1.2],
+        [3.2, -1.0],
+      ],
+      2.4
+    ),
+    B3
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [5.0, -0.1],
+        [3.2, -0.9],
+        [-4.4, -1.1],
+        [-5.5, -0.6],
+        [-5.5, -0.1],
+      ],
+      2.42
+    ),
+    G3,
+    [0, 0, 0],
+    null,
+    null,
+    false
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 4.2, 1.0, 0.05),
+    mats.bm(HX.holo, 0.55, true),
+    [-0.3, -0.1, 1.23],
+    null,
+    null,
+    false
+  );
+  for (let i = 0; i < 8; i++) {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.25, 0.06, 0.06),
+      mats.tm(HX.yel),
+      [-2.1 + i * 0.52, 0.35, 1.25],
+      null,
+      null,
+      false
+    );
+  }
+  mk(three, mats, g, Bx(three, 1.7, 1.4, 1.0), B3, [-1.8, 2.0, 0]);
+  for (let i = 0; i < 4; i++) {
+    mk(
+      three,
+      mats,
+      g,
+      Bx(three, 0.25, 0.18, 0.05),
+      mats.tm(HX.glass),
+      [-2.4 + i * 0.38, 2.25, 0.52],
+      null,
+      null,
+      false
+    );
+  }
+  mk(
+    three,
+    mats,
+    g,
+    Ex(
+      three,
+      [
+        [0, 0],
+        [-1.0, 0],
+        [-1.6, 1.4],
+        [-1.3, 1.4],
+      ],
+      0.12
+    ),
+    mats.tm(HX.red),
+    [-3.8, 1.3, 0]
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 5.0, 0.14, 2.44),
+    mats.tm(HX.red),
+    [1.8, 0.15, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Bx(three, 0.6, 2.0, 2.0), G3, [-5.85, 0.2, 0]);
+  (
+    [
+      [0.7, 0.5],
+      [-0.1, 0],
+      [-0.7, -0.5],
+    ] as const
+  ).forEach(([y, z]) =>
+    fl.push(flame3(three, mats, g, [-6.2, y, z], 2.4, 0.32, "x-"))
+  );
+  eye3(three, mats, g, [5.3, 0.15, 0.4], 0.09);
+
+  return {
+    g,
+    len: 12,
+    h: 4,
+    fl,
+    upd: () => {},
   };
 }

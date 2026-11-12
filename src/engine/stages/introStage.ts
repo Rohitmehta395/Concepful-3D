@@ -100,6 +100,7 @@ export function createIntroStage(ctx: StageBuildContext): Stage {
 
   function update(params: StageUpdateParams): void {
     const { t, dt, p, kk, box, viewportH, reduceMotion } = params;
+    cosmosLayer.update(t, reduceMotion);
     stars.update(dt, 1.8, reduceMotion);
     planet.rotation.y = t / 30000;
     mother.upd(t);

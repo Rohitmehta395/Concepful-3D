@@ -43,10 +43,19 @@ export function SceneHost() {
               "position:fixed;inset:0;width:1280px;height:800px;pointer-events:none;opacity:0;";
             document.body.appendChild(host);
             const root = createRoot(host);
+            const prevEng = win[`__${k}_ENGINE__`];
             root.render(
               createElement(StrictMode, null, createElement(SceneHost))
             );
-            await new Promise((r) => setTimeout(r, 60));
+            for (let w = 0; w < 50; w++) {
+              await new Promise((r) => setTimeout(r, 10));
+              if (
+                win[`__${k}_ENGINE__`] &&
+                win[`__${k}_ENGINE__`] !== prevEng
+              ) {
+                break;
+              }
+            }
             const activeEng = win[`__${k}_ENGINE__`] as Engine | undefined;
             const pre = activeEng
               ? {
