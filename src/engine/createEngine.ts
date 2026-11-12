@@ -16,6 +16,7 @@ import {
 import { createStageManager, type StageManager } from "./stages/StageManager";
 import { createIntroStage } from "./stages/introStage";
 import { createClassesStage } from "./stages/classesStage";
+import { createLogiStage } from "./stages/logiStage";
 import { createRulesStage } from "./stages/rulesStage";
 import { createStagesStage } from "./stages/stagesStage";
 import { createOutroStage } from "./stages/outroStage";
@@ -104,6 +105,7 @@ export function createEngine(
     {
       intro: createIntroStage,
       classes: createClassesStage,
+      logi: createLogiStage,
       rules: createRulesStage,
       stages: createStagesStage,
       outro: createOutroStage,

@@ -259,6 +259,7 @@ describe("Task 4: computeScroll Differential Unit Tests", () => {
           measureText: () => ({ width: 100 }),
           strokeText: () => {},
           fillText: () => {},
+          bezierCurveTo: () => {},
         }),
       }),
       querySelector: (sel: string) => {

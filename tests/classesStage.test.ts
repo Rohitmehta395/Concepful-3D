@@ -5,6 +5,7 @@ import { createOrbitController } from "@/engine/camera/orbitController";
 import { createStageManager } from "@/engine/stages/StageManager";
 import { createIntroStage } from "@/engine/stages/introStage";
 import { createClassesStage } from "@/engine/stages/classesStage";
+import { createLogiStage } from "@/engine/stages/logiStage";
 import { createRulesStage } from "@/engine/stages/rulesStage";
 import { createStagesStage } from "@/engine/stages/stagesStage";
 import { createOutroStage } from "@/engine/stages/outroStage";
@@ -44,6 +45,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
           measureText: () => ({ width: 100 }),
           strokeText: () => {},
           fillText: () => {},
+          bezierCurveTo: () => {},
         }),
       }),
     });
@@ -94,6 +96,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
       {
         intro: createIntroStage,
         classes: createClassesStage,
+        logi: createLogiStage,
         rules: createRulesStage,
         stages: createStagesStage,
         outro: createOutroStage,
@@ -103,21 +106,24 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
     // Lazy build check (STS semantics)
     expect(mgr.getBuiltStage("intro")).toBeUndefined();
     expect(mgr.getBuiltStage("classes")).toBeUndefined();
+    expect(mgr.getBuiltStage("logi")).toBeUndefined();
     expect(mgr.getBuiltStage("rules")).toBeUndefined();
     expect(mgr.getBuiltStage("stages")).toBeUndefined();
     expect(mgr.getBuiltStage("outro")).toBeUndefined();
 
     const introStage = mgr.select("intro")!;
     const classesStage = mgr.select("classes")!;
+    const logiStage = mgr.select("logi")!;
     const rulesStage = mgr.select("rules")!;
     const stagesStage = mgr.select("stages")!;
     const outroStage = mgr.select("outro")!;
     expect(mgr.getBuiltStage("intro")).toBe(introStage);
     expect(mgr.getBuiltStage("classes")).toBe(classesStage);
+    expect(mgr.getBuiltStage("logi")).toBe(logiStage);
     expect(mgr.getBuiltStage("rules")).toBe(rulesStage);
     expect(mgr.getBuiltStage("stages")).toBe(stagesStage);
     expect(mgr.getBuiltStage("outro")).toBe(outroStage);
-    expect(mgr.select("logi")).toBeNull();
+    expect(mgr.select("nonexistent")).toBeNull();
 
     const box = {
       x0: 500,
@@ -157,6 +163,15 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
         viewportH: 800,
         reduceMotion: false,
       });
+      logiStage.update({
+        t,
+        dt: 16.67,
+        p: 0.5,
+        kk: 0.1,
+        box,
+        viewportH: 800,
+        reduceMotion: false,
+      });
       rulesStage.update({
         t,
         dt: 16.67,
@@ -187,7 +202,7 @@ describe("Part 4.4: materials, orbit controller, and classesStage", () => {
     }
 
     console.log(
-      "Per-frame allocations over 120 update frames (all 5 stages):",
+      "Per-frame allocations over 120 update frames (all 6 stages):",
       {
         Vector3: vec3Alloc,
         Matrix4: mat4Alloc,

@@ -1495,3 +1495,92 @@ export function uWatch(
     },
   };
 }
+
+/**
+ * uLancer ("pos"): Biped with lance arm + holo eye/glow.
+ * Reference lines 8801-8822.
+ */
+export function uLancer(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.blu,
+    torso: [0.8, 1.0, 0.55],
+    stance: 0.1,
+  });
+  const g = b.g;
+  b.arms[0]!.rotation.set(-1.3, 0, -0.5);
+  b.arms[1]!.rotation.set(-1.25, 0, 0.25);
+  const r = new three.Group();
+  r.position.set(0.1, b.shY - 0.25, 0.75);
+  g.add(r);
+  const G3 = mats.tm(HX.dark);
+  mk(three, mats, r, Bx(three, 2.8, 0.14, 0.16), G3, [0.4, 0, 0]);
+  mk(three, mats, r, Bx(three, 0.6, 0.2, 0.16), G3, [-0.9, -0.12, 0]);
+  mk(three, mats, r, Bx(three, 0.7, 0.16, 0.16), G3, [0.4, 0.18, 0]);
+  eye3(three, mats, r, [0.78, 0.18, 0], 0.06);
+  glowS(three, mats, r, [1.85, 0, 0], 0.5, HX.holo);
+  return {
+    g,
+    w: 2.6,
+    h: 3.4,
+    upd: (t: number) => {
+      r.rotation.y = Math.sin(t / 1400) * 0.15;
+    },
+  };
+}
+
+/**
+ * uQuill ("copy"): Dome-headed biped holding a pen with textSprite bubble.
+ * Reference lines 9126-9156.
+ */
+export function uQuill(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.red,
+    legH: 1.0,
+    torso: [0.7, 0.8, 0.45],
+    head: "dome",
+  });
+  const g = b.g;
+  g.scale.setScalar(0.9);
+  b.arms[0]!.rotation.set(-1.0, 0, 0.4);
+  b.arms[1]!.rotation.set(-1.0, 0, -0.3);
+  const pen = new three.Group();
+  pen.position.set(0.1, 1.9, 0.55);
+  pen.rotation.z = -0.75;
+  g.add(pen);
+  const B3 = mats.tm(HX.bone);
+  mk(three, mats, pen, Cy(three, 0.08, 0.08, 3.6, 6), B3, [0, 0, 0]);
+  mk(
+    three,
+    mats,
+    pen,
+    Co(three, 0.13, 0.6, 4),
+    mats.tm(HX.chrome),
+    [0, 2.1, 0]
+  );
+  eye3(three, mats, pen, [0, 2.42, 0], 0.06);
+  mk(
+    three,
+    mats,
+    pen,
+    Bx(three, 0.22, 0.2, 0.22),
+    mats.tm(HX.red),
+    [0, 1.6, 0]
+  );
+  const bub = textSprite(three, "Aa", "#ECE6D6", 0.55);
+  bub.position.set(1.9, 4.0, 0);
+  g.add(bub);
+  return {
+    g,
+    w: 2.6,
+    h: 4.6,
+    upd: (t: number) => {
+      bub.position.y = 4.0 + Math.sin(t / 500) * 0.12;
+    },
+  };
+}

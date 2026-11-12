@@ -26,7 +26,12 @@ export function createCosmos(
   const glowTex = createGlowTexture(three);
   disposables.push(glowTex);
 
-  function glowSprite(p: [number, number, number], size: number, col: number) {
+  function glowSprite(
+    parentGroup: THREE.Object3D,
+    p: [number, number, number],
+    size: number,
+    col: number
+  ) {
     const mat = new three.SpriteMaterial({
       map: glowTex,
       color: brandCol(col, three),
@@ -38,7 +43,7 @@ export function createCosmos(
     const sprite = new three.Sprite(mat);
     sprite.position.set(p[0], p[1], p[2]);
     sprite.scale.set(size, size, 1);
-    root.add(sprite);
+    parentGroup.add(sprite);
     return sprite;
   }
 
@@ -308,7 +313,7 @@ export function createCosmos(
       tail.position.x = -7;
       C.add(tail);
 
-      glowSprite([0, 0, 0], 0.7, 0xffffff);
+      glowSprite(C, [0, 0, 0], 0.7, 0xffffff);
 
       C.rotation.z = -0.35 - r() * 0.3;
       const z = area[2] - r() * 20;
@@ -363,6 +368,7 @@ export function createCosmos(
 
     pts.forEach((p, i) =>
       glowSprite(
+        root,
         [p.x, p.y, p.z],
         i % 3 ? 0.6 : 0.9,
         i % 3 ? 0xffffff : 0xff7fa6
