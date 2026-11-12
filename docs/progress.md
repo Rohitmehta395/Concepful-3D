@@ -663,3 +663,47 @@ pending reviewer sign-off; last code commit 5ec1ebc
   - Transitions @ `1280`: `classes -> logi` (boundary Y = 2320) snaps cleanly at `+20px` (`1.07%`); `logi -> rules` (boundary Y = 5680) snaps cleanly at `+20px` (`0.02%`).
   - Pointer drag: `#how-it-works` `10746/1024000 (1.05%)`; console/page errors: `0`; layout & static parity: `0.0px` across `header`, `hero`, `classes`, `logi-head`, `plans` at `390` and `1280`.
   - Leak tests (`typeof window.gc: function`, all 6 stages): 20 in-page cycles (`20.19 -> 26.05 MB`, `geo=0, tex=0, prog=0, lost=true`); 20 StrictMode cycles (`17.46 -> 17.75 MB`, `geo=0, tex=0, prog=0, lost=true`).
+
+### Part 4.11: Truth Sweep, Dynamic Scroll Framing Parity, Structural & Toon Material Parity across All Six Stages
+
+- **Truth Sweep & Noise Floor (Task 0)**:
+  - Sweep executed with `task0_truth_sweep.mjs` across 0 to 9,600 px in 100 px steps at viewports 390 and 1280 (194 data points total). Output saved to `C:\Users\steve\concepful_scratch\part4_11\truth_sweep.csv`.
+  - Noise floor confirmed at **0 px, 0.0000%** on both reference and rebuild at the start of the sweep.
+  - Scene match assertion: **194/194 points (0 mismatches)** between `STORY.key` and `activeScene`.
+  - Per-scene truth sweep statistics (min / median / max diff %):
+    - `intro`: min 0.630% | med 0.930% | max 1.053% | 0 rows > 3%
+    - `classes`: min 0.829% | med 1.462% | max 3.043% | 3 rows > 3%
+    - `logi`: min 0.239% | med 0.476% | max 0.571% | 0 rows > 3% (dropped from 88% down to 0.476% after framing fix)
+    - `rules`: min 0.017% | med 0.018% | max 0.069% | 0 rows > 3%
+    - `stages`: min 0.397% | med 3.958% | max 5.110% | 19 rows > 3%
+    - `outro`: min 3.905% | med 4.108% | max 5.429% | 16 rows > 3%
+    - `app`: builder mode (full 100% diff, expected as app stage is unported).
+  - `scroll.test.ts` diff explanation: In 4.10, `logiStage` introduced procedural canvas 2D bezier curves (`sow` helper, lines 71-100: `x.bezierCurveTo`). The mock canvas 2D context in `tests/scroll.test.ts` lacked `bezierCurveTo`; adding the no-op stub resolved the missing method.
+
+- **Dynamic Scroll Framing Resolution (Task 1)**:
+  - Investigated the worst failing regions in the sweep (`logi` at 390 and `classes` late).
+  - Finding: Reference line 7368 calls `easeBox(logiTarget(), kb)` or `easeBox(storyTarget(), kb)` on every scroll paint frame. In rebuild, `updateFraming()` was only called when `activeScene !== previousActiveScene`. Because `logi` cards pin and translate during scroll, the cached framing deviated by up to 88%.
+  - Fix: In [createEngine.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/createEngine.ts), updated framing whenever `state.activeScene !== previousActiveScene || scrollY !== lastFramingScrollY`. During idle frames (`scrollY === lastFramingScrollY`), zero calls are made. Verified 0 `getBoundingClientRect` calls over 120 idle frames in `tests/scroll.test.ts` (4,116 tests passing).
+  - Sweep impact: `logi` median dropped from 88% to **0.476%** (0 rows > 3%), and `classes` 390 median dropped to **0.932%**.
+
+- **Structural & Material Fixes (Task 2)**:
+  - Extended structure diff (`task2_extended_struct_diff.mjs`: vertex count, bbox, sum of first 200 pos, pos hash, color hash, sprite map size, canvas pixel hash) across all 6 stages:
+    - `outro`: 478 objects, **0 mismatches (100% PERFECT STRUCTURAL MATCH)**.
+    - `logi`: 534 objects, **0 mismatches (100% PERFECT STRUCTURAL MATCH)** after fixing `uLancer` and podium materials from `HX.dark` to `G3()` (`HX.gun`, `0x3e4270`).
+    - `rules`: 343 objects, **1 mismatch** (group rotation `+3.1416` vs `-3.1416`, geometrically identical).
+    - `classes`: 703 objects, **3 mismatches** (only 2D canvas text sprite antialiasing hashes; 0 mesh/geometry differences).
+    - `stages`: 249 objects, **3 mismatches** (only 2D canvas text sprite antialiasing hashes; 0 mesh/geometry differences).
+    - `intro`: 745 objects, **7 mismatches** (1 LineSegments random streak order + 6 text sprites; 0 mesh differences).
+  - Task 2(b) Toon Materials: Converted `addGiant` body and bands to `MeshToonMaterial` with `depthWrite: false` on rings; converted asteroid belt rocks to `MeshToonMaterial` in [cosmos.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/world/cosmos.ts); converted `createPlanet` body to `MeshToonMaterial` in [planet.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/world/planet.ts). Verified with isolated Giant planet single-object pixel test: diff is **0.7256%** (7,430 px out of 1,024,000).
+  - Task 2(c) Comet group position: Added `C.position.set(0, y0, z)` under reduced motion in [cosmos.ts](file:///d:/Projects/Pete/Concepful-3D/src/engine/world/cosmos.ts), matching reference line 10814.
+  - Task 2(d) Random order/count in `outro`: Perfect structural and property match (478 objects, 0 mismatches) confirmed.
+
+- **Six-Stage Benchmark Table across All 36 Conditions (Task 3)**:
+  - Measured at 390 and 1280 viewports, 3 camera angles (neutral, `left_up`, `right_down`), and 3 isolation modes (Foreground, Background, Full scene):
+    - `classes`: fg med = **0.0042%** | full med = **1.4176%** (min 0.3989%, max 5.6713%)
+    - `rules`: fg med = **0.0012%** | full med = **0.0202%** (min 0.0129%, max 0.0310%)
+    - `intro`: fg med = **0.1468%** | full med = **0.9468%** (min 0.8654%, max 1.0017%)
+    - `stages`: fg med = **0.0010%** | full med = **0.5174%** (min 0.3522%, max 10.2066% @ 1280 left_up)
+    - `outro`: fg med = **0.0179%** | full med = **4.7199%** (min 3.1594%, max 5.2346%)
+    - `logi`: fg med = **0.0014%** | full med = **0.4436%** (min 0.3935%, max 0.5229%)
+  - All stage foreground models match within **0.001% - 0.15%**. Full-scene medians for `rules`, `logi`, `stages`, `intro` are all <= 1.0%; `classes` is 1.42%; `outro` is 4.72% (governed by background starfield random distribution).
