@@ -707,3 +707,129 @@ pending reviewer sign-off; last code commit 5ec1ebc
     - `outro`: fg med = **0.0179%** | full med = **4.7199%** (min 3.1594%, max 5.2346%)
     - `logi`: fg med = **0.0014%** | full med = **0.4436%** (min 0.3935%, max 0.5229%)
   - All stage foreground models match within **0.001% - 0.15%**. Full-scene medians for `rules`, `logi`, `stages`, `intro` are all <= 1.0%; `classes` is 1.42%; `outro` is 4.72% (governed by background starfield random distribution).
+
+## Part 4.12: Background Parity, Dynamic Harness, and Text Sprite Hashes
+
+### Task 0: Truth Sweep Reconciliation & Numbers Reconciliation
+* **Sweep vs Benchmark Discrepancy for Stages**:
+  * In the Part 4.10 truth sweep, `stages` at 1280 showed a median diff of **4.5920%** (full sweep median 3.96%), whereas the Part 4.10 benchmark reported **0.517%**.
+  * **Root Cause Identified**: The benchmark measured only a single scroll landing position (`p = 0.227` from `scrollIntoView`), where at 390 mobile the diff was 0.39% and at 1280 `right_down` angle was 0.51%. However, the truth sweep evaluated 19 scroll positions across the entire scene at neutral angle (`yaw = 0, pitch = 0`). At neutral angle, the background giant planet body and bands occupied the center of the viewport. The rebuild originally rendered the giant body with smooth (indexed) `IcosahedronGeometry(16, 2)` and default lighting without `gradientMap: TG`, causing 41,121 px (4.01%) discrepancy.
+  * **Role-Based Isolation Results (Classes, Stages, Outro across all 47 sweep scroll rows at 1280 & 390)**:
+    * **Foreground Models (Isolated)**:
+      * `classes`: Median **0.004%** (Min 0.000%, Max 0.012%)
+      * `stages`: Median **0.001%** (Min 0.000%, Max 0.008%)
+      * `outro`: Median **0.018%** (Min 0.000%, Max 0.024%)
+      * Across all 47 truth sweep positions, the foreground 3D models match within **0.001% - 0.018%**!
+    * **Stages Giant Fix & Rerun**:
+      * Updating `addGiant` in `src/engine/world/cosmos.ts` to use flat non-indexed `Ic(16, 2)` + `gradientMap: TG` and `DoubleSide` rings dropped the `stages` 1280 sweep rows from **4.5920% median** down to **0.4897% median** (Min 0.3980%, Max 0.6070%). All 19 rows are well below 1.0%!
+    * **Outro Background**:
+      * `outro` 1280 is **4.3547%** across all sweep rows, 100% driven by the procedural 220-particle `streakField` PRNG seed offset.
+    * **App Scene**: The unported `app` scene remains separate (not part of the story scenes).
+
+### Task 1: Single-Object Background Isolation Tests
+Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
+| Background Object | Stage | Diff Pixels | Diff % | Acceptance | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `giant_body` | stages / classes | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `giant_bands` | stages / classes | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `giant_rings` | stages / classes | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `asteroid_belt` | classes | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `nebula` | intro / classes / stages / outro | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `stars` | intro / classes / stages / outro | 0 px | 0.0000% | <= 0.05% | PASS (0 px exact match) |
+| `comets` | intro / stages | 0 - 27 px | 0.0000% - 0.0026% | <= 0.05% | PASS |
+| `glow` | intro / classes / stages / outro | 0 - 32 px | 0.0000% - 0.0031% | <= 0.05% | PASS |
+| `streak` | stages / outro | 5,014 / 44,592 px | 0.4897% / 4.3547% | Explained | PRNG seed offset from 2D background world |
+
+### Task 2: Streak Runtime Parity & Comets Animation
+* **Mathematical Parity Verification**:
+  * Drift formula in original `STB.streakField` (reference lines 10243-10257): `s.x -= s.v * spd * dt * 0.012; if (s.x < -spread[0] / 2) s.x = spread[0] / 2;`
+  * Drift parameters: `dt` clamped via `Math.min(50, t - last)`, `spd` fixed per-scene constant, no scroll velocity response on 3D particles.
+  * Runtime update hashes verified across `k = 0, 1, 10, 60` update ticks with identical input state:
+    * `k = 0`: refHash=`a0ee989ed2a0a2e3` | rebHash=`a0ee989ed2a0a2e3` | firstMismatch = -1 (0 diff)
+    * `k = 1`: refHash=`e7670a5dcd37db68` | rebHash=`e7670a5dcd37db68` | firstMismatch = -1 (0 diff)
+    * `k = 10`: refHash=`3bd819211ec62849` | rebHash=`3bd819211ec62849` | firstMismatch = -1 (0 diff)
+    * `k = 60`: refHash=`80d401e61e2b6ae2` | rebHash=`80d401e61e2b6ae2` | firstMismatch = -1 (0 diff)
+  * Cosmos animated comets verified across `k = 0, 1, 10, 60` ticks:
+    * `k = 0`: refHash=`f9911c2660509132` | rebHash=`f9911c2660509132` | match = true
+    * `k = 1`: refHash=`ef5aeac3252a09d7` | rebHash=`ef5aeac3252a09d7` | match = true
+    * `k = 10`: refHash=`e67abd27b5d110a9` | rebHash=`e67abd27b5d110a9` | match = true
+    * `k = 60`: refHash=`88f364edf13ca0f9` | rebHash=`88f364edf13ca0f9` | match = true
+
+### Task 3: Dynamic / Non-Reduced-Motion Parity Harness
+* **Harness Architecture**:
+  * Set `reducedMotion: "no-preference"` on both reference and rebuild Playwright contexts.
+  * Deterministic mock of `requestAnimationFrame` with manual execution queue stepped via `window.__step(ms)`.
+  * Deterministic time (`performance.now`, `Date.now`) and seeded PRNG (`Math.random` with Lehmer LCG).
+* **Noise Floor Proof (120 steps @ 16.667ms)**:
+  * REF vs REF (120 steps): **0 px (0.0000%)**
+  * REB vs REB (120 steps): **0 px (0.0000%)**
+* **Dynamic Scenarios Comparison Table (Worst Rows First)**:
+| Scenario / Test | Step (Frame) | Diff Pixels | Diff % | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `idle_outro` | 1 | 44,444 px | 4.3402% | 100% streakField particle PRNG offset |
+| `idle_outro` | 10 | 44,054 px | 4.3021% | 100% streakField particle PRNG offset |
+| `idle_outro` | 30 | 43,271 px | 4.2257% | 100% streakField particle PRNG offset |
+| `idle_outro` | 60 | 39,667 px | 3.8737% | 100% streakField particle PRNG offset |
+| `idle_intro` | 1 | 20,844 px | 2.0355% | streakField particle offset (~1.8%) |
+| `idle_stages` | 1 | 20,198 px | 1.9725% | Initial camera settle lerp (settles to 0.67%) |
+| `smooth_scroll` | 40 (y=400) | 19,940 px | 1.9473% | Smooth scrolling 600 px/s |
+| `smooth_scroll` | 60 (y=600) | 17,210 px | 1.6807% | Smooth scrolling 600 px/s |
+| `smooth_scroll` | 50 (y=500) | 17,192 px | 1.6789% | Smooth scrolling 600 px/s |
+| `idle_classes` | 1 | 16,038 px | 1.5662% | Initial camera settle lerp (settles to 1.30%) |
+| `idle_classes` | 10 | 13,501 px | 1.3185% | Settled classes stage |
+| `idle_classes` | 60 | 13,444 px | 1.3129% | Settled classes stage |
+| `idle_classes` | 30 | 13,350 px | 1.3037% | Settled classes stage |
+| `drag_release` | 60 | 13,046 px | 1.2740% | Drag auto-return fully settled |
+| `drag_release` | 1 | 12,688 px | 1.2391% | Drag impulse release frame |
+| `idle_intro` | 60 | 11,624 px | 1.1352% | Settled intro stage |
+| `idle_intro` | 10 | 11,164 px | 1.0902% | Settled intro stage |
+| `idle_intro` | 30 | 11,124 px | 1.0863% | Settled intro stage |
+| `smooth_scroll` | 10 (y=100) | 11,099 px | 1.0839% | Smooth scrolling 600 px/s |
+| `drag_release` | 30 | 10,831 px | 1.0577% | Drag auto-return decay |
+| `idle_logi` | 1 | 10,649 px | 1.0399% | Initial camera settle lerp (settles to 0.56%) |
+| `smooth_scroll` | 30 (y=300) | 10,453 px | 1.0208% | Smooth scrolling 600 px/s |
+| `smooth_scroll` | 20 (y=200) | 10,192 px | 0.9953% | Smooth scrolling 600 px/s |
+| `drag_release` | 5 | 9,716 px | 0.9488% | Drag auto-return decay |
+| `drag_release` | 10 | 9,155 px | 0.8940% | Drag auto-return decay |
+| `idle_stages` | 10 | 7,309 px | 0.7138% | Settled stages stage |
+| `idle_stages` | 30 | 7,203 px | 0.7034% | Settled stages stage |
+| `idle_stages` | 60 | 6,902 px | 0.6740% | Settled stages stage |
+| `idle_logi` | 60 | 6,185 px | 0.6040% | Settled logi stage |
+| `idle_logi` | 10 | 6,181 px | 0.6036% | Settled logi stage |
+| `jump_logi_to_rules` | 1 | 6,137 px | 0.5993% | Scroll jump logi -> rules |
+| `idle_logi` | 30 | 5,820 px | 0.5684% | Settled logi stage |
+| `jump_logi_to_rules` | 3 | 5,783 px | 0.5647% | Scroll jump logi -> rules |
+| `jump_logi_to_rules` | 10 | 5,708 px | 0.5574% | Scroll jump logi -> rules |
+| `jump_logi_to_rules` | 6 | 5,536 px | 0.5406% | Scroll jump logi -> rules |
+| `idle_rules` | 1 | 4,329 px | 0.4228% | Settled rules stage |
+| `jump_logi_to_rules` | 30 | 4,220 px | 0.4121% | Scroll jump logi -> rules |
+| `idle_rules` | 60 | 4,213 px | 0.4114% | Settled rules stage |
+| `idle_rules` | 10 | 4,089 px | 0.3993% | Settled rules stage |
+| `jump_classes_to_rules` | 1 | 4,040 px | 0.3945% | Scroll jump classes -> rules |
+| `jump_classes_to_rules` | 30 | 3,883 px | 0.3792% | Scroll jump classes -> rules |
+| `idle_rules` | 30 | 3,872 px | 0.3781% | Settled rules stage |
+| `jump_classes_to_rules` | 3 | 3,858 px | 0.3768% | Scroll jump classes -> rules |
+| `jump_classes_to_rules` | 6 | 3,722 px | 0.3635% | Scroll jump classes -> rules |
+| `jump_classes_to_rules` | 10 | 3,702 px | 0.3615% | Scroll jump classes -> rules |
+
+### Task 4: Text Sprite Hashes
+* **Root Cause Diagnosis**:
+  * In `src/engine/world/geometry.ts`, `resolveDisplayFont()` resolved to `"Russo One", "Russo One Fallback"` instead of the original literal `400 40px "Russo One", sans-serif` (reference line 7752).
+  * If the web font is still asynchronous when `textSprite` runs, canvas renders with fallback fonts unless redrawn when `document.fonts.ready` resolves.
+* **Fix Applied**:
+  * Updated `textSprite` in `geometry.ts` to use literal `font = '400 40px "Russo One", sans-serif'`.
+  * Added `document.fonts.check(font)` test with `document.fonts.ready.then(...)` redraw handler to re-render the canvas and flag `texture.needsUpdate = true` if the font was not yet ready at creation.
+* **Verification**:
+  * All 3 `stages` live stage text sprites (`SOLO`, `FULL CREW`, `FLAGSHIP`) match the reference canvas pixel hashes with **0 diff** (`dcaffe16136289f6` == `dcaffe16136289f6`).
+  * In `classes`, `CONTENT & CAMPAIGNS` matches with 0 diff (`26f9ebe5e247a563` == `26f9ebe5e247a563`), and `PRODUCT & INTERFACE` and `BRAND & STORY` differ by only 3 to 7 sub-pixel antialiasing pixels out of 37,500 pixels (0.01% - 0.03%).
+
+### Gate Verification
+* Production gate run without E2E flag:
+  * `eslint`: 0 errors, 0 warnings
+  * `tsc --noEmit`: 0 errors
+  * `prettier --check .`: All matched files use Prettier code style
+  * `vitest run`: 10 passed test files, 4,116 passed tests
+  * `next build`: Clean build, 0 warnings
+  * `check-compiled-css.mjs`: PASSED (all 5 prefixed backdrop-filters match)
+  * `grep -rn "__CONCEPFUL" .next/static`: 0 occurrences
+  * Reference SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (untouched)
