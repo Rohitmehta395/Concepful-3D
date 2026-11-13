@@ -324,7 +324,7 @@ export function createEngine(
     renderer.setSize(w, h, false);
     scrollDriver.measureSections();
     updateFraming();
-    if (!isRunning) {
+    if (!isRunning && motionQuery && motionQuery.matches) {
       renderFrame(performance.now());
     }
   }

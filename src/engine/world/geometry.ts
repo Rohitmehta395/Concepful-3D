@@ -1,10 +1,5 @@
 import type * as THREE from "three";
-import {
-  HX,
-  resolveDisplayFont,
-  texC,
-  type MaterialRegistry,
-} from "./materials";
+import { HX, texC, type MaterialRegistry } from "./materials";
 
 export type Vec3Tuple = [number, number, number];
 export type Vec2Tuple = [number, number];
@@ -382,7 +377,7 @@ export function textSprite(
   col: string,
   h: number
 ): THREE.Sprite {
-  const font = `400 40px ${resolveDisplayFont()}`;
+  const font = '400 40px "Russo One", sans-serif';
   let cw = 256;
   if (
     typeof document !== "undefined" &&
@@ -409,6 +404,35 @@ export function textSprite(
     },
     three
   );
+
+  // Redraw when fonts.ready if font wasn't yet loaded at creation time
+  if (
+    typeof document !== "undefined" &&
+    document.fonts &&
+    typeof document.fonts.check === "function" &&
+    !document.fonts.check(font) &&
+    document.fonts.ready
+  ) {
+    document.fonts.ready.then(() => {
+      const img = t.image as HTMLCanvasElement | undefined;
+      if (img && typeof img.getContext === "function") {
+        const x = img.getContext("2d");
+        if (x) {
+          x.clearRect(0, 0, img.width, img.height);
+          x.font = font;
+          x.textAlign = "center";
+          x.textBaseline = "middle";
+          x.lineWidth = 9;
+          x.strokeStyle = "#141624";
+          x.strokeText(txt, img.width / 2, 38);
+          x.fillStyle = col;
+          x.fillText(txt, img.width / 2, 38);
+          t.needsUpdate = true;
+        }
+      }
+    });
+  }
+
   const s = new three.Sprite(
     new three.SpriteMaterial({
       map: t,

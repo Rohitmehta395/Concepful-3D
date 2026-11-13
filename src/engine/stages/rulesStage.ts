@@ -252,6 +252,7 @@ export function createRulesStage(ctx: StageBuildContext): Stage {
   function update(params: StageUpdateParams): void {
     const { t, dt, kk, box, viewportH, reduceMotion } = params;
     stars.update(dt, 0.6, reduceMotion);
+    cosmosLayer.update(t, reduceMotion);
 
     const q = (t / 3200) % 1;
     scan.position.z = -1.85 + q * 3.7;

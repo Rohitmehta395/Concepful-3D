@@ -107,6 +107,7 @@ export function createClassesStage(ctx: StageBuildContext): ClassesStage {
   function update(params: StageUpdateParams): void {
     const { t, dt, p, kk, box, viewportH, reduceMotion } = params;
     stars.update(dt, 1, reduceMotion);
+    cosmosLayer.update(t, reduceMotion);
 
     for (let i = 0; i < plinthGroups.length; i++) {
       const pg = plinthGroups[i];

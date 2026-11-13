@@ -1,5 +1,6 @@
 import type * as THREE from "three";
-import { brandCol } from "./materials";
+import { brandCol, createToonGradient } from "./materials";
+import { Ic, Tor } from "./geometry";
 
 export interface Planet {
   readonly group: THREE.Group;
@@ -24,24 +25,27 @@ export function createPlanet(
   parent.add(group);
 
   // Planet body
-  const bodyGeo = new three.IcosahedronGeometry(r, 1);
+  const TG = createToonGradient(three);
+  const bodyGeo = Ic(three, r, 1);
   const bodyMat = new three.MeshToonMaterial({
     color: brandCol(col, three),
+    gradientMap: TG,
   });
   const bodyMesh = new three.Mesh(bodyGeo, bodyMat);
   group.add(bodyMesh);
 
   // Optional ring
-  let ringGeo: THREE.TorusGeometry | null = null;
+  let ringGeo: THREE.BufferGeometry | null = null;
   let ringMat: THREE.MeshBasicMaterial | null = null;
   let ringMesh: THREE.Mesh | null = null;
 
   if (ring) {
-    ringGeo = new three.TorusGeometry(r * 1.5, r * 0.03, 3, 32);
+    ringGeo = Tor(three, r * 1.6, 0.04, 2, 64);
     ringMat = new three.MeshBasicMaterial({
       color: brandCol(0xece6d6, three),
       transparent: true,
       opacity: 0.35,
+      depthWrite: false,
       side: three.DoubleSide,
     });
     ringMesh = new three.Mesh(ringGeo, ringMat);
@@ -58,6 +62,7 @@ export function createPlanet(
       parent.remove(group);
       bodyGeo.dispose();
       bodyMat.dispose();
+      TG.dispose();
       if (ringGeo) ringGeo.dispose();
       if (ringMat) ringMat.dispose();
     },

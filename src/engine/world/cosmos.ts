@@ -1,6 +1,12 @@
 import type * as THREE from "three";
 import { createCRND } from "./prng";
-import { brandCol, texC, createGlowTexture } from "./materials";
+import {
+  brandCol,
+  texC,
+  createGlowTexture,
+  createToonGradient,
+} from "./materials";
+import { Ic } from "./geometry";
 
 const MEL = "#EE004E";
 const VIO = "#5B47D6";
@@ -22,6 +28,9 @@ export function createCosmos(
 
   const disposables: { dispose: () => void }[] = [];
   const animators: ((t: number) => void)[] = [];
+
+  const TG = createToonGradient(three);
+  disposables.push(TG);
 
   const glowTex = createGlowTexture(three);
   disposables.push(glowTex);
@@ -203,9 +212,10 @@ export function createCosmos(
     P.position.set(p[0], p[1], p[2]);
     root.add(P);
 
-    const bodyGeo = new three.IcosahedronGeometry(r, 2);
+    const bodyGeo = Ic(three, r, 2);
     const bodyMat = new three.MeshToonMaterial({
       color: brandCol(col, three),
+      gradientMap: TG,
     });
     disposables.push(bodyGeo, bodyMat);
     const bodyMesh = new three.Mesh(bodyGeo, bodyMat);
@@ -221,6 +231,7 @@ export function createCosmos(
         );
         const bandMat = new three.MeshToonMaterial({
           color: brandCol(band, three),
+          gradientMap: TG,
         });
         disposables.push(bandGeo, bandMat);
         const bandMesh = new three.Mesh(bandGeo, bandMat);
@@ -241,6 +252,7 @@ export function createCosmos(
         transparent: true,
         opacity: 0.55,
         depthWrite: false,
+        side: three.DoubleSide,
       });
       disposables.push(ringGeo1, ringMat1);
       R.add(new three.Mesh(ringGeo1, ringMat1));
@@ -251,6 +263,7 @@ export function createCosmos(
         transparent: true,
         opacity: 0.3,
         depthWrite: false,
+        side: three.DoubleSide,
       });
       disposables.push(ringGeo2, ringMat2);
       R.add(new three.Mesh(ringGeo2, ringMat2));
@@ -277,9 +290,10 @@ export function createCosmos(
     for (let i = 0; i < n; i++) {
       const a = r() * Math.PI * 2;
       const rr = R * (0.85 + r() * 0.3);
-      const geo = new three.IcosahedronGeometry(0.3 + r() * 1.1, 0);
+      const geo = Ic(three, 0.3 + r() * 1.1, 0);
       const mat = new three.MeshToonMaterial({
         color: brandCol(r() < 0.3 ? 0x4a4f86 : 0x2e3256, three),
+        gradientMap: TG,
       });
       disposables.push(geo, mat);
       const mesh = new three.Mesh(geo, mat);

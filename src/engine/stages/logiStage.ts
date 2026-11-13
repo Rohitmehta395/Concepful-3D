@@ -1,8 +1,7 @@
 import type * as THREE from "three";
-import { HX, bgTex, texC, type MaterialRegistry } from "../world/materials";
+import { HX, bgTex, texC } from "../world/materials";
 import {
   Bx,
-  Co,
   Cy,
   Ex,
   Ic,
