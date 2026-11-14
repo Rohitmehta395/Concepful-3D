@@ -5,6 +5,7 @@ import { createEngine, hasWebGL, type Engine } from "@/engine";
 
 export function SceneHost() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const overlayRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,7 +23,9 @@ export function SceneHost() {
     import("three")
       .then((three) => {
         if (!isMounted || !canvasRef.current) return;
-        engine = createEngine(canvasRef.current, three);
+        engine = createEngine(canvasRef.current, three, {
+          overlayCanvas: overlayRef.current,
+        });
         engine.start();
 
         // Gated test hooks: exposed only when NEXT_PUBLIC_E2E === "1"
@@ -30,12 +33,11 @@ export function SceneHost() {
           process.env.NEXT_PUBLIC_E2E === "1" &&
           typeof window !== "undefined"
         ) {
-          const k = window ? "CONCEPFUL" : "";
           const win = window as unknown as Record<string, unknown>;
-          win[`__${k}_ENGINE__`] = engine;
-          win[`__${k}_CREATE__`] = (c: HTMLCanvasElement) =>
+          win.__CONCEPFUL_ENGINE__ = engine;
+          win.__CONCEPFUL_CREATE__ = (c: HTMLCanvasElement) =>
             createEngine(c, three);
-          win[`__${k}_STRICT_CYCLE__`] = async () => {
+          win.__CONCEPFUL_STRICT_CYCLE__ = async () => {
             const [{ StrictMode, createElement }, { createRoot }] =
               await Promise.all([import("react"), import("react-dom/client")]);
             const host = document.createElement("div");
@@ -43,20 +45,20 @@ export function SceneHost() {
               "position:fixed;inset:0;width:1280px;height:800px;pointer-events:none;opacity:0;";
             document.body.appendChild(host);
             const root = createRoot(host);
-            const prevEng = win[`__${k}_ENGINE__`];
+            const prevEng = win.__CONCEPFUL_ENGINE__;
             root.render(
               createElement(StrictMode, null, createElement(SceneHost))
             );
             for (let w = 0; w < 50; w++) {
               await new Promise((r) => setTimeout(r, 10));
               if (
-                win[`__${k}_ENGINE__`] &&
-                win[`__${k}_ENGINE__`] !== prevEng
+                win.__CONCEPFUL_ENGINE__ &&
+                win.__CONCEPFUL_ENGINE__ !== prevEng
               ) {
                 break;
               }
             }
-            const activeEng = win[`__${k}_ENGINE__`] as Engine | undefined;
+            const activeEng = win.__CONCEPFUL_ENGINE__ as Engine | undefined;
             const pre = activeEng
               ? {
                   geometries: activeEng.renderer.info.memory.geometries,
@@ -77,7 +79,7 @@ export function SceneHost() {
               : null;
             return { pre, post };
           };
-          win[`__${k}_BENCH__`] = async (
+          win.__CONCEPFUL_BENCH__ = async (
             kind: "u3" | "h3" | "mjet" | "plinth" | "label",
             id: string,
             yawDeg: number,
@@ -142,6 +144,16 @@ export function SceneHost() {
                 gtm: uMod.uKraken,
                 decks: uMod.uHerald,
                 motion: uMod.uDolly,
+                naming: uMod.uStamp,
+                research: uMod.uArachne,
+                fab: uMod.uGantry,
+                hw: uMod.uGoliath,
+                intel: uMod.uCortex,
+                stamp: uMod.uStamp,
+                arachne: uMod.uArachne,
+                gantry: uMod.uGantry,
+                goliath: uMod.uGoliath,
+                cortex: uMod.uCortex,
               };
               const u = map[id]!(three, mats);
               u.upd(t);
@@ -178,12 +190,12 @@ export function SceneHost() {
         process.env.NEXT_PUBLIC_E2E === "1" &&
         typeof window !== "undefined"
       ) {
-        const k = window ? "CONCEPFUL" : "";
-        const hookKey = `__${k}_ENGINE__`;
-        if (
-          (window as unknown as Record<string, unknown>)[hookKey] === engine
-        ) {
-          delete (window as unknown as Record<string, unknown>)[hookKey];
+        const win = window as unknown as Record<string, unknown>;
+        if (win.__CONCEPFUL_ENGINE__ === engine) {
+          delete win.__CONCEPFUL_ENGINE__;
+          delete win.__CONCEPFUL_CREATE__;
+          delete win.__CONCEPFUL_STRICT_CYCLE__;
+          delete win.__CONCEPFUL_BENCH__;
         }
       }
       if (engine) {
@@ -193,5 +205,14 @@ export function SceneHost() {
     };
   }, []);
 
-  return <canvas id="gl" ref={canvasRef} aria-hidden="true" />;
+  return (
+    <>
+      <canvas id="gl" ref={canvasRef} aria-hidden="true" />
+      <canvas
+        id="cv"
+        ref={overlayRef}
+        aria-label="Animated scene of your build: a hero on a solo mission, a party, or a raid flagship carrying the whole team"
+      />
+    </>
+  );
 }

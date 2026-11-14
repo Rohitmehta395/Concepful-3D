@@ -4,6 +4,7 @@ import {
   Bx,
   Co,
   Cy,
+  Do,
   Ex,
   Hemi,
   Ic,
@@ -1584,3 +1585,421 @@ export function uQuill(
     },
   };
 }
+
+/**
+ * uStamp ("naming"): Biped carrying NAME™ sign board.
+ * Reference lines 8957-8989.
+ */
+export function uStamp(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const b = biped(three, mats, {
+    acc: HX.blu,
+    legH: 0.8,
+    torso: [1.15, 0.95, 0.75],
+    stance: 0.18,
+    head: "dome",
+  });
+  const g = b.g;
+  b.arms[0]!.rotation.z = -2.75;
+  b.arms[1]!.rotation.z = 2.75;
+
+  const B3 = mats.tm(HX.bone);
+  const signGeom = Bx(three, 2.4, 1.05, 0.12);
+  const signMat = [
+    B3,
+    B3,
+    B3,
+    B3,
+    new three.MeshBasicMaterial({ map: mats.TX("name") }),
+    B3,
+  ];
+  const sign = new three.Mesh(signGeom, signMat);
+  sign.position.set(0, b.shY + 1.75, 0);
+  g.add(sign);
+
+  const o = new three.Mesh(signGeom, mats.INK);
+  o.scale.set(1.04, 1.08, 1.6);
+  sign.add(o);
+
+  const baseShY = b.shY + 1.75;
+  return {
+    g,
+    w: 2.6,
+    h: 3.9,
+    upd: (t: number) => {
+      sign.position.y = baseShY + Math.sin(t / 500) * 0.08;
+    },
+  };
+}
+
+/**
+ * uArachne ("research"): Hexapod spider research mech with rotating dish.
+ * Reference lines 8990-9042.
+ */
+export function uArachne(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  interface ArachneLeg {
+    s: number;
+    z: number;
+    i: number;
+    k: THREE.Mesh;
+    f: THREE.Mesh;
+  }
+
+  const legs: ArachneLeg[] = [];
+  [-1, 1].forEach((s) => {
+    [-0.5, 0, 0.5].forEach((z, i) => {
+      const k = mk(
+        three,
+        mats,
+        g,
+        Cy(three, 0.07, 0.07, 1.0, 4),
+        i % 2 ? G3 : B3
+      );
+      const f = mk(three, mats, g, Cy(three, 0.06, 0.03, 1.25, 4), G3);
+      legs.push({ s, z, i, k, f });
+    });
+  });
+
+  mk(three, mats, g, Do(three, 0.7), B3, [0, 1.25, 0], null, [1.4, 0.62, 1.05]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 1.7, 0.08, 1.25),
+    mats.tm(HX.blu),
+    [0, 1.32, 0],
+    null,
+    null,
+    false
+  );
+  mk(three, mats, g, Ic(three, 0.38), G3, [0, 1.15, 0.75]);
+  eye3(three, mats, g, [0, 1.18, 1.08], 0.14);
+  eye3(three, mats, g, [-0.24, 1.36, 0.95], 0.05);
+  eye3(three, mats, g, [0.24, 1.36, 0.95], 0.05);
+  mk(three, mats, g, Cy(three, 0.04, 0.04, 0.6, 4), G3, [0, 1.85, 0]);
+  const dish = mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.45, 0.1, 0.18, 8),
+    B3,
+    [0, 2.2, 0],
+    [0.6, 0, 0]
+  );
+
+  return {
+    g,
+    w: 3.2,
+    h: 2.6,
+    upd: (t: number) => {
+      for (let j = 0; j < legs.length; j++) {
+        const L = legs[j]!;
+        const ph = Math.sin(t / 220 + L.i * 2 + L.s) * 0.18;
+        const hx = L.s * 0.55;
+        const hy = 1.2;
+        const kx = L.s * 1.25;
+        const ky = 1.75 + ph;
+        const fx = L.s * 1.8;
+        const fy = 0;
+        L.k.position.set((hx + kx) / 2, (hy + ky) / 2, L.z * 1.3);
+        L.k.rotation.set(0, 0, Math.atan2(ky - hy, kx - hx) - Math.PI / 2);
+        L.f.position.set((kx + fx) / 2, (ky + fy) / 2, L.z * 1.6);
+        L.f.rotation.set(0, 0, Math.atan2(fy - ky, fx - kx) - Math.PI / 2);
+      }
+      dish.rotation.y = t / 600;
+    },
+  };
+}
+
+/**
+ * uGantry ("fab"): Gantry crane crawler with hazard stripes and moving stack.
+ * Reference lines 9411-9489.
+ */
+export function uGantry(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  mk(three, mats, g, Bx(three, 3.2, 0.62, 1.4), G3, [0, 0.31, 0]);
+  const wh: THREE.Mesh[] = [];
+  for (let i = 0; i < 6; i++) {
+    const w = mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.22, 0.22, 0.08, 8),
+      mats.tm(HX.dark),
+      [-1.25 + i * 0.5, 0.31, 0.72],
+      [Math.PI / 2, 0, 0]
+    );
+    wh.push(w);
+  }
+
+  mk(three, mats, g, Bx(three, 3.0, 0.5, 1.3), B3, [0, 0.87, 0]);
+
+  const hzMatDark = mats.tm(HX.dark);
+  const hzMatHaz = new three.MeshBasicMaterial({ map: mats.TX("haz") });
+  const hz = new three.Mesh(Bx(three, 3.02, 0.16, 1.32), [
+    hzMatDark,
+    hzMatDark,
+    hzMatDark,
+    hzMatDark,
+    hzMatHaz,
+    hzMatHaz,
+  ]);
+  hz.position.set(0, 0.75, 0);
+  g.add(hz);
+
+  mk(three, mats, g, Bx(three, 0.9, 0.9, 1.2), B3, [-1.0, 1.57, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 0.7, 0.4, 0.04),
+    mats.tm(HX.glass),
+    [-1.0, 1.65, 0.62],
+    null,
+    null,
+    false
+  );
+  eye3(three, mats, g, [-1.3, 1.9, 0.62], 0.05);
+  mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.12, 0.12, 3.0, 6),
+    mats.tm(HX.yel),
+    [0.1, 2.6, 0]
+  );
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 2.0, 0.16, 0.16),
+    mats.tm(HX.yel),
+    [1.0, 4.05, 0]
+  );
+
+  const cab = mk(
+    three,
+    mats,
+    g,
+    Cy(three, 0.015, 0.015, 1, 3),
+    mats.tm(HX.dark),
+    [1.75, 3.5, 0],
+    null,
+    null,
+    false
+  );
+
+  const head = new three.Group();
+  g.add(head);
+  mk(three, mats, head, Bx(three, 0.35, 0.3, 0.35), G3);
+  eye3(three, mats, head, [0, -0.2, 0], 0.05);
+
+  const stack: THREE.Mesh[] = [];
+  for (let i = 0; i < 12; i++) {
+    stack.push(
+      mk(
+        three,
+        mats,
+        g,
+        Bx(three, 0.55 - i * 0.02, 0.08, 0.55 - i * 0.02),
+        i % 2 ? mats.tm(HX.bone2) : B3,
+        [1.75, 1.16 + i * 0.085, 0],
+        null,
+        null,
+        false
+      )
+    );
+  }
+
+  return {
+    g,
+    w: 3.6,
+    h: 4.4,
+    upd: (t: number) => {
+      const hy = 2.6 + Math.sin(t / 500) * 0.15;
+      head.position.set(1.75, hy, 0);
+      cab.scale.y = 4.0 - hy;
+      cab.position.y = (4.0 + hy) / 2;
+      const n = Math.floor((t / 250) % 13);
+      for (let i = 0; i < stack.length; i++) {
+        stack[i]!.visible = i < n;
+      }
+      for (let i = 0; i < wh.length; i++) {
+        wh[i]!.rotation.y = t / 300;
+      }
+    },
+  };
+}
+
+/**
+ * uGoliath ("hw"): Heavy industrial hardware biped mech.
+ * Reference lines 9490-9540.
+ */
+export function uGoliath(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const A = mats.tm(HX.yel);
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  [-1, 1].forEach((s) => {
+    mk(three, mats, g, Bx(three, 0.42, 0.7, 0.5), B3, [s * 0.45, 0.75, 0]);
+    mk(three, mats, g, Bx(three, 0.5, 0.2, 0.7), G3, [s * 0.45, 0.1, 0.1]);
+  });
+  mk(three, mats, g, Bx(three, 2.1, 1.45, 1.25), B3, [0, 2.1, 0], [0.25, 0, 0]);
+  mk(
+    three,
+    mats,
+    g,
+    Bx(three, 2.12, 0.16, 1.0),
+    A,
+    [0, 2.1, 0.4],
+    [0.25, 0, 0],
+    null,
+    false
+  );
+  [-1, 1].forEach((s) => {
+    mk(three, mats, g, Ic(three, 0.62), B3, [s * 1.15, 2.75, -0.1]);
+    mk(
+      three,
+      mats,
+      g,
+      Cy(three, 0.32, 0.28, 1.2, 6),
+      B3,
+      [s * 1.45, 2.1, 0.1],
+      [0, 0, s * 0.35]
+    );
+    mk(three, mats, g, Cy(three, 0.3, 0.45, 1.3, 6), A, [s * 1.62, 1.0, 0.2]);
+    mk(three, mats, g, Bx(three, 0.75, 0.5, 0.75), G3, [s * 1.62, 0.25, 0.3]);
+  });
+  mk(three, mats, g, Bx(three, 0.6, 0.45, 0.55), G3, [0, 2.6, 0.65]);
+  eye3(three, mats, g, [0, 2.62, 0.94], 0.09);
+
+  return {
+    g,
+    w: 4.0,
+    h: 3.4,
+    upd: (t: number) => {
+      g.position.y = Math.abs(Math.sin(t / 700)) * 0.05;
+    },
+  };
+}
+
+/**
+ * uCortex ("intel"): Intelligence orb drone with floating holographic rings and flames.
+ * Reference lines 9704-9759.
+ */
+export function uCortex(
+  three: typeof THREE,
+  mats: MaterialRegistry
+): UnitHandle {
+  const g = new three.Group();
+  const body = new three.Group();
+  g.add(body);
+  const fl: THREE.Group[] = [];
+  const B3 = mats.tm(HX.bone);
+  const G3 = mats.tm(HX.gun);
+
+  mk(three, mats, body, Ic(three, 1.0, 1), B3, [0, 2.5, 0]);
+  mk(
+    three,
+    mats,
+    body,
+    Tor(three, 1.02, 0.05, 3, 10),
+    mats.tm(HX.teal),
+    [0, 2.5, 0],
+    [Math.PI / 2, 0, 0]
+  );
+  mk(
+    three,
+    mats,
+    body,
+    Cy(three, 0.42, 0.42, 0.2, 8),
+    G3,
+    [0, 2.5, 0.92],
+    [Math.PI / 2, 0, 0]
+  );
+  eye3(three, mats, body, [0, 2.5, 1.03], 0.24);
+
+  const r1 = mk(
+    three,
+    mats,
+    body,
+    Tor(three, 1.55, 0.04, 3, 24),
+    mats.bm(HX.holo, 0.8, true),
+    [0, 2.5, 0],
+    null,
+    null,
+    false
+  );
+  const r2 = mk(
+    three,
+    mats,
+    body,
+    Tor(three, 1.38, 0.04, 3, 24),
+    mats.bm(HX.red, 0.8, true),
+    [0, 2.5, 0],
+    null,
+    null,
+    false
+  );
+
+  fl.push(
+    flame3(three, mats, body, [-0.35, 1.55, 0], 0.8, 0.12),
+    flame3(three, mats, body, [0.35, 1.55, 0], 0.8, 0.12)
+  );
+
+  return {
+    g,
+    w: 3.2,
+    h: 4.2,
+    upd: (t: number) => {
+      body.position.y = Math.sin(t / 800) * 0.15;
+      r1.rotation.set(1.2 + Math.sin(t / 900) * 0.2, t / 700, 0);
+      r2.rotation.set(0.4, -t / 500, 0.6);
+      flick(fl, t);
+    },
+  };
+}
+
+export const U3: Record<
+  string,
+  (three: typeof THREE, mats: MaterialRegistry) => UnitHandle
+> = {
+  pos: uLancer,
+  gtm: uKraken,
+  dir: uMarshal,
+  naming: uStamp,
+  research: uArachne,
+  brand: uRonin,
+  uiux: uArchitect,
+  decks: uHerald,
+  copy: uQuill,
+  illus: uFresco,
+  web: uForge,
+  motion: uDolly,
+  "3d": uPrism,
+  fab: uGantry,
+  hw: uGoliath,
+  pm: uNexus,
+  ws: uHub,
+  cmd: uWatch,
+  intel: uCortex,
+};

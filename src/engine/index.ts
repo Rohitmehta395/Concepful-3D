@@ -5,3 +5,5 @@ export { measureBox, applyCameraOffset } from "./layout";
 export type { Box, CardRect } from "./layout";
 export { computeScroll, createScrollDriver } from "./scroll";
 export type { SectionBounds, ScrollState, ScrollDriver } from "./scroll";
+export { createOverlay } from "./overlay";
+export type { OverlayManager } from "./overlay";

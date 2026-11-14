@@ -20,6 +20,7 @@ import { createLogiStage } from "./stages/logiStage";
 import { createRulesStage } from "./stages/rulesStage";
 import { createStagesStage } from "./stages/stagesStage";
 import { createOutroStage } from "./stages/outroStage";
+import { createOverlay, type OverlayManager } from "./overlay";
 
 export interface EngineOptions {
   antialias?: boolean;
@@ -36,6 +37,7 @@ export interface Engine {
   readonly orbitController: OrbitController;
   readonly stageManager: StageManager;
   readonly materials: MaterialRegistry;
+  readonly overlay?: OverlayManager | null;
   start: () => void;
   stop: () => void;
   resize: () => void;
@@ -86,6 +88,12 @@ export function createEngine(
   let snap = true;
   let wasInPortedStage = false;
   let lastTime = typeof performance !== "undefined" ? performance.now() : 0;
+  let fadeT: number | null = null;
+
+  let overlay: OverlayManager | null = null;
+  if (options.overlayCanvas) {
+    overlay = createOverlay(options.overlayCanvas);
+  }
 
   // Reference line 2646: const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const motionQuery =
@@ -234,6 +242,7 @@ export function createEngine(
       if (state.activeScene !== previousActiveScene) {
         previousActiveScene = state.activeScene;
         snap = true;
+        fadeT = time;
       }
       lastFramingScrollY = scrollY;
       currentTargetBox = getTargetBox();
@@ -307,6 +316,9 @@ export function createEngine(
     }
 
     renderer.render(scene, camera);
+    if (overlay) {
+      overlay.render(time, fadeT);
+    }
     if (frameCount === 1 && canvas.classList) {
       canvas.classList.add("ready");
     }
@@ -367,6 +379,9 @@ export function createEngine(
     const w = canvas.clientWidth || window.innerWidth || 1;
     const h = canvas.clientHeight || window.innerHeight || 1;
     renderer.setSize(w, h, false);
+    if (overlay) {
+      overlay.resize(w, h, maxPixelRatio);
+    }
     scrollDriver.measureSections();
     updateFraming(true);
     if (!isRunning && motionQuery && motionQuery.matches) {
@@ -602,6 +617,11 @@ export function createEngine(
     backgroundManager.dispose();
     materials.dispose();
 
+    if (overlay) {
+      overlay.dispose();
+      overlay = null;
+    }
+
     renderer.dispose();
     renderer.forceContextLoss();
   }
@@ -614,6 +634,7 @@ export function createEngine(
     orbitController,
     stageManager,
     materials,
+    overlay,
     start,
     stop,
     resize,
