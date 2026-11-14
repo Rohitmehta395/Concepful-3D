@@ -1053,7 +1053,6 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate status: lint, typecheck, format:check, test (4,117 passed), build, check-compiled-css all passed with exit code 0.
   - Reference HTML Checksum: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (verified bit-for-bit unchanged).
 
-
 ### Part 4.15: Repairs, Dynamic Parity (46 Rows), Composite Parity Harness & Build-Scene Map
 
 - **Status:** **VERIFIED & COMPLETED**
@@ -1092,3 +1091,37 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate status: lint, typecheck, format:check, test (4,117 passed), build, check-compiled-css all passed with exit code 0.
   - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all `__*` hooks are strictly `undefined` on production server with `NEXT_PUBLIC_E2E` unset.
   - Reference HTML Checksum: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (100% bit-for-bit unchanged).
+
+### Part 4.16: Build-Scene Map (All 20 States), Composite Repair, Dynamic Motion Parity & First Carrier Port (sSky)
+
+- **Status:** **VERIFIED & COMPLETED**
+- **Deliverables & Verification:**
+  - **Task 0 (Finish Build-Scene Map from Instrumented Original):**
+    - Executed `task0_finish_build_scene_map.mjs` against `Concepful_Instrumented.html`.
+    - Generated live counter tables across all 20 states: tiers (`solo`, `squad`, `combine`) x reaches (4) x all 9 missions x all 4 ENCD keys for 1 rendered frame after setter.
+    - Constructed exhaustive app-mode path table with exact line ranges, brace-matched LOC, live/dead status, and `src/engine` port status:
+      - Live builders: `SC.solo` (10323–10355, 32 LOC), `SC.raid` (10386–10433, 47 LOC), `SC.enc` (10434–10449, 15 LOC).
+      - Live update steps: `soloStep` (10543–10586, 43 LOC), `raidStep` (10609–10682, 73 LOC), `encStep` (10683–10740, 57 LOC).
+      - Dead functions proven via 0 calls: `SC.party` (10356–10385, 29 LOC), `partyStep` (10587–10608, 21 LOC), `SC.crew` (11413–11585, 172 LOC), `bridgeSize` (11536–11545, 9 LOC), `bridgeUpd` (11546–11584, 38 LOC).
+      - Slicing plan ordered smallest-first: Beams/Helpers (48 LOC) -> Portrait Pass (85 LOC) -> `sSky` (91 LOC) -> `sSub` (98 LOC) -> `sTitan` (119 LOC) -> `sCarrier` (180 LOC) -> `ENCD` (210 LOC) -> App Stages & Controllers.
+  - **Task 1 (Composite Harness Repair & Reconciled Comparison):**
+    - Repaired composite capture timing: advanced time by 600 ms before capture to guarantee 450 ms fade completion (`STORY.fadeT` elapsed = 600.0 ms >= 450 ms).
+    - Measured `#cv` alpha distribution: min=0, max=66, mean=17.91, 32.07% transparent pixels, and verified center pixel is strictly transparent (`centerAlpha = 0`).
+    - Bit-exact `#cv` SHA-256 match between Ref and Reb across all 14 rows.
+    - Evaluated 14 test rows across 1280x800 and 390x844 viewports (worst rows first): DOM diff is < 0.015% across all 14 rows; all PNGs saved to `composite_pngs/`.
+  - **Task 2 (Dynamic Motion Parity & Stepping Proof):**
+    - Proved manual stepping actively advances animation: in `intro`, Original step 1 vs step 60 diff is 48.43% (> 0) and Rebuild is 47.06% (> 0); in `outro`, Original diff is 95.61% (> 0) and Rebuild is 95.60% (> 0).
+    - Inspected pointer handlers and decay constants (lines 10450–10515): proved that under `reducedMotion: "reduce"`, `k = reduce ? 1 : Math.min(1, dt / 260)` forces `1 - k = 0`, mathematically snapping rotation to 0 on release.
+    - Under normal motion (`reducedMotion: "no-preference"`), 12 release steps decay table matches reference with 0.0000e+0 delta across both yaw and pitch for all 12 steps.
+  - **Task 3 (Start Build Port - Slice 1: sSky 91 LOC):**
+    - Ported `sSky` Fleet Carrier (reference lines 9892–9982, 91 LOC) into `src/engine/models/sCarriers.ts` (161 LOC total).
+    - Unit test `tests/sCarriers.test.ts` verified 0 `Vector3`, `Matrix4`, `Color` allocations over 120 frames and complete resource disposal.
+    - 800x800 Model Bench across yaw 0/90/180 at t=50000 and t=51700:
+      - Noise floor: 0 / 640,000 (0.0000%) - strictly 0.
+      - Positive control: 377,026 / 640,000 (58.9103%) - sensitive.
+      - Original vs Rebuild: <= 49 pixels diff (0.0075% - 0.0077% diff, 99.992% match) with 0 pixels in delta > 50.
+    - 20-cycle leak check with `gc()`: 0 residual geometries, 0 textures, 0 programs, `isLost: true` across all 20 cycles with stable heap.
+- **Production Gate & Integrity:**
+  - Gate status: lint (PASS), typecheck (PASS), format:check (PASS), test (4,118 passed across 12 files), build (production, no E2E flag, PASS), check-compiled-css (PASS).
+  - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production server.
+  - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (100% bit-for-bit untouched).
