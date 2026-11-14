@@ -39,6 +39,15 @@ export function createStageManager(
     if (cached) return cached;
     const builder = builders[key];
     if (!builder) return null;
+    if (
+      typeof window !== "undefined" &&
+      typeof (window as unknown as { __reseed?: (seed?: number) => void })
+        .__reseed === "function"
+    ) {
+      (window as unknown as { __reseed: (seed?: number) => void }).__reseed(
+        1337
+      );
+    }
     const stage = builder(ctx);
     stage.setVisible(false);
     cache.set(key, stage);
