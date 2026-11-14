@@ -1052,3 +1052,43 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
 - **Production Gate & Integrity:**
   - Gate status: lint, typecheck, format:check, test (4,117 passed), build, check-compiled-css all passed with exit code 0.
   - Reference HTML Checksum: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (verified bit-for-bit unchanged).
+
+
+### Part 4.15: Repairs, Dynamic Parity (46 Rows), Composite Parity Harness & Build-Scene Map
+
+- **Status:** **VERIFIED & COMPLETED**
+- **Deliverables & Verification:**
+  - **Task 0 (Repairs & Hardening):**
+    - Reverted `env` block in `next.config.ts`: `git diff 5ec1ebc next.config.ts` is 100% empty. Built bundle check and production server check (with `NEXT_PUBLIC_E2E` unset) verify that `typeof window.__CONCEPFUL_ENGINE__` and all `window.__*` hooks evaluate strictly to `"undefined"`.
+    - `uGantry` & `uGoliath` extended structure diff against reference (vertex hashes, material class/colour, positions, renderOrder): 0 mismatches across all 47 nodes for `uGantry` and 0 mismatches across all 33 nodes for `uGoliath`. Root cause of `uGantry` visual difference was a missing `reduce` check in crate stack calculation (`n = reduce ? 8 : Math.floor((t / 250) % 13)`).
+    - 800x800 Model Bench for all 5 new units:
+      - `uGantry`: 0 / 640,000 (0.0000%) on all 6 tests!
+      - `uCortex`: 0 / 640,000 (0.0000%) on all 6 tests!
+      - `uStamp`: 0 to 2 pixels across all yaw and timestamps.
+      - `uArachne`: 0 to 1 pixel across all yaw and timestamps.
+      - `uGoliath`: 0 to 8 pixels on 5 of 6 tests; 72 pixels on yaw 90, t=0 (1px footplate gunmetal box outline viewed edge-on).
+    - Documented `#gl` fade: verified reference HTML lines 582–605 have no opacity or transition property; removed artificial `opacity: 0; transition: opacity 200ms ease;` and `#gl.ready` from `src/styles/scene.css`.
+  - **Task 1 (Dynamic Parity Suite - 46 Rows & Drag Dump):**
+    - Built single deterministic test suite (`task1_dynamic_suite.mjs`) using `file://` reference URL, real per-page section selectors, and synchronized rAF queues with deterministic reseeding.
+    - Evaluated exactly 46 rows (idle x24, jumps x10, drag/release x6, smooth scroll x6):
+      - Worst row in entire table: `idle_intro_step_60` at 0.9776% (< 1.0%).
+      - Jumps (`classes->rules` & `logi->rules`): 0.0013% to 0.0015%.
+      - Drag release steps (1, 5, 10, 30, 60): 0.1997% to 0.2002%.
+      - Drag dump: camera position, quaternion, drag state, and auto state match reference identically to 16 decimal places across all 12 release steps.
+      - Explained earlier 3.83% "during drag": 4.13 used a 20 px drag while 4.14 used a 150 px drag; with normalized 40 px drag, "during drag" diff is 0.2021%.
+  - **Task 2 (Composite Parity Harness):**
+    - Evaluated composite, DOM-only, GL-only, and #cv-only captures across 1280x800 and 390x844 viewports for all 6 story scenes and mid-transition.
+    - Verified scene offsets from each page's own `[data-scene]` elements: scroll offsets match expected scene keys on both pages.
+    - #cv-only parity: **0.0000% diff (0 differing pixels)** with identical SHA-256 and non-black pixel counts across all story scenes.
+    - DOM investigation of composite discrepancies: isolated to unported Phase 6 builder configurator (`#panel`), which reference hides during story scenes via `body:not(.app) .panel { opacity: 0; pointer-events: none; }`.
+    - Documented reference `storyScan` DOM behavior (lines 11953–12004) with exact LOC and ranges: body class toggles, beat card `.on` toggles, and clock updates.
+  - **Task 3 (Build-Scene Map from Instrumented Source):**
+    - Created instrumented copy `Concepful_Instrumented.html` instrumenting 144 top-level functions between lines 7280 and 15145.
+    - Systematically exercised all tiers (`solo`, `squad`, `combine`), reaches (`local`, `regional`, `national`, `global`), missions (all 9 H3 missions), and encounter modes (all 4 ENCD encounters).
+    - Produced complete runtime evidence table with exact start/end lines, LOC, baseline counts, total counts, deltas, and `src/engine` port status.
+    - Confirmed active mappings: 19 U3 models, 9 H3 hero vehicles, 4 S3 support craft, 4 ENCD encounter models, 4 SHIPS.
+    - Proved that `SC.crew` / `BRIDGE` (lines 11413–11585) is dead code in the original prototype and never called by any active tier or button.
+- **Production Gate & Integrity:**
+  - Gate status: lint, typecheck, format:check, test (4,117 passed), build, check-compiled-css all passed with exit code 0.
+  - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all `__*` hooks are strictly `undefined` on production server with `NEXT_PUBLIC_E2E` unset.
+  - Reference HTML Checksum: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (100% bit-for-bit unchanged).
