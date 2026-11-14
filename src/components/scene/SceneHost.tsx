@@ -80,16 +80,17 @@ export function SceneHost() {
             return { pre, post };
           };
           win.__CONCEPFUL_BENCH__ = async (
-            kind: "u3" | "h3" | "mjet" | "plinth" | "label",
+            kind: "u3" | "h3" | "mjet" | "plinth" | "label" | "s3",
             id: string,
             yawDeg: number,
             t: number
           ) => {
-            const [uMod, hCMod, gMod, mMod] = await Promise.all([
+            const [uMod, hCMod, gMod, mMod, sMod] = await Promise.all([
               import("@/engine/models/uUnits"),
               import("@/engine/models/hVehiclesC"),
               import("@/engine/world/geometry"),
               import("@/engine/world/materials"),
+              import("@/engine/models/sCarriers"),
             ]);
             const sc = new three.Scene();
             sc.background = new three.Color(0x12161e);
@@ -126,6 +127,14 @@ export function SceneHost() {
               v.upd(t, { reduceMotion: true });
               if (v.fl.length > 0) gMod.flick(v.fl, t);
               obj = v.g;
+              obj.position.set(0, 1.5, 0);
+            } else if (kind === "s3") {
+              const carrier = sMod.S3[id]
+                ? sMod.S3[id]!(three, mats)
+                : sMod.sSky(three, mats);
+              carrier.upd(t);
+              if (carrier.fl.length > 0) gMod.flick(carrier.fl, t);
+              obj = carrier.g;
               obj.position.set(0, 1.5, 0);
             } else {
               const map: Record<
