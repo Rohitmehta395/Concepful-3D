@@ -136,6 +136,12 @@ export function createOrbitController(
   }
 
   function autoPick(snap: boolean, now = performance.now()): void {
+    if (process.env.NEXT_PUBLIC_E2E === "1" && typeof window !== "undefined") {
+      const win = window as unknown as { __reseed?: (seed?: number) => void };
+      if (typeof win.__reseed === "function") {
+        win.__reseed(1337);
+      }
+    }
     auto.ty = (Math.random() * 2 - 1) * 0.55;
     auto.tp = -0.1 + Math.random() * 0.28;
     auto.t0 = now;
@@ -195,13 +201,13 @@ export function createOrbitController(
     const d = Math.max(dH, dW);
 
     _tmpV.copy(_target).addScaledVector(_dir.normalize(), d);
-    const effK = drag.on ? Math.max(k, 0.5) : k;
-    if (effK >= 1) {
+    if (drag.on) k = Math.max(k, 0.5);
+    if (k >= 1) {
       _camPos.copy(_tmpV);
       _camTgt.copy(_target);
     } else {
-      _camPos.lerp(_tmpV, effK);
-      _camTgt.lerp(_target, effK);
+      _camPos.lerp(_tmpV, k);
+      _camTgt.lerp(_target, k);
     }
     camera.position.copy(_camPos);
     camera.lookAt(_camTgt);

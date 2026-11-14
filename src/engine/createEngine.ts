@@ -25,6 +25,7 @@ export interface EngineOptions {
   antialias?: boolean;
   powerPreference?: WebGLPowerPreference;
   maxPixelRatio?: number;
+  overlayCanvas?: HTMLCanvasElement | null;
 }
 
 export interface Engine {
@@ -84,15 +85,24 @@ export function createEngine(
   let frameCount = 0;
   let snap = true;
   let wasInPortedStage = false;
-  const clock = new three.Clock(false);
+  let lastTime = typeof performance !== "undefined" ? performance.now() : 0;
+
+  // Reference line 2646: const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionQuery =
+    typeof window !== "undefined" && window.matchMedia
+      ? window.matchMedia("(prefers-reduced-motion: reduce)")
+      : null;
 
   // Material registry + Background Manager + Orbit controller + Stage Manager
   const materials = createMaterialRegistry(three);
   const backgroundManager = createBackgroundManager(three);
   backgroundManager.build(scene, camera, renderer);
-  const orbitController = createOrbitController(three, canvas, () =>
-    renderFrame(performance.now())
-  );
+  const orbitController = createOrbitController(three, canvas, () => {
+    // Reference line 7387: if (reduce) paint(performance.now());
+    if (motionQuery && motionQuery.matches) {
+      renderFrame(performance.now());
+    }
+  });
   const stageManager = createStageManager(
     scene,
     {
@@ -116,7 +126,7 @@ export function createEngine(
   const scrollDriver = createScrollDriver();
   let previousActiveScene = "";
   let lastFramingScrollY = -1;
-  let currentBox: Box = {
+  const currentBox: Box = {
     x0: 0,
     x1: width,
     y0: 0,
@@ -126,15 +136,10 @@ export function createEngine(
     cx: width / 2,
     cy: height / 2,
   };
+  let currentTargetBox: Box = { ...currentBox };
 
-  // Reference line 2646: const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const motionQuery =
-    typeof window !== "undefined" && window.matchMedia
-      ? window.matchMedia("(prefers-reduced-motion: reduce)")
-      : null;
-
-  function updateFraming(): void {
-    if (isDisposed || typeof document === "undefined") return;
+  function getTargetBox(): Box {
+    if (isDisposed || typeof document === "undefined") return currentBox;
     const w = window.innerWidth || canvas.clientWidth || 1;
     const h = window.innerHeight || canvas.clientHeight || 1;
 
@@ -179,14 +184,60 @@ export function createEngine(
       boxartTop: boxart ? boxart.getBoundingClientRect().top : undefined,
     };
 
-    currentBox = measureBox(w, h, topBottom, cards, sceneMode, elements);
+    return measureBox(w, h, topBottom, cards, sceneMode, elements);
+  }
+
+  function easeBox(current: Box, target: Box, k: number): void {
+    current.w += (target.w - current.w) * k;
+    current.h += (target.h - current.h) * k;
+    current.x0 += (target.x0 - current.x0) * k;
+    current.y0 += (target.y0 - current.y0) * k;
+    current.x1 = current.x0 + current.w;
+    current.y1 = current.y0 + current.h;
+    current.cx = current.x0 + current.w / 2;
+    current.cy = current.y0 + current.h / 2;
+  }
+
+  function updateFraming(snapImmediate = false): void {
+    if (isDisposed || typeof document === "undefined") return;
+    currentTargetBox = getTargetBox();
+    if (snapImmediate) {
+      currentBox.w = currentTargetBox.w;
+      currentBox.h = currentTargetBox.h;
+      currentBox.x0 = currentTargetBox.x0;
+      currentBox.y0 = currentTargetBox.y0;
+      currentBox.x1 = currentTargetBox.x1;
+      currentBox.y1 = currentTargetBox.y1;
+      currentBox.cx = currentTargetBox.cx;
+      currentBox.cy = currentTargetBox.cy;
+    }
+    const w = window.innerWidth || canvas.clientWidth || 1;
+    const h = window.innerHeight || canvas.clientHeight || 1;
     applyCameraOffset(camera, currentBox, w, h);
   }
 
   function renderFrame(time = performance.now()): void {
     if (isDisposed) return;
     frameCount++;
+
+    // Reference line 7362: dt = Math.min(50, t - last);
+    const dtMs = Math.min(50, Math.max(0, time - lastTime));
+    lastTime = time;
+
+    // 1. storyScan
     const state = scrollDriver.update(time);
+    const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
+    if (
+      state.activeScene !== previousActiveScene ||
+      scrollY !== lastFramingScrollY
+    ) {
+      if (state.activeScene !== previousActiveScene) {
+        previousActiveScene = state.activeScene;
+        snap = true;
+      }
+      lastFramingScrollY = scrollY;
+      currentTargetBox = getTargetBox();
+    }
 
     // Update beats and clock in active section DOM (reference lines 11987-12000)
     if (typeof document !== "undefined") {
@@ -208,21 +259,16 @@ export function createEngine(
       }
     }
 
-    const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
-    if (
-      state.activeScene !== previousActiveScene ||
-      scrollY !== lastFramingScrollY
-    ) {
-      if (state.activeScene !== previousActiveScene) {
-        previousActiveScene = state.activeScene;
-        snap = true;
-      }
-      lastFramingScrollY = scrollY;
-      updateFraming();
-    }
-
+    // 2. easeBox (reference line 7366: const kb = SNAP || reduce ? 1 : Math.min(1, dt / 180);)
     const reduceMotion = !!(motionQuery && motionQuery.matches);
-    const dtMs = clock.getDelta() * 1000;
+    const kb = snap || reduceMotion ? 1 : Math.min(1, dtMs / 180);
+    easeBox(currentBox, currentTargetBox, kb);
+
+    // 3. render3D: apply camera view offset from eased box
+    const w = window.innerWidth || canvas.clientWidth || 1;
+    const h = window.innerHeight || canvas.clientHeight || 1;
+    applyCameraOffset(camera, currentBox, w, h);
+
     const viewportH =
       typeof window !== "undefined" && window.innerHeight
         ? window.innerHeight
@@ -291,7 +337,7 @@ export function createEngine(
   function start(): void {
     if (isDisposed || isRunning) return;
     isRunning = true;
-    clock.start();
+    lastTime = typeof performance !== "undefined" ? performance.now() : 0;
 
     // If prefers-reduced-motion is true, render exactly one frame and pause
     if (motionQuery && motionQuery.matches) {
@@ -310,7 +356,6 @@ export function createEngine(
   function stop(): void {
     if (isDisposed) return;
     isRunning = false;
-    clock.stop();
     if (rAFId !== null) {
       cancelAnimationFrame(rAFId);
       rAFId = null;
@@ -323,7 +368,7 @@ export function createEngine(
     const h = canvas.clientHeight || window.innerHeight || 1;
     renderer.setSize(w, h, false);
     scrollDriver.measureSections();
-    updateFraming();
+    updateFraming(true);
     if (!isRunning && motionQuery && motionQuery.matches) {
       renderFrame(performance.now());
     }
