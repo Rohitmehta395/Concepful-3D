@@ -351,13 +351,6 @@ export function createEngine(
     isRunning = true;
     lastTime = typeof performance !== "undefined" ? performance.now() : 0;
 
-    // If prefers-reduced-motion is true, render exactly one frame and pause
-    if (motionQuery && motionQuery.matches) {
-      renderFrame(performance.now());
-      isRunning = false;
-      return;
-    }
-
     if (typeof document !== "undefined" && document.hidden) {
       return;
     }

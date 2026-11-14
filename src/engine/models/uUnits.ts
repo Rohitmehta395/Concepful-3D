@@ -51,7 +51,7 @@ export interface UnitHandle {
   readonly g: THREE.Group;
   readonly w: number;
   readonly h: number;
-  upd(t: number): void;
+  upd(t: number, opts?: { reduceMotion?: boolean }): void;
 }
 
 /**
@@ -1830,12 +1830,17 @@ export function uGantry(
     g,
     w: 3.6,
     h: 4.4,
-    upd: (t: number) => {
+    upd: (t: number, opts?: { reduceMotion?: boolean }) => {
       const hy = 2.6 + Math.sin(t / 500) * 0.15;
       head.position.set(1.75, hy, 0);
       cab.scale.y = 4.0 - hy;
       cab.position.y = (4.0 + hy) / 2;
-      const n = Math.floor((t / 250) % 13);
+      const reduce =
+        opts?.reduceMotion ??
+        (typeof window !== "undefined" && window.matchMedia
+          ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          : false);
+      const n = reduce ? 8 : Math.floor((t / 250) % 13);
       for (let i = 0; i < stack.length; i++) {
         stack[i]!.visible = i < n;
       }
