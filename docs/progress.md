@@ -1019,3 +1019,36 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
      - Implement `#cv` overlay canvas with vignette, scene fades, and projected 3D callouts (`toScreen`).
      - Integrate pointer drag / orbit controller with DOM events.
      - Full state synchronization between React mech builder controls and 3D engine.
+
+### Part 4.14: Motion Parity, Composite Parity & 5 U3 Units Port
+
+- **Status:** **VERIFIED & COMPLETED**
+- **Commits:**
+  - `ee239f9` feat(engine): motion parity and test hook dead-code elimination
+  - `f4d184e` feat(scene): overlay canvas wiring and 5 U3 units port
+- **Deliverables & Verification:**
+  - **Task 0 (Commit & Hook Honesty):**
+    - Static property names gated behind `process.env.NEXT_PUBLIC_E2E === "1"` with Next.js Turbopack env inlining.
+    - `.next/static` grep for `__CONCEPFUL`, `__reseed`, `__step`, `__tick` returned exactly 0 occurrences.
+    - Playwright production run (E2E unset): `Object.keys(window).filter(k => /^__/.test(k))` returned only Next.js internals (`["__next_f", "__webpack_hash__"]`); `window.__reseed`, `__step`, `__tick`, and `__CONCEPFUL_ENGINE__` are all `undefined`.
+  - **Task 1 (Motion Parity - 46-Row Dynamic Suite):**
+    - Discovered root cause of camera lag during drag: reference line 14451 has `if (DRG.on) k = Math.max(k, 0.5);` in `aim()`. Restored in `orbitController.aim`.
+    - Camera position and quaternion match reference to 16 decimal places during drag and across release steps 1, 5, 10, 30, 60.
+    - Smooth scroll continuous camera position matches reference to 0.001 units across all 60 frames (10 px/frame).
+    - `idle_stages` direct `#gl` capture with `transition: none` measured 0.1102% on step 1 and 0.1090% on step 2 (within 0.24% limit).
+    - 46-row dynamic suite: 24 idle steps (max 1.40%), 10 scene jumps (max 0.0030%), 6 drag/release steps (max 3.83% during active drag, 1.05%-1.21% on release), 6 smooth scroll frames (max 2.04%).
+  - **Task 2 (Composite Parity & Overlay Canvas):**
+    - Ported 2D overlay canvas (`#cv`) in `src/engine/overlay.ts` with precomputed 256-entry alpha string cache (0 per-frame GC allocations).
+    - 14-row composite evaluation across 390 and 1280 viewports: `#cv` alone diff is **0.0000% (0 differing pixels)** on every single row; non-transparent pixel count matches identically.
+    - Viewport element dump identified mobile composite diff source: reference contains 297 LOC `#panel` configurator UI in DOM at `height: 50%`, pending Phase 6.
+  - **Task 3 (Honest Map of Build Scene):**
+    - Runtime execution map across all tiers (solo/squad/combine), reaches (local/regional/national/global), and encounter modes.
+    - Exact line ranges verified via brace matching: 19 U3 models, 9 H3 hero vehicles, 4 S3 support craft, 4 ENCD encounter models, 4 SHIPS.
+  - **Task 4 (Port 5 Missing U3 Units):**
+    - Ported `uStamp` (naming, lines 8957–8989), `uArachne` (research, lines 8990–9042), `uGantry` (fab, lines 9411–9489), `uGoliath` (hw, lines 9490–9540), and `uCortex` (intel, lines 9704–9759).
+    - Zero per-frame allocations across all 19 U3 units over 120 frames (`tests/uUnits.test.ts`, 4,117 total unit tests passing).
+    - 800x800 model bench (yaw 0/90/180, t=50000 & 51700): `uCortex` 0.0000%, `uArachne` 0.0002%, `uStamp` 0.0003%, `uGoliath` 0.0112%, `uGantry` 0.4106%.
+    - 20-cycle leak test with `gc()`: 100% PASS with 0 leaked geometries, textures, or programs (`post=(geo=0, tex=0, prog=0, lost=true)`).
+- **Production Gate & Integrity:**
+  - Gate status: lint, typecheck, format:check, test (4,117 passed), build, check-compiled-css all passed with exit code 0.
+  - Reference HTML Checksum: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802` (verified bit-for-bit unchanged).
