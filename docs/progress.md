@@ -1173,3 +1173,36 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate checks: `lint` (PASS), `typecheck` (PASS), `format:check` (PASS), `test` (4,119 passed across 13 files), `build` (production, no E2E flag, PASS), `check-compiled-css` (PASS). Gate log saved to `gate_output.txt` (6,542 bytes).
   - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production build (100% dead-code eliminated).
   - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).
+
+## Part 4.18: Composite Regression Bisection, Normal-Motion Parity & App Framing Parity
+
+- **Task 0 (Mobile + Desktop Composite Verification Across 3 Commits):**
+  - Evaluated the 14-row composite harness (`part4_16/task1_composite_repair.mjs`) across isolated worktrees at commits `a4eef26` (Part 4.16), `ed6d9e7` (Part 4.17), and `7d51409` (HEAD) on fixed port 3008 with `NEXT_PUBLIC_E2E=1`.
+  - Result: All 14 rows are **100% bit-for-bit identical** across all three commits. There was **zero code regression** introduced in `ed6d9e7` or `7d51409`.
+  - DOM diffs across all three commits remain $\le 0.0143\%$ on mobile and $\le 0.0108\%$ on desktop.
+- **Task 1 (Normal-Motion Parity & Motion Proof Root Cause):**
+  - Executed `part4_12/task3_dynamic_harness.mjs` (46 rows: idle across 6 scenes at steps 1/10/30/60, scroll jumps, drag/release 12 steps, and smooth scroll 600 px/s) under `reducedMotion: "no-preference"` at HEAD and at `4fac606` (4.15).
+  - Result: All 46 rows are **100% bit-for-bit identical** between HEAD and 4.15 baseline (`4fac606`). The worst row is `idle_outro_step_1` at 4.3402%, and 39/46 rows are $\le 1.9\%$.
+  - Executed the exact same 46 rows under `reducedMotion: "reduce"`: with manual rAF paint fallback, all 46 rows pass with worst row `idle_outro` at 4.3543%, and 42/46 rows $\le 0.99\%$.
+  - Root cause of 4.17 motion proof 84-93% intro/outro spikes identified: `part4_17/task2_motion_proof_fixed.mjs` stepped time under `no-preference` where pageRef ran without active WebGL paint, while rebuild auto-drift reseeded to yaw -0.5385 rad (-31°), introducing an un-synced 50° camera yaw rotation offset.
+- **Task 2 (App-Mode Framing Check & layout.ts Fallback Calibration):**
+  - Measured original reference DOM elements in app mode:
+    - Viewport desktop (1280x800): `#top` bottom=64, `#panel` top=94, right=416, width=400; `#card` top=94, left=1008, width=256; `#boxart` top=680, height=120.
+    - Viewport mobile (390x844): `#top` bottom=115.34375, `#panel` top=436, right=390, width=390; `#card` width=0; `#boxart` height=0.
+  - Calibrated fallback constants in `src/engine/layout.ts`:
+    - Updated mobile `prTop` fallback from 414 to 436 (`#panel.top = 436` at start of `#build`).
+    - Verified desktop `brTop` fallback at 680 (`#boxart.top = 680` at start of `#build`).
+    - Result: Box delta between reference and rebuild dropped to **0.0000 px** across both desktop and mobile viewports.
+  - Ran 18-row GL framing check (9 missions x 2 viewports) with exact camera orientation and projection matrices: quaternion delta $\le 0.0039$, projection delta $\le 0.0175$, camera position delta $\le 0.48$ (and $\le 2.0$ on copy/decks due to vehicle bounding differences).
+- **Task 3 (Honest Accounting for appStage.ts):**
+  - `git diff ed6d9e7 7d51409 -- src/engine/stages/appStage.ts` verified only 1 line changed (objective union type alignment: `gtm | dir | research | product`).
+  - `appStage.ts` (385 lines) replaces 194 lines of original reference code derived by script:
+    - ENVD definition: lines 10971-11036 (66 LOC)
+    - SOLO state & scene setup (disc, planet, rings): lines 10283-10323 (41 LOC)
+    - setEnv() mission environment loader: lines 11394-11413 (20 LOC)
+    - soloStep update in render3D (`tier === "solo"`): lines 14488-14546 (59 LOC)
+    - paint() app-mode canvas branches: lines 7374-7381 (8 LOC)
+- **Production Gate & Integrity:**
+  - Gate checks: `lint` (PASS), `typecheck` (PASS), `format:check` (PASS), `test` (4,119 passed across 13 files), `build` (production, no E2E flag, PASS), `check-compiled-css` (PASS). Gate log saved to `gate_output.txt` (14,954 bytes).
+  - Runtime hook check: `window.__CONCEPFUL_ENGINE__` evaluates strictly to `undefined` in production bundle (dead-code eliminated).
+  - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).
