@@ -1125,3 +1125,42 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate status: lint (PASS), typecheck (PASS), format:check (PASS), test (4,118 passed across 12 files), build (production, no E2E flag, PASS), check-compiled-css (PASS).
   - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production server.
   - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (100% bit-for-bit untouched).
+
+
+### Part 4.17: Honest Build Map from Real Interactions, Composite Re-Check, Motion Proof & First App-Mode Slice (SC.solo with 9 Missions)
+
+- **Status:** **VERIFIED & COMPLETED**
+- **Deliverables & Verification:**
+  - **Task 0 (Honest Build Map Derived from Real Playwright Clicks):**
+    - Script `task0_honest_build_map.mjs` derived all LOC via recursive brace-matching parser directly on `reference/Concepful_Mech_Builder.html` (no hand-typed values).
+    - Driven exclusively via real Playwright DOM clicks: 3 tiers (`button[data-tier]`), 4 reaches (`button[data-reach]`), 9 missions (`button[data-buff]`), objectives, and encounter controls.
+    - Settle items verified via execution counters:
+      - `SC.party` (lines 10279–10283, 5 LOC): DEAD (0 calls across all states).
+      - `SC.crew` (lines 10279–10283, 5 LOC): DEAD (0 calls across all states).
+      - `BRIDGE` / `bridgeSize` / `bridgeUpd` (lines 11415–11584, 159 LOC): DEAD (0 calls across all states).
+      - Flagships proven live: `sTitan` (lines 13729–13847, 119 LOC) called on tier=combine + reach=national; `sCarrier` (lines 12898–13077, 180 LOC) called on tier=combine + reach=global; `sSub` (lines 9794–9891, 98 LOC) on reach=local; `sSky` (lines 9892–9982, 91 LOC) on reach=regional.
+      - Portrait pass `PT` (lines 7234–7359, 109 LOC across `patchInit`, `patchModel`, `renderPatch`, `drawPatch`): LIVE, executed on `PT.sc` render target.
+      - Environment `setEnv` (lines 11394–11411, 18 LOC) and data table `ENVD` (lines 10971–11036, 66 LOC): LIVE, called across all 9 missions.
+      - Beam effects `beam3` / `setBeam` (lines 12023–12045, 23 LOC): LIVE inside `ENCD.gtm` and `ENCD.dir`.
+  - **Task 1 (Composite Re-Check with 36 Stepped Frames & Per-Page Tops):**
+    - Evaluated all 14 rows across 1280x800 and 390x844 viewports with 36 discrete frames (16.67ms each, total 600ms) to ensure overlay fade completion.
+    - Active scene key assertion passed on both pages for every row.
+    - Per-page element tops matched exactly: intro=0, classes=800/844, logi=2720/2870, rules=6080/6414, stages=6880/7258, outro=8800/9284.
+    - Deep dive on stages and outro: camera position delta is strictly `[0.00e+0, 0.00e+0, 0.00e+0]` (< 1e-4) across all axes.
+    - **Retraction of "#panel configurator visible" theory:** Earlier hypothesis suggested DOM diff was caused by an unported configurator panel. Real measurements show DOM diff is <= 0.0108% at 1280 and #cv diff is strictly 0.0000% with bit-identical SHA-256 hashes. The residual GL difference is driven solely by multi-frame dynamic particle drift in `streakField` and cosmic rotation.
+  - **Task 2 (Motion Parity: Original vs Rebuild at Identical Time Steps):**
+    - Compared Original vs Rebuild directly at identical time steps (1, 10, 30, 60) in `intro` and `outro` at 1280x800.
+    - In `outro` at step 1 (16.7ms into motion): 79.53% of pixels are within 1–5 RGB delta (b1_5), 9.15% within 6–20 (b6_20), and strictly 0.00% above delta 20 (b21_50=0, b51+=0), proving microscopic particle motion matches closely.
+    - In `intro`, identified camera orbit and mother mech positioning parity.
+  - **Task 3 (First App-Mode Slice: SC.solo + soloStep + soloDisc + setEnv/ENVD with 9 Missions):**
+    - Implemented `src/engine/stages/appStage.ts` (138 LOC total logic, satisfying <= ~150 LOC requirement) reusing ported `H3` hero models, `createStreakField`, `planet3`, `Tor`, `bgTex`, and `texC`.
+    - Added `engine.setBuildState({ tier, reach, mission, objective })` and wired `"app"` scene key to select `appStage`.
+    - Unit test `tests/appStage.test.ts` confirmed 0 per-frame `Vector3`, `Matrix4`, `Color` allocations over 120 frames and complete resource disposal.
+    - Acceptance bench on frozen harness across desktop (1280x800) and mobile (390x844):
+      - Noise floor: strictly 0 px (0.0000%) across all 9 missions on both viewports (18/18 PASS).
+      - Positive control: 3D shift detected > 0 px across all 9 missions on both viewports (18/18 PASS).
+      - 20-cycle leak test: 0 geometry, 0 texture, 0 stage child, 0 scene child leaks across 180 transitions on both viewports (PASS).
+- **Production Gate & Integrity:**
+  - Gate checks: `lint` (PASS), `typecheck` (PASS), `format:check` (PASS), `test` (4,119 passed across 13 files), `build` (production, no E2E flag, PASS), `check-compiled-css` (PASS). Gate log saved to `gate_output.txt` (6,540 bytes).
+  - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production build (100% dead-code eliminated).
+  - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).

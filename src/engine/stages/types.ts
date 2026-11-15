@@ -31,6 +31,12 @@ export interface StageBuildContext {
   readonly mats: MaterialRegistry;
   readonly camera: THREE.PerspectiveCamera;
   readonly orbitCtrl: OrbitController;
+  readonly getBuildState?: () => {
+    readonly mission: string;
+    readonly tier?: string;
+    readonly reach?: string;
+    readonly objective?: string;
+  };
 }
 
 export type StageBuilder = (ctx: StageBuildContext) => Stage;

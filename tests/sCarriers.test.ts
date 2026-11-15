@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import * as THREE from "three";
 import { createMaterialRegistry } from "@/engine/world/materials";
 import { flick } from "@/engine/world/geometry";
-import { sSky, S3 } from "@/engine/models/sCarriers";
+import { sSky } from "@/engine/models/sCarriers";
 
 describe("Part 4.16: sSky Fleet Carrier model", () => {
   it("builds sSky and performs 0 Vector3 / Matrix4 / Color allocations per frame", () => {

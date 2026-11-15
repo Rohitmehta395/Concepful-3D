@@ -7,3 +7,5 @@ export { computeScroll, createScrollDriver } from "./scroll";
 export type { SectionBounds, ScrollState, ScrollDriver } from "./scroll";
 export { createOverlay } from "./overlay";
 export type { OverlayManager } from "./overlay";
+export type { BuildState } from "./stages/appStage";
+export { createAppStage, DEFAULT_BUILD_STATE } from "./stages/appStage";

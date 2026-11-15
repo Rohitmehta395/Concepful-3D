@@ -20,6 +20,11 @@ import { createLogiStage } from "./stages/logiStage";
 import { createRulesStage } from "./stages/rulesStage";
 import { createStagesStage } from "./stages/stagesStage";
 import { createOutroStage } from "./stages/outroStage";
+import {
+  createAppStage,
+  type BuildState,
+  DEFAULT_BUILD_STATE,
+} from "./stages/appStage";
 import { createOverlay, type OverlayManager } from "./overlay";
 
 export interface EngineOptions {
@@ -46,6 +51,8 @@ export interface Engine {
   getFrameCount: () => number;
   getScrollState: () => ScrollState;
   getBox: () => Box;
+  setBuildState: (state: Partial<BuildState>) => void;
+  getBuildState: () => BuildState;
 }
 
 export function createEngine(
@@ -101,6 +108,8 @@ export function createEngine(
       ? window.matchMedia("(prefers-reduced-motion: reduce)")
       : null;
 
+  let buildState: BuildState = { ...DEFAULT_BUILD_STATE };
+
   // Material registry + Background Manager + Orbit controller + Stage Manager
   const materials = createMaterialRegistry(three);
   const backgroundManager = createBackgroundManager(three);
@@ -119,6 +128,7 @@ export function createEngine(
       mats: materials,
       camera,
       orbitCtrl: orbitController,
+      getBuildState: () => buildState,
     },
     {
       intro: createIntroStage,
@@ -127,6 +137,7 @@ export function createEngine(
       rules: createRulesStage,
       stages: createStagesStage,
       outro: createOutroStage,
+      app: createAppStage,
     }
   );
 
@@ -636,5 +647,12 @@ export function createEngine(
     getFrameCount: () => frameCount,
     getScrollState: () => scrollDriver.getState(),
     getBox: () => currentBox,
+    setBuildState: (state: Partial<BuildState>) => {
+      buildState = { ...buildState, ...state };
+      if (motionQuery && motionQuery.matches) {
+        renderFrame(performance.now());
+      }
+    },
+    getBuildState: () => buildState,
   };
 }
