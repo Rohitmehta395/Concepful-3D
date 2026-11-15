@@ -19,7 +19,7 @@ export interface BuildState {
     | "3d"
     | "fab"
     | "ai";
-  objective: "gtm" | "brand" | "web" | "dir";
+  objective: "gtm" | "dir" | "research" | "product";
 }
 
 export const DEFAULT_BUILD_STATE: BuildState = {
