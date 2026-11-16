@@ -92,6 +92,28 @@
   }
 }
 
+/* Lines 680-693: App mode pricing total badge */
+.tot {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.tot b {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.tot small {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.seg button {
+  line-height: normal;
+}
+
 /* Lines 694-706, 1688-1690: Base tactical call-to-action button */
 .fu {
   border: 0;
@@ -105,6 +127,10 @@
   padding: 10px 18px;
   box-shadow: 0 3px 0 var(--redLo);
   transition: transform 0.1s;
+}
+
+button.fu {
+  line-height: normal;
 }
 
 /* Lines 116-120: Header nav-nested CTA compact overrides */

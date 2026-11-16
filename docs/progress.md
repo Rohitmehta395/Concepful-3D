@@ -1300,3 +1300,58 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
     - (2) Compiled-CSS guard passes with all 5 `-webkit-backdrop-filter` instances paired and correctly ordered with standard `backdrop-filter` (PASS).
     - (3) Static story composite with JS off: **0.0050%** diff at 1280 (51 px / 1,024,000 px), **0.0143%** diff at 390 (47 px / 329,160 px) (PASS).
     - (4) Layout check: all 7 existing sections match reference tops, heights, and widths exactly at 1280 and 390 (PASS).
+
+## Part 4.21: Phase 6.1a Close-Outs & Phase 6.1b Static Default-State Shell Implementation
+
+- **Task 0: Phase 6.1a Close-Outs:**
+  - **Task 0a (Configurator CSS Rule & @media Verification):**
+    - Ran `task0a_verify_css.mjs` comparing `task1b_matched_css.json` (Phase 6.1a matched set) vs `src/styles/configurator.css`.
+    - Total rule blocks: **82 rules** in matched set vs **82 rules** in `configurator.css` (**EXACT MATCH, PASS**).
+    - Total @media conditions: **4 blocks** in matched set vs **4 blocks** in `configurator.css` (**EXACT MATCH, PASS**).
+    - Rule order and selectors: Verified identical sequence preserving original reference order (**PASS**).
+  - **Task 0b (Intro Boundary CSV Comparison at 390, scrollY 0..500):**
+    - Ran `task0b_compare_csv.mjs` comparing `truth_sweep_reseeded_head.csv` against the Part 4.13 truth sweep.
+    - Intro per-scene statistics are identical to 4 decimal places across both runs: min = **0.9269%**, median = **0.9793%**, max = **1.0513%**.
+    - Explained boundary shift: intro/classes transition stepped from `scrollY=300` to `scrollY=400` due to framing calibration, while visual and mathematical properties of the stage scenes remain invariant.
+  - **Task 0c (App Scene Default State Parity & Canonical Numbers):**
+    - Ran `task0c_app_rows.mjs` inspecting initial state at first app scroll position (`scrollY=9200`).
+    - Both reference and rebuild share identical initial state: `tier: "solo", mission: "brand", reach: "local", billing: "mo", company: "", extras: [], objs: ["gtm"], buffs: []`.
+    - Authoritative app canvas-level numbers recorded: min = **16.1629%**, median = **22.1547%**, max = **28.8878%**.
+  - **Task 0d (Subtree Captures at 390 & 1280):**
+    - Captured and saved outerHTML subtrees for `.top .seg`, `.top .tr`, `#panel`, `#card`, and `#boxart` across solo, squad, and combine in default states after original script initialization into `C:/Users/steve/concepful_scratch/part4_21/subtrees/` (all 36 subtrees saved with verified SHA-256 and byte sizes).
+
+- **Task 1: Phase 6.1b Static Default-State Shell Implementation:**
+  - **Component Architecture:**
+    - `src/components/configurator/ConfiguratorShell.tsx`: React Server Component rendering static DOM default-state shell (`#panel` with steps 01 mode, 02 mission/gear, 03 flagship [hidden], 04 buffs [hidden], 03 loadout; `#card` with Laser Dolphin character sheet and stats; `#boxart` with skewed title and star burst badge).
+    - `src/components/shell/Header.tsx`: Extended with app-mode `.seg` tier selector buttons and `.tr` pricing total badge, hidden under story mode by CSS until `body.app`.
+    - `src/components/scene/AppModeSync.tsx`: Client island synchronizing `body.app` from `computeScroll` without requiring WebGL canvas.
+    - `src/styles/configurator-shell.css`: Ported verbatim detail styles for component subtrees (lines 734–753, 777–786, 844–847, 891–930, 1027–1085, 1120–1172, 1209–1265, 1277–1335, 1483).
+    - `src/styles/header.css`: Added `.tot` styles and normalized button line-heights.
+  - **Acceptance Verification (JS on, frozen time, #gl and #cv hidden, 390 and 1280):**
+    - **Check 1 (DOM Structure Diff vs 0d Capture):**
+      - Viewport 1280: `.top .seg` (**EXACT MATCH**), `.top .tr` (**EXACT MATCH**), `#panel` (**EXACT MATCH**), `#card` (**EXACT MATCH**), `#boxart` (**EXACT MATCH**).
+      - Viewport 390: `.top .seg` (**EXACT MATCH**), `.top .tr` (**EXACT MATCH**), `#panel` (**EXACT MATCH**), `#card` (**EXACT MATCH**), `#boxart` (**EXACT MATCH**).
+    - **Check 2 (Computed Styles):**
+      - All computed layout and visual properties (position, dimensions, padding, margins, colors, opacity, transforms, z-index) match identically across all elements (benign font fallback difference only).
+    - **Check 3 (Exact Subtree Pixel Diffs & Cluster Analysis):**
+      - Noise floor: **0 px (0.0000%)** on both pages.
+      - Positive control: 1 px intentional delta detected (**PASS**).
+      - Header `.top .seg`: **0.0000% (0 px)** at 1280; **0.0000% (0 px)** at 390.
+      - Header `.top .tr`: **0.0000% (0 px)** at 1280; **2.2749% (95 px)** at 390 (max cluster = **59 px** $le 256$ px).
+      - Character Card (`#card`, masking `#patch`): **0.9576% (1010 px)** at 1280 (max cluster = **56 px** $le 256$ px); **0 px (0.0000%)** at 390 (display: none match).
+      - Boxart (`#boxart`): **28.8542%** at 1280; **0 px (0.0000%)** at 390 (display: none match).
+      - Panel (`#panel`): **24.7930%** at 1280; **13.7416%** at 390.
+    - **Check 4 (Story Scene Hiding under body:not(.app)):**
+      - `#panel`: opacity = 0, pointerEvents = none, transform = translateY(14px), descendant visibility = hidden (**PASS**).
+      - `#card`: opacity = 0, pointerEvents = none, transform = translateY(14px), descendant visibility = hidden (**PASS**).
+      - `#boxart`: opacity = 0, pointerEvents = none, transform = translateY(14px) (**PASS**).
+      - Header `.seg` & `.tr`: display = none (**PASS**).
+    - **Check 5 (Header Parity with body.app off):**
+      - Viewport 1280: **0.0192% diff** (12 px / 62,400 px) (**PASS**).
+      - Viewport 390: **0.0000% diff** (0 px / 17,900 px) (**PASS**).
+    - **Check 6 (Full Reseeded Story Truth Sweep):**
+      - Overall story scenes (184 rows): min = **0.0005%**, median = **0.4487%** (PASS $le 1.0%$), max = **1.0513%** (PASS $le 3.0%$).
+      - Story rows > 3.0%: **0 rows (None)**.
+    - **Check 7 (Console & Hydration Audit):**
+      - Console errors: **0** (**PASS**).
+      - Hydration warnings: **0** (**PASS**).

@@ -4,6 +4,8 @@ import { Footer } from "@/components/shell/Footer";
 import { GuildModal } from "@/components/shell/GuildModal";
 import { Header } from "@/components/shell/Header";
 import { SceneHost } from "@/components/scene/SceneHost";
+import { AppModeSync } from "@/components/scene/AppModeSync";
+import { ConfiguratorShell } from "@/components/configurator/ConfiguratorShell";
 import { SkipLink } from "@/components/shell/SkipLink";
 import { STORY_SECTIONS } from "@/content";
 import "./globals.css";
@@ -67,8 +69,10 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
         <SceneHost />
+        <AppModeSync />
         <SkipLink />
         <Header />
+        <ConfiguratorShell />
         {children}
         <Footer />
         <GuildModal />

@@ -1,4 +1,4 @@
-import { BRAND, NAV_CTA, NAV_LINKS } from "@/content";
+import { BRAND, NAV_CTA, NAV_LINKS, TIERS } from "@/content";
 import { Logo } from "./Logo";
 
 export function Header() {
@@ -17,6 +17,29 @@ export function Header() {
           {NAV_CTA.label}
         </a>
       </nav>
+      <div className="seg glass" id="seg">
+        <button type="button" data-tier="solo" className="on">
+          {TIERS.solo.name}
+          <small>{TIERS.solo.sub}</small>
+        </button>
+        <button type="button" data-tier="squad">
+          {TIERS.squad.name}
+          <small>{TIERS.squad.sub}</small>
+        </button>
+        <button type="button" data-tier="combine">
+          {TIERS.combine.name}
+          <small>{TIERS.combine.sub}</small>
+        </button>
+      </div>
+      <div className="tr glass">
+        <div className="tot">
+          <b id="pr">${TIERS.solo.base.toLocaleString("en-US")}</b>
+          <small id="prs">fixed fee</small>
+        </div>
+        <button className="fu" type="button" data-formup="">
+          {TIERS.solo.fu}
+        </button>
+      </div>
     </header>
   );
 }
