@@ -1,7 +1,12 @@
+"use client";
+
 import { BRAND, NAV_CTA, NAV_LINKS, TIERS } from "@/content";
+import { useConfigurator } from "@/components/configurator/ConfiguratorProvider";
 import { Logo } from "./Logo";
 
 export function Header() {
+  const { state, dispatch, q } = useConfigurator();
+
   return (
     <header className="top" id="top">
       <a className="logo glass" href={BRAND.href} aria-label={BRAND.label}>
@@ -18,26 +23,39 @@ export function Header() {
         </a>
       </nav>
       <div className="seg glass" id="seg">
-        <button type="button" data-tier="solo" className="on">
+        <button
+          type="button"
+          data-tier="solo"
+          className={state.tier === "solo" ? "on" : ""}
+          onClick={() => dispatch({ type: "SET_TIER", tier: "solo" })}
+        >
           {TIERS.solo.name}
           <small>{TIERS.solo.sub}</small>
         </button>
-        <button type="button" data-tier="squad">
+        <button
+          type="button"
+          data-tier="squad"
+          className={state.tier === "squad" ? "on" : ""}
+        >
           {TIERS.squad.name}
           <small>{TIERS.squad.sub}</small>
         </button>
-        <button type="button" data-tier="combine">
+        <button
+          type="button"
+          data-tier="combine"
+          className={state.tier === "combine" ? "on" : ""}
+        >
           {TIERS.combine.name}
           <small>{TIERS.combine.sub}</small>
         </button>
       </div>
       <div className="tr glass">
         <div className="tot">
-          <b id="pr">${TIERS.solo.base.toLocaleString("en-US")}</b>
+          <b id="pr">${q.total.toLocaleString("en-US")}</b>
           <small id="prs">fixed fee</small>
         </div>
         <button className="fu" type="button" data-formup="">
-          {TIERS.solo.fu}
+          {q.T.fu}
         </button>
       </div>
     </header>

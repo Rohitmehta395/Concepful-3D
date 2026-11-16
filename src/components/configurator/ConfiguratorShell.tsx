@@ -1,27 +1,24 @@
+"use client";
+
 import { BUFFS, GEAR, QUESTS, TIERS } from "@/content";
+import { useConfigurator } from "./ConfiguratorProvider";
 
 /**
- * ConfiguratorShell Component (Phase 6.1b)
+ * ConfiguratorShell Component (Phase 6.2 - Solo Interactivity)
  *
- * Renders the static default-state DOM shell for tier=solo:
+ * Renders the configurator DOM shell with solo tier interactivity:
  * - #panel with steps 01 (mode), 02 (pick mission/gear), 03 (flagship, hidden), 04 (buffs, hidden), 03 (loadout/blueprint)
- * - #card with hero Laser Dolphin character sheet and initial stats
+ * - #card with hero character sheet and live stats/level
  * - #boxart with title, server lead, and burst badge
  *
- * Rendered as React Server Components using static domain data from src/content.
+ * Wired to ConfiguratorProvider (useReducer + configReducer + quote).
  */
 export function ConfiguratorShell() {
+  const { state, dispatch, q, currentQuest, level, stats } = useConfigurator();
+
   const soloTier = TIERS.solo;
   const squadTier = TIERS.squad;
   const combineTier = TIERS.combine;
-  const defaultQuest = QUESTS[0] ?? {
-    id: "brand",
-    name: "Brand identity",
-    desc: "Logo, system, guidelines.",
-    hero: "Laser Dolphin",
-    cls: "Striker",
-    p: 0,
-  };
 
   return (
     <>
@@ -49,52 +46,57 @@ export function ConfiguratorShell() {
           <div className="tiers" id="tiers">
             <button
               type="button"
-              className="tier on"
+              className={`tier${state.tier === "solo" ? " on" : ""}`}
               data-tier="solo"
-              aria-pressed="true"
+              aria-pressed={state.tier === "solo"}
+              onClick={() => dispatch({ type: "SET_TIER", tier: "solo" })}
             >
               <span>
                 <span className="t">{soloTier.name}</span>
                 <span className="k">{soloTier.sub}</span>
               </span>
               <span className="p">
-                ${soloTier.base.toLocaleString("en-US")}
-                <small></small>
+                <span className="cur">
+                  ${soloTier.base.toLocaleString("en-US")}
+                </span>
+                <span className="s">fixed fee</span>
               </span>
-              <span className="d">{soloTier.d}</span>
             </button>
+
             <button
               type="button"
-              className="tier mini"
+              className={`tier mini${state.tier === "squad" ? " on" : ""}`}
               data-tier="squad"
-              aria-pressed="false"
+              aria-pressed={state.tier === "squad"}
             >
-              <span className="badge">Most popular</span>
               <span>
                 <span className="t">{squadTier.name}</span>
                 <span className="k">{squadTier.sub}</span>
               </span>
               <span className="p">
-                from ${squadTier.base.toLocaleString("en-US")}
-                <small>/mo</small>
+                <span className="cur">
+                  ${squadTier.base.toLocaleString("en-US")}
+                </span>
+                <span className="s">/mo</span>
               </span>
-              <span className="d">{squadTier.d}</span>
             </button>
+
             <button
               type="button"
-              className="tier mini"
+              className={`tier mini${state.tier === "combine" ? " on" : ""}`}
               data-tier="combine"
-              aria-pressed="false"
+              aria-pressed={state.tier === "combine"}
             >
               <span>
                 <span className="t">{combineTier.name}</span>
                 <span className="k">{combineTier.sub}</span>
               </span>
               <span className="p">
-                from ${combineTier.base.toLocaleString("en-US")}
-                <small>/mo</small>
+                <span className="cur">
+                  ${combineTier.base.toLocaleString("en-US")}
+                </span>
+                <span className="s">/mo</span>
               </span>
-              <span className="d">{combineTier.d}</span>
             </button>
           </div>
         </section>
@@ -116,27 +118,32 @@ export function ConfiguratorShell() {
                 <span>Pick one</span>
               </div>
               <div className="opts radio">
-                {QUESTS.map((q) => {
-                  const isDefault = q.id === "brand";
+                {QUESTS.map((qItem) => {
+                  const on = state.mission === qItem.id;
                   return (
                     <button
-                      key={q.id}
+                      key={qItem.id}
                       type="button"
-                      className={`opt${isDefault ? " on" : ""}`}
-                      data-mission={q.id}
-                      aria-pressed={isDefault ? "true" : "false"}
+                      className={`opt${on ? " on" : ""}`}
+                      data-mission={qItem.id}
+                      aria-pressed={on}
+                      onClick={() =>
+                        dispatch({ type: "SET_MISSION", mission: qItem.id })
+                      }
                     >
                       <span className="ck" aria-hidden="true"></span>
                       <span className="ot">
-                        <b>{q.name}</b>
-                        <small>{q.desc}</small>
+                        <b>{qItem.name}</b>
+                        <small>{qItem.desc}</small>
                         <em>
-                          Summons · {q.hero}{" "}
-                          <span className="dom">{q.cls.toUpperCase()}</span>
+                          Summons · {qItem.hero}{" "}
+                          <span className="dom">{qItem.cls.toUpperCase()}</span>
                         </em>
                       </span>
                       <span className="op">
-                        {q.p ? `+$${q.p.toLocaleString("en-US")}` : "incl."}
+                        {qItem.p > 0
+                          ? `+$${qItem.p.toLocaleString("en-US")}`
+                          : "incl."}
                       </span>
                     </button>
                   );
@@ -151,27 +158,38 @@ export function ConfiguratorShell() {
                 <span>Optional</span>
               </div>
               <div className="opts">
-                {GEAR.map((e) => (
-                  <button
-                    key={e.id}
-                    type="button"
-                    className="opt"
-                    data-extra={e.id}
-                    aria-pressed="false"
-                  >
-                    <span className="ck" aria-hidden="true"></span>
-                    <span className="ot">
-                      <b>{e.name}</b>
-                      <small>{e.desc}</small>
-                      <em>Adds · {e.fx}</em>
-                    </span>
-                    <span className="op">+${e.p.toLocaleString("en-US")}</span>
-                  </button>
-                ))}
+                {GEAR.filter((e) => e.not !== state.mission).map((e) => {
+                  const on = state.extras.has(e.id);
+                  return (
+                    <button
+                      key={e.id}
+                      type="button"
+                      className={`opt${on ? " on" : ""}`}
+                      data-extra={e.id}
+                      aria-pressed={on}
+                      onClick={() =>
+                        dispatch({ type: "TOGGLE_EXTRA", gearId: e.id })
+                      }
+                    >
+                      <span className="ck" aria-hidden="true"></span>
+                      <span className="ot">
+                        <b>{e.name}</b>
+                        <small>{e.desc}</small>
+                        <em>Adds · {e.fx}</em>
+                      </span>
+                      <span className="op">
+                        +${e.p.toLocaleString("en-US")}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
-          <div className="nudge" id="nudge">
+          <div
+            className={`nudge${state.tier === "solo" && state.extras.size >= 2 ? " show" : ""}`}
+            id="nudge"
+          >
             <span>Bigger mission than one hero can carry? Bring a party.</span>
             <button type="button" data-tier="squad">
               Form a Full Crew
@@ -244,24 +262,32 @@ export function ConfiguratorShell() {
           <div className="bp" id="bp">
             <div className="bl">
               <span className="l">
-                <i style={{ background: "var(--fg)" }}></i>Mission ·{" "}
-                {defaultQuest.hero}
+                <i style={{ background: "var(--fg)" }}></i>
+                {`Mission · ${currentQuest.hero}`}
               </span>
               <span className="n">
-                ${soloTier.base.toLocaleString("en-US")}
+                {"$" + q.T.base.toLocaleString("en-US")}
               </span>
             </div>
             <div className="bl mut">
               <span className="l">
-                <i style={{ background: "var(--dim)" }}></i>Mission included
+                <i style={{ background: "var(--dim)" }}></i>
+                {"Mission included"}
               </span>
               <span className="n">incl.</span>
             </div>
+            {q.lines.map((l) => (
+              <div key={l.name} className="bl">
+                <span className="l">
+                  <i style={{ background: l.c }}></i>
+                  {l.name}
+                </span>
+                <span className="n">{"+$" + l.p.toLocaleString("en-US")}</span>
+              </div>
+            ))}
             <div className="bl total">
               <span>Estimated fixed fee</span>
-              <span className="n">
-                ${soloTier.base.toLocaleString("en-US")}
-              </span>
+              <span className="n">{"$" + q.total.toLocaleString("en-US")}</span>
             </div>
           </div>
           <button className="fu wide" type="button" data-formup="">
@@ -280,7 +306,7 @@ export function ConfiguratorShell() {
       <section className="card glass" id="card" aria-label="Character sheet">
         <div className="hd">
           <span id="chd">Character</span>
-          <span id="cid">LV 12</span>
+          <span id="cid">LV {level}</span>
         </div>
         <div className="bd">
           <canvas
@@ -290,102 +316,28 @@ export function ConfiguratorShell() {
             width="132"
           ></canvas>
           <div className="cn" id="cn">
-            {defaultQuest.hero}
+            {currentQuest.hero}
           </div>
           <div className="cc" id="cc">
-            Class: {defaultQuest.cls} · {defaultQuest.name}
+            Class: {currentQuest.cls} · {currentQuest.name}
           </div>
           <div className="stats" id="stats">
-            <div className="stat">
-              <span title="Strategy">INT · Strategy</span>
-              <span className="bar">
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-              </span>
-              <b>2</b>
-            </div>
-            <div className="stat">
-              <span title="Design">DEX · Design</span>
-              <span className="bar">
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-              </span>
-              <b>7</b>
-            </div>
-            <div className="stat">
-              <span title="Production">STR · Production</span>
-              <span className="bar">
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-              </span>
-              <b>2</b>
-            </div>
-            <div className="stat">
-              <span title="Operations">STA · Operations</span>
-              <span className="bar">
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-              </span>
-              <b>2</b>
-            </div>
-            <div className="stat">
-              <span title="Speed">SPD · Speed</span>
-              <span className="bar">
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className="on"></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-                <i className=""></i>
-              </span>
-              <b>6</b>
-            </div>
-          </div>
-          <div className="party" id="party"></div>
-          <div className="motto">
-            <span>Motto</span>
-            <q id="motto">{soloTier.motto}</q>
+            {stats.map(([code, name, val]) => (
+              <div key={code} className="stat">
+                <span title={name}>{`${code} · ${name}`}</span>
+                <span className="bar">
+                  {Array.from({ length: 10 }).map((_, idx) => (
+                    <i key={idx} className={idx < val ? "on" : ""} />
+                  ))}
+                </span>
+                <b>{val}</b>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Boxart Visual Title & Badge */}
+      {/* Boxart Visual Branding */}
       <div className="boxart" id="boxart">
         <div>
           <h1 className="title">
@@ -393,19 +345,14 @@ export function ConfiguratorShell() {
             <br />
             <span>creative</span> department.
           </h1>
-          <div className="fp">
-            Server: Concepful · Senior lead on every build · Four encounters to
-            clear
-          </div>
+          <div className="fp">Senior lead on every build</div>
         </div>
         <div className="burst">
-          No pay
-          <br />
-          to win.
-          <br />
-          Priced
-          <br />
-          up front.
+          <div>
+            <b>NO MOVES</b>
+            <br />
+            WASTED
+          </div>
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ import { Header } from "@/components/shell/Header";
 import { SceneHost } from "@/components/scene/SceneHost";
 import { AppModeSync } from "@/components/scene/AppModeSync";
 import { ConfiguratorShell } from "@/components/configurator/ConfiguratorShell";
+import { ConfiguratorProvider } from "@/components/configurator/ConfiguratorProvider";
 import { SkipLink } from "@/components/shell/SkipLink";
 import { STORY_SECTIONS } from "@/content";
 import "./globals.css";
@@ -67,13 +68,15 @@ export default function RootLayout({
       lang="en"
       className={`${russoOne.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="font-sans antialiased" suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <SceneHost />
         <AppModeSync />
         <SkipLink />
-        <Header />
-        <ConfiguratorShell />
-        {children}
+        <ConfiguratorProvider>
+          <Header />
+          <ConfiguratorShell />
+          {children}
+        </ConfiguratorProvider>
         <Footer />
         <GuildModal />
       </body>

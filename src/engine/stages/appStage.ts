@@ -24,7 +24,7 @@ export interface BuildState {
 
 export const DEFAULT_BUILD_STATE: BuildState = {
   tier: "solo",
-  reach: "regional",
+  reach: "local",
   mission: "brand",
   objective: "gtm",
 };

@@ -1355,3 +1355,75 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
     - **Check 7 (Console & Hydration Audit):**
       - Console errors: **0** (**PASS**).
       - Hydration warnings: **0** (**PASS**).
+
+## Part 4.21: Real Parity Verification, Root Cause Fixes & Phase 6.2 First Slice (Solo Interactivity)
+
+- **Task 0 (Real Parity Verification Helpers & Checks):**
+  - **Shared Compare Helper (`shared_compare_helper.mjs`):**
+    - Exact pixel comparison (tolerance 0: `dr > 0 || dg > 0 || db > 0 || da > 0`).
+    - 3-load noise floor measurements across all target subtrees (`.top .seg`, `.top .tr`, `#panel`, `#card`, `#boxart`) at viewports 1280 and 390:
+      - Ref vs Ref noise floor: **0 px (0.0000%)** across all subtrees.
+      - Reb vs Reb noise floor: **0 px (0.0000%)** across all subtrees.
+    - Positive control validation: Applied style mutation on rebuild elements and verified every control strictly exceeded noise floor (`#panel` diff 22,875 px / 8.1232%, maxComponentSize=12,049; `#boxart` diff 28,833 px / 28.6816%; `#card` diff 1,396 px / 1.3236%; `.top .seg` diff 1,013 px / 4.6605%; `.top .tr` diff 706 px / 5.5810%).
+    - Max cluster per $16 \times 16$ block: verified $\le 256$ px for all components.
+  - **Exhaustive Computed Styles Sweep (`task0b_computed_styles.mjs`):**
+    - Evaluated computed styles across every single DOM element in all 5 subtrees (Ref=337, Reb=337 elements total).
+    - Excluded custom properties (`--*`), user-agent / Next.js font-loader fallbacks, `-webkit-*`, and 0px width border styles.
+    - Non-benign differences: **0** across `.top .seg` (1280 & 390), `.top .tr` (1280 & 390), `#card` (1280 & 390), and `#boxart` (1280 & 390).
+    - In `#panel`: The sole difference across all 232 elements is sub-pixel text measurement (`inline-size`: 152.25px vs 152.266px, 0.016px difference on `#bp .bl span.l`).
+  - **AppModeSync Real Scroll & WebGL Blocked Verification (`task0c_app_mode_sync_verify.mjs`):**
+    - Evaluated scroll behavior across all 7 sections (`intro`, `classes`, `logi`, `rules`, `stages`, `outro`, `app`) at viewports 1280 and 390.
+    - Standard environment: `body.classList.contains("app")` is false on story scenes 1-6 and true on scene 7 (`app`) on both reference and rebuild.
+    - Toggle boundary measured to 2px resolution:
+      - Viewport 1280: RefToggleY = **9200**, RebToggleY = **9200**, Difference = **0 px**!
+      - Viewport 390: RefToggleY = **9707**, RebToggleY = **9707**, Difference = **0 px**!
+    - WebGL Blocked test (`--disable-gpu --disable-webgl` and `getContext = () => null` on rebuild): `AppModeSync` operates as an independent client island; toggled `body.app` at exact identical scroll coordinates (**9200** at 1280, **9707** at 390).
+
+- **Task 1 (Root Cause Resolution for Visual Diffs):**
+  - **Root Causes Identified & Resolved:**
+    1. **Tailwind button reset height drift:** In reference, buttons default to browser agent stylesheet (`font-size: 13.3333px; line-height: normal;`), whereas Tailwind reset forced `font-size: 14px` on `.tier.mini .p`, shifting `#st-mode` height from 232.046875px to 234px (+2px drift across all subsequent groups). Adding `button.tier, button.opt { font-size: 13.3333px; line-height: normal; }` restored exact sub-pixel box match (`232.046875px` vs `232.046875px` on `#st-mode`, `1055.4px` vs `1055.4px` on `#st-pick`).
+    2. **.burst background color:** In `src/styles/configurator-shell.css`, `.burst` had `background: var(--pro)` (pink, ref line 1302) overridden by reference line 1696 `background: var(--sun)` (yellow). Updated to `var(--sun)`.
+    3. **.title text-shadow:** In reference lines 1681-1687, `.title { text-shadow: 3px 3px 0 var(--redLo); }` and `.title span { text-shadow: 3px 3px 0 #141624; }` overrode line 1285. Updated in `configurator-shell.css`.
+    4. **.stat .bar i.on background:** Line 1698 sets `.stat .bar i.on { background: var(--red); }`. Updated from `var(--pro)` to `var(--red)`.
+    5. **Font smoothing:** Removed `antialiased` class from `<body>` in `layout.tsx`, restoring native sub-pixel antialiasing (`-webkit-font-smoothing: auto`) matching reference HTML.
+  - **Post-Fix Visual Diff Metrics (`task1_explain_diffs.mjs`):**
+    - `#panel` @ 1280: **0.0426%** (120 px / 281,600 px; top cluster = 42 px $\le 256$ px).
+    - `#panel` @ 390: **0.0589%** (97 px / 164,580 px; top cluster = 3 px).
+    - `#boxart` @ 1280: **0.0303%** (30 px / 98,880 px; top cluster = 2 px).
+    - `.top .tr` @ 390: **2.3707%** (99 px / 4,176 px; top cluster = 99 px $\le 256$ px, text antialiasing on dark glass).
+
+- **Task 2 (Truth Sweep Rerun & Canonical Accounting):**
+  - **CSV Comparison at 390 (scrollY 0..600):**
+    - Evaluated `truth_sweep_reseeded.csv` (Part 4.13, SHA-256: `2875c1a1d55ecb626a810540bc31ec16d7bd3cc90be3e1067305bc48033bad8f`) against HEAD.
+    - Side-by-side rows 0..600: exactly **0 rows moved scene**; diffPx and scene keys are identical across all rows.
+  - **Unchanged Part 4.13 Sweep Rerun at HEAD (`task0_reseeded_sweep.mjs`, SHA-256: `21a7dfeb...`):**
+    - Output saved to `truth_sweep_reseeded_head.csv` (11,704 bytes, SHA-256: `df6c63b7ad60492dd3607771e8ba846a4f780822fa706911c750b6910606b29f`).
+    - Overall story scenes (184 rows): min = **0.0006%**, median = **0.4487%** (PASS $\le 1.0\%$), max = **1.0513%** (PASS $\le 3.0\%$).
+    - Rows > 3.0% in story scenes: **0 rows (None)**.
+  - **Live State Alignment:**
+    - Reference live variables at scrollY=9200: `tier: "solo", mission: "brand", reach: "local", billing: "mo", objs: ["gtm"], buffs: [], extras: []`.
+    - Rebuild `createEngine.getBuildState()`: corrected default `reach: "regional"` to `reach: "local"` in `src/engine/stages/appStage.ts` (`tier: "solo", reach: "local", mission: "brand", objective: "gtm"`). 100% exact match.
+    - 10 unported app scene WebGL rows (Phase 7): 390 (34.34% to 17.39%), 1280 (18.24% to 16.19%).
+
+- **Task 3 (Phase 6.2 First Slice: Solo Interactivity):**
+  - Implemented `ConfiguratorProvider` client island (`src/components/configurator/ConfiguratorProvider.tsx`) owning state via `useReducer(configReducer, INITIAL_CONFIG_STATE)` and `quote()`.
+  - Wired live solo interactions:
+    - Tier button in `.top .seg` for solo dispatches `SET_TIER`.
+    - Mission radio list in `#st-pick` (`QUESTS`) dispatches `SET_MISSION`.
+    - Gear optional extras in `#st-pick` (`GEAR`, filtered by `not !== mission`) dispatches `TOGGLE_EXTRA`.
+    - Character sheet `#card` live updates: Level `#cid` (`LV 12` $\to$ `LV 30`), Hero name `#cn`, Class `#cc`, and 5-stat bar scores (`#stats`).
+    - Loadout blueprint `#bp` and header price line `#pr`, `#prs` live update totals.
+    - `#nudge` toggles `.show` when solo has $\ge 2$ extras selected.
+  - **Click Acceptance Sequence (`task3_click_acceptance.mjs`):**
+    - Step 0 (Initial Solo Baseline): Price=$4,000, Level=LV 12, Hero=Laser Dolphin, Nudge=false (**DOM Match: true**).
+    - Step 1 (Click Mission 'web'): Price=$4,000, Level=LV 12, Hero=Grid Manta, Nudge=false (**DOM Match: true**).
+    - Step 2 (Click Gear Extra 'x-illus'): Price=$5,500, Level=LV 18, Hero=Grid Manta, Nudge=false (**DOM Match: true**).
+    - Step 3 (Click Gear Extra 'x-rush'): Price=$6,700, Level=LV 24, Hero=Grid Manta, Nudge=true (**DOM Match: true**).
+    - Step 4 (Click Mission 'motion'): Price=$8,700, Level=LV 30, Hero=Reel Dragonfly, Nudge=true (**DOM Match: true**).
+    - Step 5 (Click Seg Button Solo): Price=$8,700, Level=LV 30, Hero=Reel Dragonfly, Nudge=true (**DOM Match: true**).
+    - Data parity match across all 6 real-click interaction steps: **100% TRUE**.
+
+- **Production Gate & Integrity:**
+  - Gate checks: `lint` (PASS, exit 0), `typecheck` (PASS, exit 0), `format:check` (PASS, exit 0), `test` (4,119 passed across 13 files, exit 0), `build` (production with NEXT_PUBLIC_E2E=1, PASS, exit 0), `check-compiled-css` (PASS, exit 0).
+  - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production server.
+  - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).

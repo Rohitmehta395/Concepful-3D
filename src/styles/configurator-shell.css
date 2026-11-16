@@ -231,7 +231,7 @@
   border-radius: 1px;
 }
 .stat .bar i.on {
-  background: var(--pro);
+  background: var(--red);
 }
 .stat b {
   color: var(--fg);
@@ -269,13 +269,11 @@
   line-height: 0.95;
   transform: skewX(-8deg);
   color: var(--bone);
-  text-shadow:
-    3px 3px 0 #8e1c29,
-    0 0 18px rgba(0, 0, 0, 0.35);
+  text-shadow: 3px 3px 0 var(--redLo);
 }
 .title span {
   color: var(--red);
-  text-shadow: 3px 3px 0 #2a292f;
+  text-shadow: 3px 3px 0 #141624;
 }
 .fp {
   font-family: var(--mono);
@@ -290,7 +288,7 @@
   flex: none;
   width: 92px;
   height: 92px;
-  background: var(--pro);
+  background: var(--sun);
   color: #1a1206;
   display: grid;
   place-items: center;
@@ -326,4 +324,29 @@
   .intro .mt {
     display: block;
   }
+}
+
+/* Button and canvas normalization to counter Tailwind reset */
+button.tier,
+button.opt {
+  line-height: normal;
+  font-size: 13.3333px;
+}
+
+.panel button {
+  line-height: normal;
+}
+
+.billing button em {
+  line-height: normal;
+}
+
+.top button,
+.panel button,
+.card button {
+  appearance: auto;
+}
+
+#patch {
+  vertical-align: baseline;
 }
