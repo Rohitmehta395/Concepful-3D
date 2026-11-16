@@ -245,21 +245,8 @@ export function createEngine(
 
     // 1. storyScan
     const state = scrollDriver.update(time);
-    const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
-    if (
-      state.activeScene !== previousActiveScene ||
-      scrollY !== lastFramingScrollY
-    ) {
-      if (state.activeScene !== previousActiveScene) {
-        previousActiveScene = state.activeScene;
-        snap = true;
-        fadeT = time;
-      }
-      lastFramingScrollY = scrollY;
-      currentTargetBox = getTargetBox();
-    }
 
-    // Update beats and clock in active section DOM (reference lines 11987-12000)
+    // Update beats and clock in active section DOM before framing measurement (matches reference lines 11987-12000)
     if (typeof document !== "undefined") {
       const activeEl = document.querySelector(
         `[data-scene="${state.activeScene}"]`
@@ -277,6 +264,20 @@ export function createEngine(
           });
         }
       }
+    }
+
+    const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
+    if (
+      state.activeScene !== previousActiveScene ||
+      scrollY !== lastFramingScrollY
+    ) {
+      if (state.activeScene !== previousActiveScene) {
+        previousActiveScene = state.activeScene;
+        snap = true;
+        fadeT = time;
+      }
+      lastFramingScrollY = scrollY;
+      currentTargetBox = getTargetBox();
     }
 
     // 2. easeBox (reference line 7366: const kb = SNAP || reduce ? 1 : Math.min(1, dt / 180);)

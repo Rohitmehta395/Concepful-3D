@@ -60,8 +60,8 @@ export function measureBox(
     }
   } else if (sceneMode === "app") {
     if (W < 900) {
-      // TODO(phase6): measured from reference at W=390 (#panel.top = 436 at #build top, header.top bottom gap -> y0 = 119.34375)
-      const prTop = elements?.panelTop ?? 436; // TODO(phase6): measured from reference at W=390
+      // TODO(phase6): measured from reference at W=390 (#panel.top = 414 at #build top, header.top bottom gap -> y0 = 119.34375)
+      const prTop = elements?.panelTop ?? 414; // TODO(phase6): measured from reference at W=390
       x0 = 10;
       x1 = W - 10;
       // TODO(phase6): measured from reference at W=390 (119.34375 when #panel is absent in Phase 4)

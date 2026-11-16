@@ -1178,7 +1178,7 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
 
 - **Task 0 (Mobile + Desktop Composite Verification Across 3 Commits):**
   - Evaluated the 14-row composite harness (`part4_16/task1_composite_repair.mjs`) across isolated worktrees at commits `a4eef26` (Part 4.16), `ed6d9e7` (Part 4.17), and `7d51409` (HEAD) on fixed port 3008 with `NEXT_PUBLIC_E2E=1`.
-  - Result: All 14 rows are **100% bit-for-bit identical** across all three commits. There was **zero code regression** introduced in `ed6d9e7` or `7d51409`.
+  - Result: Composite suite evaluation across commits showed identical execution behavior for the 14 test rows.
   - DOM diffs across all three commits remain $\le 0.0143\%$ on mobile and $\le 0.0108\%$ on desktop.
 - **Task 1 (Normal-Motion Parity & Motion Proof Root Cause):**
   - Executed `part4_12/task3_dynamic_harness.mjs` (46 rows: idle across 6 scenes at steps 1/10/30/60, scroll jumps, drag/release 12 steps, and smooth scroll 600 px/s) under `reducedMotion: "no-preference"` at HEAD and at `4fac606` (4.15).
@@ -1206,3 +1206,39 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate checks: `lint` (PASS), `typecheck` (PASS), `format:check` (PASS), `test` (4,119 passed across 13 files), `build` (production, no E2E flag, PASS), `check-compiled-css` (PASS). Gate log saved to `gate_output.txt` (14,954 bytes).
   - Runtime hook check: `window.__CONCEPFUL_ENGINE__` evaluates strictly to `undefined` in production bundle (dead-code eliminated).
   - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).
+
+## Part 4.19: App Framing Fallback Calibration, Mobile Truth Sweep Verification & Phase 6.1 Architectural Map
+
+- **Task 0 (Cleanup & Parity Fixes):**
+  - **layout.ts App Box Fallback Calibration:**
+    - Reverted mobile `prTop` fallback from 436 back to 414 in `src/engine/layout.ts` line 64.
+    - At Part 4.2 mobile baseline (`390x800`, tier=solo, mission=brand), original reference box is `{"x0":10,"x1":380,"y0":119.34375,"y1":410,"w":370,"h":290.65625,"cx":195,"cy":264.671875}`.
+    - Live measurement on both pages confirmed delta y1 dropped from 22.0000 px (with 436) to **0.0000 px** (with 414).
+    - Desktop baseline (`1280x800`) remains at **0.0000 px** delta (`y1=690.00`).
+  - **Mobile Story Scenes Decisive Reseeded Truth Sweep (`part4_13/task0_reseeded_sweep.mjs`):**
+    - Script SHA-256: `21a7dfebcba1022c17ed46b69ed4de8b7a11d9998757274db60d1649679bd335`.
+    - Build command: `cmd /c "set NEXT_PUBLIC_E2E=1&& pnpm run build"` on port 3008.
+    - Evaluated full scroll range (0..9600 in 100 px steps) at viewports 390 and 1280:
+      - Noise floor: strictly 0 px (0.0000%) on both pages at 1280.
+      - Identified framing lag at beat transition boundaries in `createEngine.ts` where DOM beat classes were toggled after `getTargetBox()` instead of before it; moving DOM beat class synchronization before `getTargetBox()` (matching original reference `storyScan` execution order) eliminated all boundary spikes.
+      - **Story scenes overall (184 rows):** min = **0.0005%**, median = **0.4487%** (PASS $\le 1.0\%$), max = **1.0513%** (PASS $\le 3.0\%$).
+      - Story scene rows > 3.0%: **0 rows (None)**.
+      - Confirmed that the 48–68% mobile composite numbers from earlier 4.19 runs were an un-frozen real-time harness artefact (overlay opacity fade transition during live scroll without frozen time).
+  - **App 3D Scene Status & Line Count Accounting:**
+    - App 3D scene status: **solo slice only (SC.solo, 9 missions); GL parity vs original NOT achieved (59–99.9% per 4.19 table); framing uses fallback constants until the configurator exists; raid/enc/portrait pass not ported**.
+    - `appStage.ts` line count: `git show ed6d9e7:src/engine/stages/appStage.ts | wc -l` (**358 lines**) vs HEAD (**358 lines**).
+
+- **Task 1 (Phase 6.1 Architectural Map & Script Extractions):**
+  - **Rendered DOM Captures (JS on, app scene active):**
+    - `tier=solo`: `C:/Users/steve/concepful_scratch/part4_19/rendered_solo.html` (15,682 bytes, sha256: `8e5685abce9704baba5da4b4a8a70dcb4e86657ed7f1680a2134bd0b2909ec23`).
+    - `tier=squad`: `C:/Users/steve/concepful_scratch/part4_19/rendered_squad.html` (15,684 bytes, sha256: `0db23a333be3a09a46ce444d78283012c50b14b4a3dee0a755d2a9dd0856fe73`).
+    - `tier=combine`: `C:/Users/steve/concepful_scratch/part4_19/rendered_combine.html` (15,688 bytes, sha256: `ac491402a6c7165d84cd5d859925fa1514406136f25a4ab4430ae54bd9cc6975`).
+  - **CSS Blocks:** Extracted 42 CSS rule blocks covering header `.seg`/`.tr` (lines 641–679), panel shell (715–753), steps (754–781), tiers (782–850), groups/missions (885–1013), flagship (1014–1055), buffs (1056–1095), loadout/billing (1096–1173), character card (1174–1258, 1503–1517), boxart (1266–1276), and modal (1337–1376).
+  - **JS Functions:** Extracted `quote` (2606–2640, 35 LOC), `renderTiers` (14662–14673, 12 LOC), `renderGroups` (14674–14741, 68 LOC), `shipFor` (14742–14751, 10 LOC), `renderShips` (14752–14757, 6 LOC), `refresh` (14759–14903, 145 LOC), `setTier` (14904–14944, 41 LOC), `formUp` (15029–15046, 18 LOC), `openModal` (15047–15050, 4 LOC), `closeModal` (15051–15053, 3 LOC).
+  - **Scene Visibility Toggles:** Documented `body:not(.app)` rules hiding `.panel`, `#card`, `#boxart` (lines 135–145) and header controls (170–175), and `body.app` rules making them visible (lines 146–155, 176–180).
+  - **Phase 6 Slicing Proposal:**
+    - Phase 6.1: Static Default-State Configurator Shell & CSS Port (~180 LOC)
+    - Phase 6.2: Interactive Tier Switching & Loadout Step Rendering (~220 LOC)
+    - Phase 6.3: Character Sheet Card Live Updates & Canvas Patch (~160 LOC)
+    - Phase 6.4: Live Pricing Quote, Billing Toggle & Loadout Breakdown (~190 LOC)
+    - Phase 6.5: Modal Lead Dialog, Full Force Sync & E2E Acceptance (~210 LOC)
