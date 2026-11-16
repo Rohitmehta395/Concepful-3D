@@ -1,0 +1,658 @@
+/**
+ * Concepful Mech Builder - Configurator & App-Mode Stylesheet (Phase 6.1a)
+ * Source: reference/Concepful_Mech_Builder.html
+ * Source Line Ranges: 120-145, 640-679, 713-733, 753-850, 870-890, 930-1026, 1085-1119, 1172-1208, 1264-1276, 1448-1517, 1575-1597, 1616-1648, 1693-1697, 1765-1768, 1784-1799
+ * Matched Rules Count: 82
+ * Generated mechanically by task2_generate_configurator_css.mjs. DO NOT EDIT BY HAND.
+ */
+
+/* Line 120-124 */
+body:not(.app) .seg,
+body:not(.app) .tr {
+  display: none;
+}
+
+/* Line 124-127 */
+body.app .navl {
+  display: none;
+}
+
+/* Line 127-134 */
+.panel,
+.card,
+.boxart {
+  transition:
+    opacity 0.35s,
+    transform 0.35s;
+}
+
+/* Line 134-141 */
+body:not(.app) .panel,
+body:not(.app) .card,
+body:not(.app) .boxart {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+}
+
+/* Line 141-145 */
+body:not(.app) .panel *,
+body:not(.app) .card * {
+  visibility: hidden;
+}
+
+/* Line 640-646 */
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+}
+
+/* Line 646-656 */
+.seg button {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Line 656-659 */
+.seg button:hover {
+  color: var(--fg);
+}
+
+/* Line 659-663 */
+.seg button.on {
+  background: var(--red);
+  color: #fff;
+}
+
+/* Line 663-672 */
+.seg button small {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  opacity: 0.75;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Line 672-679 */
+.tr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 5px 5px 16px;
+  border-radius: 999px;
+}
+
+/* Line 713-726 */
+.panel {
+  position: fixed;
+  z-index: 9;
+  top: calc(80px + var(--st));
+  bottom: calc(16px + var(--sb));
+  left: var(--gl);
+  width: 400px;
+  border-radius: 18px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 18px 18px 22px;
+}
+
+/* Line 726-729 */
+.panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Line 729-733 */
+.panel::-webkit-scrollbar-thumb {
+  background: var(--line2);
+  border-radius: 8px;
+}
+
+/* Line 753-758 */
+.step {
+  padding-top: 20px;
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+/* Line 758-763 */
+.sh {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+/* Line 763-769 */
+.sh .n {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* Line 769-776 */
+.sh h2 {
+  font-family: var(--display);
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* Line 786-798 */
+.tier {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  text-align: left;
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 12px;
+  transition: border-color 0.15s;
+}
+
+/* Line 798-801 */
+.tier:hover {
+  border-color: var(--line2);
+}
+
+/* Line 801-806 */
+.tier.on {
+  border-color: var(--red);
+  background: var(--red-soft);
+  box-shadow: inset 0 0 0 1px var(--red);
+}
+
+/* Line 806-812 */
+.tier .t {
+  font-family: var(--display);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Line 812-820 */
+.tier .k {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* Line 820-825 */
+.tier .p {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Line 825-830 */
+.tier .p small {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Line 830-836 */
+.tier .d {
+  grid-column: 1/-1;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Line 836-840 */
+.tier.mini {
+  padding: 8px 12px;
+  opacity: 0.78;
+}
+
+/* Line 840-843 */
+.tier.mini:hover {
+  opacity: 1;
+}
+
+/* Line 843-847 */
+.tier.mini .d,
+.tier.mini .k {
+  display: none;
+}
+
+/* Line 847-850 */
+.tier.mini .t {
+  font-size: 14px;
+}
+
+/* Line 870-884 */
+.tier .badge {
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  background: var(--pro);
+  color: #1a1206;
+  font-family: var(--display);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  transform: rotate(2deg);
+}
+
+/* Line 884-887 */
+.grp {
+  margin-top: 16px;
+}
+
+/* Line 887-890 */
+.grp:first-child {
+  margin-top: 0;
+}
+
+/* Line 930-935 */
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Line 935-949 */
+.opt {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  text-align: left;
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 10px;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+/* Line 949-952 */
+.opt:hover {
+  border-color: var(--line2);
+}
+
+/* Line 952-961 */
+.opt .ck {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--line2);
+  margin-top: 1px;
+  display: grid;
+  place-items: center;
+}
+
+/* Line 961-965 */
+.opt.on {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+
+/* Line 965-969 */
+.opt.on .ck {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+/* Line 969-978 */
+.opt.on .ck::after {
+  content: "";
+  width: 7px;
+  height: 4px;
+  border: 2px solid #fff;
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+/* Line 978-981 */
+.opts.radio .opt .ck {
+  border-radius: 50%;
+}
+
+/* Line 981-989 */
+.opts.radio .opt.on .ck::after {
+  width: 6px;
+  height: 6px;
+  border: 0;
+  background: #fff;
+  border-radius: 50%;
+  transform: none;
+}
+
+/* Line 989-992 */
+.opt .ot {
+  min-width: 0;
+}
+
+/* Line 992-997 */
+.opt b {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Line 997-1003 */
+.opt small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* Line 1003-1013 */
+.opt em {
+  display: block;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 3px;
+}
+
+/* Line 1013-1016 */
+.opt.on em {
+  color: var(--pro);
+}
+
+/* Line 1016-1023 */
+.opt .op {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* Line 1023-1026 */
+.opt.on .op {
+  color: var(--fg);
+}
+
+/* Line 1085-1093 */
+.toggle {
+  display: inline-flex;
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 10px;
+}
+
+/* Line 1093-1102 */
+.toggle button {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Line 1102-1106 */
+.toggle button.on {
+  background: var(--fg);
+  color: #16161c;
+}
+
+/* Line 1106-1113 */
+.toggle em {
+  font-style: normal;
+  font-size: 10px;
+  color: var(--red);
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+/* Line 1113-1119 */
+.bp {
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
+/* Line 1172-1182 */
+.card {
+  position: fixed;
+  z-index: 8;
+  top: calc(80px + var(--st));
+  right: var(--gr);
+  width: 256px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Line 1182-1193 */
+.card .hd {
+  background: var(--red);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Line 1193-1196 */
+.card .bd {
+  padding: 12px;
+}
+
+/* Line 1196-1202 */
+.card .cn {
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Line 1202-1208 */
+.card .cc {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Line 1264-1276 */
+.boxart {
+  position: fixed;
+  z-index: 7;
+  left: calc(var(--gl) + 424px);
+  right: var(--gr);
+  bottom: calc(14px + var(--sb));
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  /* Line 1448-1451 */
+  .card {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Line 1458-1462 */
+  .seg {
+    order: 3;
+    width: 100%;
+  }
+
+  /* Line 1462-1466 */
+  .seg button {
+    flex: 1;
+    padding: 7px 6px;
+  }
+
+  /* Line 1466-1469 */
+  .tr .fu {
+    display: none;
+  }
+
+  /* Line 1469-1479 */
+  .panel {
+    top: auto;
+    height: 50%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    border-radius: 18px 18px 0 0;
+    padding: 16px var(--gr) calc(18px + var(--sb)) var(--gl);
+  }
+
+  /* Line 1479-1482 */
+  .boxart {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Line 1490-1495 */
+  .fu,
+  .tier,
+  .opt {
+    transition: none;
+  }
+}
+
+/* Line 1502-1508 */
+.party {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Line 1508-1517 */
+.party .ph {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Line 1575-1581 */
+#patch {
+  width: 132px;
+  height: 132px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+/* Line 1587-1591 */
+.card .cn,
+.card .cc {
+  text-align: center;
+}
+
+/* Line 1591-1597 */
+.flag {
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Line 1616-1622 */
+.pips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 10px 0 8px;
+}
+
+/* Line 1622-1632 */
+.pips span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Line 1632-1637 */
+.pips i {
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Line 1637-1640 */
+.pips .on i {
+  background: var(--pro);
+}
+
+/* Line 1640-1643 */
+.pips .cur {
+  color: var(--fg);
+}
+
+/* Line 1643-1648 */
+.flag p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Line 1693-1697 */
+.tier .badge,
+.burst {
+  background: var(--sun);
+}
+
+/* Line 1765-1768 */
+body.app .wmark {
+  opacity: 0.45;
+}
+
+@media (max-width: 900px) {
+  /* Line 1784-1787 */
+  body.app .wmark {
+    display: none;
+  }
+}
+
+/* Line 1791-1799 */
+.opt .say {
+  display: block;
+  font-size: 12px;
+  color: #fff;
+  font-style: italic;
+  opacity: 0.85;
+  margin-top: 2px;
+}
