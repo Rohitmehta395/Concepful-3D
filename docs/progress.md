@@ -1242,3 +1242,61 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
     - Phase 6.3: Character Sheet Card Live Updates & Canvas Patch (~160 LOC)
     - Phase 6.4: Live Pricing Quote, Billing Toggle & Loadout Breakdown (~190 LOC)
     - Phase 6.5: Modal Lead Dialog, Full Force Sync & E2E Acceptance (~210 LOC)
+
+## Part 4.20: Beat-Order Fix Verification, Real Interaction Phase 6 Architecture Map & Phase 6.1a CSS Port
+
+- **Task 0: Beat-Order Fix Proof & Regression Bisection:**
+  - **Regression Commit Identification:**
+    - Reseeded sweep (`part4_13/task0_reseeded_sweep.mjs`, SHA-256: `21a7dfebcba1022c17ed46b69ed4de8b7a11d9998757274db60d1649679bd335`) evaluated across historical worktrees:
+      - `4fac606`: 5 rows > 3% (worst 64.57% at 390/1000).
+      - `ed6d9e7`: 5 rows > 3% (worst 64.57% at 390/1000).
+      - `eb81200` (`70c480b~1`): 5 rows > 3% (worst 64.57% at 390/1000).
+    - Hunk bisection identified commit `ee239f9` (Part 4.14) as the origin, where `currentTargetBox = getTargetBox()` was placed before `activeEl.querySelector("[data-beats]")` DOM class updates. At beat transition thresholds, `.beat.on small` expanded DOM card heights after box measurement, introducing stale framing deltas.
+    - Commit `70c480b` restored the reference execution order (DOM beat synchronization precedes framing).
+  - **HEAD Sweep Metrics (`truth_sweep_reseeded_head.csv`, 11,687 bytes, sha256: `3f48ae0efc1a02f6f6fd8a13d88af1f18c154e39f53aadd760da72e44c4903cf`):**
+    - All 184 story-scene rows: min = **0.0005%**, median = **0.4487%**, max = **1.0513%**.
+    - Story rows > 3.0%: **0 rows (None)**.
+    - App scene frames (10 rows): min = **16.1629%**, median = **22.1547%**, max = **28.8878%** (canvas-level stage delta before full configurator/stage completion, reconciled with 59–99.9% full-page DOM numbers in prior docs).
+  - **Composite Parity Audit (`part4_16/task1_composite_repair.mjs`, 14 rows):**
+    - At `eb81200`: `mobile_390_scene_logi` at 67.98% (GL diff 73.79%), `mobile_390_scene_stages` at 62.58% (GL diff 77.07%), `mobile_390_scene_classes` at 48.63% (GL diff 57.32%).
+    - At `70c480b`: `mobile_390_scene_logi` dropped to **0.8321%** (GL diff 0.5869%), `mobile_390_scene_classes` dropped to **4.0734%** (GL diff 2.8564%), `mobile_390_scene_stages` dropped to **13.9625%** with GL diff dropping from 77.07% to **0.4958%** (residual is 13.51% 2D #cv stage overlay). The 48–68% GL divergence completely disappeared.
+  - **appStage.ts Line Counts:**
+    - `ed6d9e7`: 386 lines
+    - `7d51409`: 386 lines
+    - HEAD: 386 lines
+
+- **Task 1: Real-Interaction Phase 6 Architecture Map:**
+  - **DOM Captures by Real Interaction (1280x800 & 390x844):**
+    - Controls interacted: `.seg button[data-tier="solo"]`, `button[data-mission="web"]`, `button[data-extra="x-rush"]`, `.seg button[data-tier="squad"]`, `button[data-obj="product"]`, `.seg button[data-tier="combine"]`, `button[data-buff="flow"]`, `button[data-buff="intel"]`.
+    - Captures saved:
+      - `dom_interactive_solo.html`: 459,789 bytes, sha256: `b2ca35d5d46bfec7d682f28ddf8d2eea992caadd0265ccb6ed1beaf6979bb878`
+      - `dom_interactive_squad.html`: 458,931 bytes, sha256: `f01f1960fac3558805ea9f956526e64f9db0d4037d916f46331621755f356d00`
+      - `dom_interactive_combine.html`: 458,015 bytes, sha256: `5945aac056ed9dd2652efb86216a89f118669df126967c7605630e03f28343de`
+    - All 3 tier captures verified distinct in SHA-256 and DOM structure.
+  - **CSS Parser Extraction:**
+    - Character-level AST parser extracted **82 rule blocks** (564 LOC) covering `.seg, .tr, .panel, .step, .sh, .tier, .grp, .opt, .opts, .buff, .flag, .pips, .toggle, .bp, .card, .boxart, #pr, #prs, #patch, .party, body.app, body:not(.app)` with enclosing `@media` conditions.
+  - **JS Function Extraction & Domain Exports Derivation:**
+    - Scanned 60 exported identifiers across `src/content/*.ts` and `src/domain/*.ts`.
+    - Identified 5 configurator DOM build/update functions:
+      - `renderTiers` (lines 14662–14673, 12 LOC, reads `TIERS`)
+      - `renderGroups` (lines 14674–14741, 68 LOC, reads `BUFFS`, `GEAR`, `OBJECTIVES`, `QUESTS`)
+      - `renderShips` (lines 14752–14757, 6 LOC, reads `CLASSES`)
+      - `refresh` (lines 14759–14903, 145 LOC, reads `CLASSES`, `TEAMOF`, `ROLE`, `UNITS`, `quote`, `units`, `leaders`, `shipFor`)
+      - `setTier` (lines 14904–14944, 41 LOC, reads `CLASSES`, `TIERS`, `units`, `shipFor`)
+      - Total configurator JS: 272 LOC.
+  - **Visibility Rules:** 6 CSS rules toggling `display`/`opacity`/`visibility` on `body.app` and `body:not(.app)`; JS line 11974: `document.body.classList.toggle("app", mode === "app")`.
+  - **Phase 6 Derived Slicing:**
+    - Phase 6.1a: Static CSS Stylesheet Extraction (564 LOC CSS)
+    - Phase 6.1b: Configurator Shell & Header Controls (186 LOC CSS, 12 LOC JS = 198 LOC)
+    - Phase 6.2: Solo Mode (223 LOC CSS, 98 LOC JS = 321 LOC)
+    - Phase 6.3: Squad Mode (17 LOC CSS, 87 LOC JS = 104 LOC)
+    - Phase 6.4: Combine Mode (45 LOC CSS, 75 LOC JS = 120 LOC)
+    - Phase 6.5: Loadout Blueprint, Billing Toggle & Modal Start (39 LOC CSS, 35 LOC JS = 74 LOC)
+
+- **Task 2: Phase 6.1a CSS Implementation & Acceptance:**
+  - Generated `src/styles/configurator.css` (659 lines) containing verbatim rules in original order with source line range comments; imported into `src/app/globals.css` after `modal.css`.
+  - Acceptance checks:
+    - (1) Compiled CSS contains all 82 selector rules (PASS).
+    - (2) Compiled-CSS guard passes with all 5 `-webkit-backdrop-filter` instances paired and correctly ordered with standard `backdrop-filter` (PASS).
+    - (3) Static story composite with JS off: **0.0050%** diff at 1280 (51 px / 1,024,000 px), **0.0143%** diff at 390 (47 px / 329,160 px) (PASS).
+    - (4) Layout check: all 7 existing sections match reference tops, heights, and widths exactly at 1280 and 390 (PASS).
