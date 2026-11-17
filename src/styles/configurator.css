@@ -1,23 +1,26 @@
 /**
- * Concepful Mech Builder - Configurator & App-Mode Stylesheet (Phase 6.1a)
- * Source: reference/Concepful_Mech_Builder.html
- * Source Line Ranges: 120-145, 640-679, 713-733, 753-850, 870-890, 930-1026, 1085-1119, 1172-1208, 1264-1276, 1448-1517, 1575-1597, 1616-1648, 1693-1697, 1765-1768, 1784-1799
- * Matched Rules Count: 82
- * Generated mechanically by task2_generate_configurator_css.mjs. DO NOT EDIT BY HAND.
+ * Concepful Mech Builder - Complete Configurator Stylesheet (Phase 6.2 Provenance)
+ * Generated from reference/Concepful_Mech_Builder.html via CSSOM rule matching.
+ * Total Rules: 150
  */
 
-/* Line 120-124 */
+/* Lines 77-79 */
+* {
+  box-sizing: border-box;
+}
+
+/* Lines 80-82 */
+[hidden] {
+  display: none !important;
+}
+
+/* Lines 121-124 */
 body:not(.app) .seg,
 body:not(.app) .tr {
   display: none;
 }
 
-/* Line 124-127 */
-body.app .navl {
-  display: none;
-}
-
-/* Line 127-134 */
+/* Lines 128-134 */
 .panel,
 .card,
 .boxart {
@@ -26,7 +29,7 @@ body.app .navl {
     transform 0.35s;
 }
 
-/* Line 134-141 */
+/* Lines 135-141 */
 body:not(.app) .panel,
 body:not(.app) .card,
 body:not(.app) .boxart {
@@ -35,13 +38,60 @@ body:not(.app) .boxart {
   transform: translateY(14px);
 }
 
-/* Line 141-145 */
+/* Lines 142-145 */
 body:not(.app) .panel *,
 body:not(.app) .card * {
   visibility: hidden;
 }
 
-/* Line 640-646 */
+/* Lines 231-239 */
+.ghost {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: 1px solid var(--line2);
+  border-radius: 999px;
+  padding: 10px 16px;
+}
+
+/* Lines 240-243 */
+.ghost:hover {
+  border-color: var(--pro);
+  color: var(--pro);
+}
+
+/* Lines 563-568 */
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Lines 569-574 */
+button,
+input,
+select {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* Lines 575-577 */
+button {
+  cursor: pointer;
+}
+
+/* Lines 606-611 */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+
+/* Lines 641-646 */
 .seg {
   display: flex;
   gap: 2px;
@@ -49,7 +99,7 @@ body:not(.app) .card * {
   border-radius: 999px;
 }
 
-/* Line 646-656 */
+/* Lines 647-656 */
 .seg button {
   border: 0;
   background: transparent;
@@ -61,18 +111,18 @@ body:not(.app) .card * {
   white-space: nowrap;
 }
 
-/* Line 656-659 */
+/* Lines 657-659 */
 .seg button:hover {
   color: var(--fg);
 }
 
-/* Line 659-663 */
+/* Lines 660-663 */
 .seg button.on {
   background: var(--red);
   color: #fff;
 }
 
-/* Line 663-672 */
+/* Lines 664-672 */
 .seg button small {
   display: block;
   font-family: var(--mono);
@@ -83,7 +133,7 @@ body:not(.app) .card * {
   text-transform: uppercase;
 }
 
-/* Line 672-679 */
+/* Lines 673-679 */
 .tr {
   display: flex;
   align-items: center;
@@ -92,7 +142,53 @@ body:not(.app) .card * {
   border-radius: 999px;
 }
 
-/* Line 713-726 */
+/* Lines 680-684 */
+.tot {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* Lines 685-689 */
+.tot b {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* Lines 690-693 */
+.tot small {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+/* Lines 694-706 */
+.fu {
+  border: 0;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  box-shadow: 0 3px 0 #8e1c29;
+  transition: transform 0.1s;
+}
+
+/* Lines 707-709 */
+.fu:hover {
+  transform: translateY(-1px);
+}
+
+/* Lines 710-713 */
+.fu:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #8e1c29;
+}
+
+/* Lines 715-726 */
 .panel {
   position: fixed;
   z-index: 9;
@@ -106,32 +202,58 @@ body:not(.app) .card * {
   padding: 18px 18px 22px;
 }
 
-/* Line 726-729 */
+/* Lines 727-729 */
 .panel::-webkit-scrollbar {
   width: 8px;
 }
 
-/* Line 729-733 */
+/* Lines 730-733 */
 .panel::-webkit-scrollbar-thumb {
   background: var(--line2);
   border-radius: 8px;
 }
 
-/* Line 753-758 */
+/* Lines 734-740 */
+.intro .eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pro);
+}
+
+/* Lines 741-748 */
+.intro .mt {
+  display: none;
+  font-family: var(--display);
+  font-size: 24px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Lines 749-753 */
+.intro p {
+  color: var(--muted);
+  margin: 6px 0 0;
+  font-size: 13.5px;
+}
+
+/* Lines 754-758 */
 .step {
   padding-top: 20px;
   margin-top: 18px;
   border-top: 1px solid var(--line);
 }
 
-/* Line 758-763 */
+/* Lines 759-763 */
 .sh {
   display: flex;
   align-items: baseline;
   gap: 10px;
 }
 
-/* Line 763-769 */
+/* Lines 764-769 */
 .sh .n {
   font-family: var(--mono);
   font-size: 11px;
@@ -139,7 +261,7 @@ body:not(.app) .card * {
   color: var(--red);
 }
 
-/* Line 769-776 */
+/* Lines 770-776 */
 .sh h2 {
   font-family: var(--display);
   font-size: 19px;
@@ -148,7 +270,21 @@ body:not(.app) .card * {
   font-weight: 400;
 }
 
-/* Line 786-798 */
+/* Lines 777-781 */
+.hint {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 4px 0 12px;
+}
+
+/* Lines 782-786 */
+.tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Lines 787-798 */
 .tier {
   position: relative;
   display: grid;
@@ -162,19 +298,19 @@ body:not(.app) .card * {
   transition: border-color 0.15s;
 }
 
-/* Line 798-801 */
+/* Lines 799-801 */
 .tier:hover {
   border-color: var(--line2);
 }
 
-/* Line 801-806 */
+/* Lines 802-806 */
 .tier.on {
   border-color: var(--red);
   background: var(--red-soft);
   box-shadow: inset 0 0 0 1px var(--red);
 }
 
-/* Line 806-812 */
+/* Lines 807-812 */
 .tier .t {
   font-family: var(--display);
   font-size: 16px;
@@ -182,7 +318,7 @@ body:not(.app) .card * {
   text-transform: uppercase;
 }
 
-/* Line 812-820 */
+/* Lines 813-820 */
 .tier .k {
   font-family: var(--mono);
   font-size: 10px;
@@ -192,21 +328,21 @@ body:not(.app) .card * {
   margin-left: 6px;
 }
 
-/* Line 820-825 */
+/* Lines 821-825 */
 .tier .p {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* Line 825-830 */
+/* Lines 826-830 */
 .tier .p small {
   font-weight: 600;
   color: var(--muted);
   font-size: 11px;
 }
 
-/* Line 830-836 */
+/* Lines 831-836 */
 .tier .d {
   grid-column: 1/-1;
   font-size: 12px;
@@ -214,29 +350,29 @@ body:not(.app) .card * {
   line-height: 1.4;
 }
 
-/* Line 836-840 */
+/* Lines 837-840 */
 .tier.mini {
   padding: 8px 12px;
   opacity: 0.78;
 }
 
-/* Line 840-843 */
+/* Lines 841-843 */
 .tier.mini:hover {
   opacity: 1;
 }
 
-/* Line 843-847 */
+/* Lines 844-847 */
 .tier.mini .d,
 .tier.mini .k {
   display: none;
 }
 
-/* Line 847-850 */
+/* Lines 848-850 */
 .tier.mini .t {
   font-size: 14px;
 }
 
-/* Line 870-884 */
+/* Lines 871-884 */
 .tier .badge {
   position: absolute;
   top: -8px;
@@ -252,24 +388,76 @@ body:not(.app) .card * {
   transform: rotate(2deg);
 }
 
-/* Line 884-887 */
+/* Lines 885-887 */
 .grp {
   margin-top: 16px;
 }
 
-/* Line 887-890 */
+/* Lines 888-890 */
 .grp:first-child {
   margin-top: 0;
 }
 
-/* Line 930-935 */
+/* Lines 891-896 */
+.gh {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Lines 897-903 */
+.gh i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  flex: none;
+}
+
+/* Lines 904-910 */
+.gh b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Lines 911-914 */
+.gh span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* Lines 915-926 */
+.gh em {
+  margin-left: auto;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+/* Lines 927-930 */
+.gh em.live {
+  color: var(--ops);
+  border-color: rgba(85, 194, 184, 0.4);
+}
+
+/* Lines 931-935 */
 .opts {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* Line 935-949 */
+/* Lines 936-949 */
 .opt {
   display: grid;
   grid-template-columns: 16px 1fr auto;
@@ -285,12 +473,12 @@ body:not(.app) .card * {
     background 0.15s;
 }
 
-/* Line 949-952 */
+/* Lines 950-952 */
 .opt:hover {
   border-color: var(--line2);
 }
 
-/* Line 952-961 */
+/* Lines 953-961 */
 .opt .ck {
   width: 16px;
   height: 16px;
@@ -301,19 +489,19 @@ body:not(.app) .card * {
   place-items: center;
 }
 
-/* Line 961-965 */
+/* Lines 962-965 */
 .opt.on {
   border-color: var(--red);
   background: var(--red-soft);
 }
 
-/* Line 965-969 */
+/* Lines 966-969 */
 .opt.on .ck {
   background: var(--red);
   border-color: var(--red);
 }
 
-/* Line 969-978 */
+/* Lines 970-978 */
 .opt.on .ck::after {
   content: "";
   width: 7px;
@@ -324,12 +512,12 @@ body:not(.app) .card * {
   transform: rotate(-45deg) translate(1px, -1px);
 }
 
-/* Line 978-981 */
+/* Lines 979-981 */
 .opts.radio .opt .ck {
   border-radius: 50%;
 }
 
-/* Line 981-989 */
+/* Lines 982-989 */
 .opts.radio .opt.on .ck::after {
   width: 6px;
   height: 6px;
@@ -339,19 +527,19 @@ body:not(.app) .card * {
   transform: none;
 }
 
-/* Line 989-992 */
+/* Lines 990-992 */
 .opt .ot {
   min-width: 0;
 }
 
-/* Line 992-997 */
+/* Lines 993-997 */
 .opt b {
   display: block;
   font-size: 13px;
   font-weight: 700;
 }
 
-/* Line 997-1003 */
+/* Lines 998-1003 */
 .opt small {
   display: block;
   font-size: 11.5px;
@@ -359,7 +547,7 @@ body:not(.app) .card * {
   line-height: 1.35;
 }
 
-/* Line 1003-1013 */
+/* Lines 1004-1013 */
 .opt em {
   display: block;
   font-style: normal;
@@ -371,12 +559,12 @@ body:not(.app) .card * {
   margin-top: 3px;
 }
 
-/* Line 1013-1016 */
+/* Lines 1014-1016 */
 .opt.on em {
   color: var(--pro);
 }
 
-/* Line 1016-1023 */
+/* Lines 1017-1023 */
 .opt .op {
   font-family: var(--mono);
   font-size: 11px;
@@ -385,12 +573,65 @@ body:not(.app) .card * {
   color: var(--muted);
 }
 
-/* Line 1023-1026 */
+/* Lines 1024-1026 */
 .opt.on .op {
   color: var(--fg);
 }
 
-/* Line 1085-1093 */
+/* Lines 1027-1038 */
+.dom {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--line2);
+  color: var(--muted);
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+
+/* Lines 1055-1063 */
+.lock button,
+.nudge button {
+  background: transparent;
+  border: 1px solid var(--line2);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Lines 1064-1068 */
+.lock button:hover,
+.nudge button:hover {
+  border-color: var(--pro);
+  color: var(--pro);
+}
+
+/* Lines 1069-1078 */
+.nudge {
+  display: none;
+  margin-top: 12px;
+  background: rgba(242, 179, 58, 0.08);
+  border: 1px solid rgba(242, 179, 58, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: #ffd98a;
+}
+
+/* Lines 1079-1085 */
+.nudge.show {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Lines 1086-1093 */
 .toggle {
   display: inline-flex;
   background: var(--glass2);
@@ -400,7 +641,7 @@ body:not(.app) .card * {
   margin-bottom: 10px;
 }
 
-/* Line 1093-1102 */
+/* Lines 1094-1102 */
 .toggle button {
   border: 0;
   background: transparent;
@@ -411,13 +652,13 @@ body:not(.app) .card * {
   color: var(--muted);
 }
 
-/* Line 1102-1106 */
+/* Lines 1103-1106 */
 .toggle button.on {
   background: var(--fg);
   color: #16161c;
 }
 
-/* Line 1106-1113 */
+/* Lines 1107-1113 */
 .toggle em {
   font-style: normal;
   font-size: 10px;
@@ -426,7 +667,7 @@ body:not(.app) .card * {
   font-weight: 700;
 }
 
-/* Line 1113-1119 */
+/* Lines 1114-1119 */
 .bp {
   background: var(--glass2);
   border: 1px solid var(--line);
@@ -434,7 +675,80 @@ body:not(.app) .card * {
   padding: 4px 12px;
 }
 
-/* Line 1172-1182 */
+/* Lines 1120-1127 */
+.bl {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+}
+
+/* Lines 1128-1130 */
+.bl:last-child {
+  border-bottom: 0;
+}
+
+/* Lines 1131-1136 */
+.bl .l {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Lines 1137-1143 */
+.bl .l i {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  flex: none;
+}
+
+/* Lines 1144-1148 */
+.bl .n {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Lines 1149-1151 */
+.bl.mut {
+  color: var(--muted);
+}
+
+/* Lines 1152-1154 */
+.bl.save {
+  color: var(--ok);
+}
+
+/* Lines 1155-1159 */
+.bl.total {
+  font-weight: 800;
+  font-size: 14.5px;
+  padding-block: 11px;
+}
+
+/* Lines 1160-1166 */
+.fu.wide {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  font-size: 17px;
+  border-radius: 12px;
+}
+
+/* Lines 1167-1172 */
+.fine {
+  font-size: 11.5px;
+  color: var(--dim);
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+
+/* Lines 1174-1182 */
 .card {
   position: fixed;
   z-index: 8;
@@ -445,7 +759,7 @@ body:not(.app) .card * {
   overflow: hidden;
 }
 
-/* Line 1182-1193 */
+/* Lines 1183-1193 */
 .card .hd {
   background: var(--red);
   color: #fff;
@@ -458,12 +772,12 @@ body:not(.app) .card * {
   justify-content: space-between;
 }
 
-/* Line 1193-1196 */
+/* Lines 1194-1196 */
 .card .bd {
   padding: 12px;
 }
 
-/* Line 1196-1202 */
+/* Lines 1197-1202 */
 .card .cn {
   font-family: var(--display);
   font-size: 22px;
@@ -471,7 +785,7 @@ body:not(.app) .card * {
   text-transform: uppercase;
 }
 
-/* Line 1202-1208 */
+/* Lines 1203-1208 */
 .card .cc {
   font-family: var(--mono);
   font-size: 10.5px;
@@ -479,7 +793,75 @@ body:not(.app) .card * {
   margin-top: 4px;
 }
 
-/* Line 1264-1276 */
+/* Lines 1209-1214 */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+/* Lines 1215-1225 */
+.stat {
+  display: grid;
+  grid-template-columns: 112px 1fr 18px;
+  gap: 8px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Lines 1226-1230 */
+.stat .bar {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+
+/* Lines 1231-1235 */
+.stat .bar i {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+}
+
+/* Lines 1236-1238 */
+.stat .bar i.on {
+  background: var(--pro);
+}
+
+/* Lines 1239-1243 */
+.stat b {
+  color: var(--fg);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lines 1244-1246 */
+.motto {
+  margin-top: 12px;
+}
+
+/* Lines 1247-1254 */
+.motto span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+}
+
+/* Lines 1255-1258 */
+.motto q {
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Lines 1266-1276 */
 .boxart {
   position: fixed;
   z-index: 7;
@@ -492,32 +874,325 @@ body:not(.app) .card * {
   gap: 16px;
 }
 
+/* Lines 1277-1288 */
+.title {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(28px, 3.4vw, 52px);
+  line-height: 0.95;
+  transform: skewX(-8deg);
+  color: var(--bone);
+  text-shadow:
+    3px 3px 0 #8e1c29,
+    0 0 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Lines 1289-1292 */
+.title span {
+  color: var(--red);
+  text-shadow: 3px 3px 0 #2a292f;
+}
+
+/* Lines 1293-1301 */
+.fp {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: #d9dce3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Lines 1302-1335 */
+.burst {
+  flex: none;
+  width: 92px;
+  height: 92px;
+  background: var(--pro);
+  color: #1a1206;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--display);
+  font-size: 11px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  transform: rotate(-12deg);
+  margin-bottom: 28px;
+  clip-path: polygon(
+    50% 0%,
+    64.5% 14.9%,
+    85.4% 14.6%,
+    85.1% 35.5%,
+    100% 50%,
+    85.1% 64.5%,
+    85.4% 85.4%,
+    64.5% 85.1%,
+    50% 100%,
+    35.5% 85.1%,
+    14.6% 85.4%,
+    14.9% 64.5%,
+    0% 50%,
+    14.9% 35.5%,
+    14.6% 14.6%,
+    35.5% 14.9%
+  );
+}
+
+/* Lines 1337-1346 */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 5, 10, 0.5);
+  padding: calc(16px + var(--st)) var(--gr) calc(16px + var(--sb)) var(--gl);
+}
+
+/* Lines 1347-1353 */
+.mcard {
+  width: min(460px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  border-radius: 18px;
+  position: relative;
+}
+
+/* Lines 1354-1361 */
+.mcard .hd {
+  background: var(--red);
+  font-family: var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 9px 16px;
+}
+
+/* Lines 1362-1364 */
+.mcard .bd {
+  padding: 18px;
+}
+
+/* Lines 1365-1371 */
+.mcard h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 24px;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+/* Lines 1372-1376 */
+.mcard p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0 14px;
+}
+
+/* Lines 1377-1387 */
+.x {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+/* Lines 1388-1392 */
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Lines 1393-1398 */
+.fld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Lines 1399-1401 */
+.fld.full {
+  grid-column: 1/-1;
+}
+
+/* Lines 1402-1408 */
+.fld label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Lines 1409-1417 */
+.fld input,
+.fld select {
+  background: var(--glass2);
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Lines 1418-1422 */
+.fld input:focus,
+.fld select:focus {
+  border-color: var(--pro);
+  outline: none;
+}
+
+/* Lines 1423-1427 */
+.fld input[type="file"] {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Lines 1428-1434 */
+.form .fu {
+  grid-column: 1/-1;
+  margin-top: 4px;
+  padding: 13px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* Lines 1435-1443 */
+.done ol {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Lines 1444-1446 */
+.done ol b {
+  color: var(--fg);
+}
+
+/* Lines 1503-1508 */
+.party {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Lines 1576-1581 */
+#patch {
+  width: 132px;
+  height: 132px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+/* Lines 1582-1587 */
+#patch2 {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: 4px auto 10px;
+}
+
+/* Lines 1588-1591 */
+.card .cn,
+.card .cc {
+  text-align: center;
+}
+
+/* Lines 1649-1656 */
+.done .unl {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pro);
+}
+
+/* Lines 1680-1683 */
+.big,
+.title {
+  text-shadow: 3px 3px 0 var(--redLo);
+}
+
+/* Lines 1684-1687 */
+.big span,
+.title span {
+  text-shadow: 3px 3px 0 #141624;
+}
+
+/* Lines 1688-1690 */
+.fu {
+  box-shadow: 0 3px 0 var(--redLo);
+}
+
+/* Lines 1691-1693 */
+.fu:active {
+  box-shadow: 0 1px 0 var(--redLo);
+}
+
+/* Lines 1694-1697 */
+.tier .badge,
+.burst {
+  background: var(--sun);
+}
+
+/* Lines 1698-1700 */
+.stat .bar i.on {
+  background: var(--red);
+}
+
+/* Lines 1792-1799 */
+.opt .say {
+  display: block;
+  font-size: 12px;
+  color: #fff;
+  font-style: italic;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
 @media (max-width: 1023px) {
-  /* Line 1448-1451 */
+  /* Lines 1449-1451 */
   .card {
     display: none;
   }
 }
 
 @media (max-width: 900px) {
-  /* Line 1458-1462 */
+  /* Lines 1459-1462 */
   .seg {
     order: 3;
     width: 100%;
   }
 
-  /* Line 1462-1466 */
+  /* Lines 1463-1466 */
   .seg button {
     flex: 1;
     padding: 7px 6px;
   }
 
-  /* Line 1466-1469 */
+  /* Lines 1467-1469 */
   .tr .fu {
     display: none;
   }
 
-  /* Line 1469-1479 */
+  /* Lines 1470-1479 */
   .panel {
     top: auto;
     height: 50%;
@@ -529,130 +1204,27 @@ body:not(.app) .card * {
     padding: 16px var(--gr) calc(18px + var(--sb)) var(--gl);
   }
 
-  /* Line 1479-1482 */
+  /* Lines 1480-1482 */
   .boxart {
     display: none;
+  }
+
+  /* Lines 1483-1485 */
+  .intro .mt {
+    display: block;
+  }
+
+  /* Lines 1486-1488 */
+  .form {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Line 1490-1495 */
+  /* Lines 1491-1495 */
   .fu,
   .tier,
   .opt {
     transition: none;
   }
-}
-
-/* Line 1502-1508 */
-.party {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-/* Line 1508-1517 */
-.party .ph {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  display: flex;
-  justify-content: space-between;
-}
-
-/* Line 1575-1581 */
-#patch {
-  width: 132px;
-  height: 132px;
-  display: block;
-  margin: 0 auto 10px;
-}
-
-/* Line 1587-1591 */
-.card .cn,
-.card .cc {
-  text-align: center;
-}
-
-/* Line 1591-1597 */
-.flag {
-  background: var(--glass2);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
-}
-
-/* Line 1616-1622 */
-.pips {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin: 10px 0 8px;
-}
-
-/* Line 1622-1632 */
-.pips span {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--dim);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Line 1632-1637 */
-.pips i {
-  height: 5px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Line 1637-1640 */
-.pips .on i {
-  background: var(--pro);
-}
-
-/* Line 1640-1643 */
-.pips .cur {
-  color: var(--fg);
-}
-
-/* Line 1643-1648 */
-.flag p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Line 1693-1697 */
-.tier .badge,
-.burst {
-  background: var(--sun);
-}
-
-/* Line 1765-1768 */
-body.app .wmark {
-  opacity: 0.45;
-}
-
-@media (max-width: 900px) {
-  /* Line 1784-1787 */
-  body.app .wmark {
-    display: none;
-  }
-}
-
-/* Line 1791-1799 */
-.opt .say {
-  display: block;
-  font-size: 12px;
-  color: #fff;
-  font-style: italic;
-  opacity: 0.85;
-  margin-top: 2px;
 }

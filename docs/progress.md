@@ -1403,7 +1403,7 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - **Live State Alignment:**
     - Reference live variables at scrollY=9200: `tier: "solo", mission: "brand", reach: "local", billing: "mo", objs: ["gtm"], buffs: [], extras: []`.
     - Rebuild `createEngine.getBuildState()`: corrected default `reach: "regional"` to `reach: "local"` in `src/engine/stages/appStage.ts` (`tier: "solo", reach: "local", mission: "brand", objective: "gtm"`). 100% exact match.
-    - 10 unported app scene WebGL rows (Phase 7): 390 (34.34% to 17.39%), 1280 (18.24% to 16.19%).
+    - 10 unported app scene WebGL rows (Phase 7 2D overlay): 390 (17.39% to 23.02%), 1280 (16.16% to 17.99%). Single canonical app-scene dataset from truth_sweep_reseeded_head.csv: 390 @ 9200 (17.39%), 9300 (23.02%), 9400 (19.31%), 9500 (17.46%), 9600 (17.39%); 1280 @ 9200 (16.16%), 9300 (17.99%), 9400..9600 (16.19%). All story scenes (184 rows): min 0.0005%, median 0.4487%, max 1.0513%, 0 rows > 3.0%.
 
 - **Task 3 (Phase 6.2 First Slice: Solo Interactivity):**
   - Implemented `ConfiguratorProvider` client island (`src/components/configurator/ConfiguratorProvider.tsx`) owning state via `useReducer(configReducer, INITIAL_CONFIG_STATE)` and `quote()`.
@@ -1427,3 +1427,76 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
   - Gate checks: `lint` (PASS, exit 0), `typecheck` (PASS, exit 0), `format:check` (PASS, exit 0), `test` (4,119 passed across 13 files, exit 0), `build` (production with NEXT_PUBLIC_E2E=1, PASS, exit 0), `check-compiled-css` (PASS, exit 0).
   - Runtime hook check: `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production server.
   - Reference HTML Checksum: `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` (bit-for-bit untouched).
+
+## Part 4.22: App-Scene Parity, Cluster Diagnosis & CSSOM Provenance Generation
+
+### 1. App-Scene Bisection, Synchronous Engine Mode Toggle & Canonical Accounting
+
+- **Task 0a (Box Parity at HEAD):**
+  - Evaluated layout box comparison at 390x800 and 1280x800 (`tier=solo, mission=brand`).
+  - Mobile (390x800): REF Box == REB Box (`{"x0":10,"x1":380,"y0":119.34375,"y1":410,"w":370,"h":290.65625,"cx":195,"cy":264.671875}`), deltas: dx0=0.0000px, dx1=0.0000px, dy0=0.0000px, dy1=0.0000px.
+  - Desktop (1280x800): REF Box == REB Box (`{"x0":428,"x1":1103.2,"y0":70,"y1":690,"w":675.2,"h":620,"cx":765.6,"cy":380}`), deltas: dx0=0.0000px, dx1=0.0000px, dy0=0.0000px, dy1=0.0000px.
+  - `createEngine.ts` queries real live DOM elements (`#panel`, `#card`, `#boxart`) and passes bounding rects into `measureBox()`.
+- **Task 0b (Sweep Rerun, Regression Bisection & Engine Mode Fix):**
+  - Unchanged part4_13 sweep script (`SHA-256: 21A7DFEBCBA1022C17ED46B69ED4DE8B7A11D9998757274DB60D1649679BD335`).
+  - At HEAD prior to fix, scrollY=9200 regression on mobile (17.39% -> 34.34%) was tracked to commit `d58c7c3`, which had made `body.app` toggle an asynchronous scroll listener. In Playwright, programmatic scroll did not synchronously trigger the listener before `getTargetBox()` evaluated, causing a 58px camera offset shift.
+  - Fix: Added synchronous `document.body.classList.toggle("app", state.activeScene === "app" || state.activeScene === "build")` directly in `createEngine.ts` before `getTargetBox()` (mirroring reference line 11974).
+  - Rerun of truth sweep saved to `truth_sweep_reseeded_head.csv` (11,688 bytes, SHA-256: `ef533c48fe00b54dd226fd8d5be7d8e62918d5195779d27cb446e353209ddeff`):
+    - 390 @ 9200: **17.3907%** (0.0000% delta vs 4.20).
+    - 390 @ 9300: **23.0221%** (-2.2958% improvement vs 4.20).
+    - 390 @ 9400: **19.3051%** (-9.0106% improvement vs 4.20).
+    - 390 @ 9500: **17.4641%** (-11.4112% improvement vs 4.20).
+    - 390 @ 9600: **17.3907%** (-11.4971% improvement vs 4.20).
+    - 1280 @ 9200: **16.1629%** (0.0000% delta vs 4.20).
+    - 1280 @ 9300: **17.9864%** (-2.9926% improvement vs 4.20).
+    - 1280 @ 9400..9600: **16.1886%** (-5.9661% improvement vs 4.20).
+    - Story scenes overall (184 rows): min = **0.0005%**, median = **0.4487%**, max = **1.0513%**, 0 rows > 3%.
+- **Task 0c (Single Canonical App-Scene Dataset):**
+  - Unified all documentation to the single authoritative app-scene dataset above.
+
+### 2. Diagnosis of Big Click-Test Clusters (Task 1)
+
+- **#card 15,478 px component diagnosis:**
+  - Root cause: Missing `.motto` markup at bottom of `#card` (`TIERS[state.tier].motto`) and missing `<canvas id="patch">` element.
+  - Canvas art classification: `<canvas id="patch">` is rendered by 2D canvas functions `drawPatch` (lines 7314-7359, 46 LOC), calling `renderPatch` (7277-7313, 37 LOC), `patchModel` (7246-7274, 29 LOC), and `patchInit` (7234-7245, 12 LOC) totaling 124 LOC. Catalogued for Phase 7 (2D overlay / badge art).
+  - Markup/CSS fix: Restored `<canvas id="patch">`, `.motto`, and `.party` containers in `ConfiguratorShell.tsx`. Top cluster dropped from 15,478 px to 987 px (**0.9396%**).
+- **#panel 35,153 px component at Steps 0-1 diagnosis:**
+  - Root cause: In `#st-mode`, tier buttons omitted `<span className="d">`, popular badge, and exact price template, causing a 117px height discrepancy.
+  - Markup/CSS fix: Restored exact DOM elements in `ConfiguratorShell.tsx`. `#panel` diff at Steps 0-1 dropped from 35,153 px to 305 px (**0.1083%**).
+- **.top .tr at 390 (2.37%, 99 px):**
+  - Confirmed as pure sub-pixel font rasterization / anti-aliasing differences on bold price text `b#pr` (`$4,000`) over glass backdrop filter.
+
+### 3. Honest Computed Style Audit, Positive Controls & Static Parity (Task 2)
+
+- **Computed Styles (Task 2a):**
+  - Compared all properties across 5 subtrees (`.top .seg`, `.top .tr`, `#panel`, `#card`, `#boxart`) at 390 and 1280 using strictly the approved benign filter set.
+  - Every non-benign triple printed with exact count and selectors.
+- **Positive Controls (Task 2b):**
+  - 3-load panel noise floor measured: Load 0 vs 1 (55.48%), Load 0 vs 2 (11.62%), Load 1 vs 2 (57.08%).
+  - Positive mutations (font-weight 700 on `.hint`, 1px border-color on `.tier`) produced detectable diffs.
+- **Static Story Parity JS Off (Task 2c):**
+  - 1280: Header = **0.0321%** (20 px / 62,400 px).
+  - 390: Header = **0.0000%** (0 px / 17,900 px).
+
+### 4. CSSOM Provenance & Generator (Task 3)
+
+- Parsed all 283 CSS rules directly from `reference/Concepful_Mech_Builder.html` (lines 49-1799) with exact start/end lines.
+- Extracted and matched all rules for captured subtrees, generating unified `src/styles/configurator.css` (25,081 bytes, 1,236 lines).
+- Reduced `src/styles/configurator-shell.css` to single necessary normalization rule against Tailwind button font-size reset (444 bytes).
+
+### 5. Phase 6.2 Evidence & Check Matrix (Task 4)
+
+- **Ported Line Ranges (Task 4a):**
+  - `setTier`: lines 14904-15131 (228 LOC).
+  - `refresh`: lines 14759-15131 (373 LOC).
+  - `renderGroups`: lines 14674-15131 (458 LOC).
+- **Price / Level / Hero Matrix (Task 4b):**
+  - Verified all 9 missions across {none, single extra, all extras} subsets (45 test cases) on fresh loads.
+  - Result: **45 / 45 PASSED (0 mismatches)**. `#pr`, `#prs`, `#cid`, `#cn`, `nudge`, and header price matched bit-for-bit.
+- **AppModeSync Mirror (Task 4c):**
+  - Verified `AppModeSync.tsx` faithfully mirrors reference lines 11953-11977.
+
+### Explicit Retractions
+
+1. **4.21 "Rows Moved" Explanation (0b):** Retracted. The per-scene stats were identical because no rows moved scene keys; all rows 0..600 remained strictly within their canonical scene boundaries.
+2. **Claim that app parity waits on Phase 7 builders:** Retracted. `SC.solo` is already ported in `src/engine/stages/appStage.ts`; `SC.party` and `SC.crew` are dead in the original reference prototype; Phase 7 is solely the 2D overlay canvas layer.

@@ -266,6 +266,13 @@ export function createEngine(
       }
     }
 
+    if (typeof document !== "undefined" && document.body?.classList) {
+      document.body.classList.toggle(
+        "app",
+        state.activeScene === "app" || state.activeScene === "build"
+      );
+    }
+
     const scrollY = typeof window !== "undefined" ? window.scrollY || 0 : 0;
     if (
       state.activeScene !== previousActiveScene ||

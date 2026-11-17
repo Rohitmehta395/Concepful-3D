@@ -1,6 +1,6 @@
 "use client";
 
-import { BUFFS, GEAR, QUESTS, TIERS } from "@/content";
+import { BUFFS, GEAR, QUESTS, TIERS, type TierId } from "@/content";
 import { useConfigurator } from "./ConfiguratorProvider";
 
 /**
@@ -17,8 +17,6 @@ export function ConfiguratorShell() {
   const { state, dispatch, q, currentQuest, level, stats } = useConfigurator();
 
   const soloTier = TIERS.solo;
-  const squadTier = TIERS.squad;
-  const combineTier = TIERS.combine;
 
   return (
     <>
@@ -44,60 +42,37 @@ export function ConfiguratorShell() {
             Solo, party or raid. Scale up whenever you&apos;re ready.
           </p>
           <div className="tiers" id="tiers">
-            <button
-              type="button"
-              className={`tier${state.tier === "solo" ? " on" : ""}`}
-              data-tier="solo"
-              aria-pressed={state.tier === "solo"}
-              onClick={() => dispatch({ type: "SET_TIER", tier: "solo" })}
-            >
-              <span>
-                <span className="t">{soloTier.name}</span>
-                <span className="k">{soloTier.sub}</span>
-              </span>
-              <span className="p">
-                <span className="cur">
-                  ${soloTier.base.toLocaleString("en-US")}
-                </span>
-                <span className="s">fixed fee</span>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`tier mini${state.tier === "squad" ? " on" : ""}`}
-              data-tier="squad"
-              aria-pressed={state.tier === "squad"}
-            >
-              <span>
-                <span className="t">{squadTier.name}</span>
-                <span className="k">{squadTier.sub}</span>
-              </span>
-              <span className="p">
-                <span className="cur">
-                  ${squadTier.base.toLocaleString("en-US")}
-                </span>
-                <span className="s">/mo</span>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`tier mini${state.tier === "combine" ? " on" : ""}`}
-              data-tier="combine"
-              aria-pressed={state.tier === "combine"}
-            >
-              <span>
-                <span className="t">{combineTier.name}</span>
-                <span className="k">{combineTier.sub}</span>
-              </span>
-              <span className="p">
-                <span className="cur">
-                  ${combineTier.base.toLocaleString("en-US")}
-                </span>
-                <span className="s">/mo</span>
-              </span>
-            </button>
+            {(Object.entries(TIERS) as [TierId, (typeof TIERS)[TierId]][]).map(
+              ([id, tItem]) => {
+                const on = state.tier === id;
+                const p = tItem.base;
+                const formattedPrice = `$${p.toLocaleString("en-US")}`;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`tier${on ? " on" : " mini"}`}
+                    data-tier={id}
+                    aria-pressed={on}
+                    onClick={() => dispatch({ type: "SET_TIER", tier: id })}
+                  >
+                    {"popular" in tItem && tItem.popular && (
+                      <span className="badge">Most popular</span>
+                    )}
+                    <span>
+                      <span className="t">{tItem.name}</span>
+                      <span className="k">{tItem.sub}</span>
+                    </span>
+                    <span className="p">
+                      {tItem.one ? "" : "from "}
+                      {formattedPrice}
+                      <small>{tItem.one ? "" : "/mo"}</small>
+                    </span>
+                    <span className="d">{tItem.d}</span>
+                  </button>
+                );
+              }
+            )}
           </div>
         </section>
 
@@ -319,7 +294,7 @@ export function ConfiguratorShell() {
             {currentQuest.hero}
           </div>
           <div className="cc" id="cc">
-            Class: {currentQuest.cls} · {currentQuest.name}
+            {currentQuest.cls}
           </div>
           <div className="stats" id="stats">
             {stats.map(([code, name, val]) => (
@@ -334,6 +309,11 @@ export function ConfiguratorShell() {
               </div>
             ))}
           </div>
+          <div className="party" id="party"></div>
+          <div className="motto">
+            <span>Motto</span>
+            <q id="motto">{TIERS[state.tier].motto}</q>
+          </div>
         </div>
       </section>
 
@@ -345,14 +325,19 @@ export function ConfiguratorShell() {
             <br />
             <span>creative</span> department.
           </h1>
-          <div className="fp">Senior lead on every build</div>
+          <div className="fp">
+            Server: Concepful · Senior lead on every build · Four encounters to
+            clear
+          </div>
         </div>
         <div className="burst">
-          <div>
-            <b>NO MOVES</b>
-            <br />
-            WASTED
-          </div>
+          No pay
+          <br />
+          to win.
+          <br />
+          Priced
+          <br />
+          up front.
         </div>
       </div>
     </>
