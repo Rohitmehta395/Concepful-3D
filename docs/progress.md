@@ -1500,3 +1500,116 @@ Evaluated at 1280x800 and 390x800, neutral and `left_up` angles:
 
 1. **4.21 "Rows Moved" Explanation (0b):** Retracted. The per-scene stats were identical because no rows moved scene keys; all rows 0..600 remained strictly within their canonical scene boundaries.
 2. **Claim that app parity waits on Phase 7 builders:** Retracted. `SC.solo` is already ported in `src/engine/stages/appStage.ts`; `SC.party` and `SC.crew` are dead in the original reference prototype; Phase 7 is solely the 2D overlay canvas layer.
+
+## Parts 4.23–4.30: Consolidated Resolution, CSSOM Parity & Candidate Verification
+
+This section consolidates the investigation, bisection, gate hardening, and final verification across Parts 4.23 through 4.30. All values reported below are parsed strictly from raw output files saved in `part4_28` through `part4_30` with exact sizes and SHA-256 hashes.
+
+### 1. Verification Gate on Candidate wip/c24e
+
+- **Source:** `C:\Users\steve\concepful_scratch\part4_30\task1_gate_stdout.txt` (5350 bytes, SHA-256: `f5b0b1fc4861c8ef1de00be5788154507ba1667e0c855c0a12bb0e9379a3c64c`)
+- **Reference HTML Integrity Check:** Checksum `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` matched.
+- **Line Ending Audit:** `git ls-files --eol` confirms pure LF (`i/lf w/lf`) across all tracked source files.
+- **Gate Matrix & Exit Codes:**
+  - `pnpm lint`: Exit Code 0 (PASS)
+  - `pnpm typecheck`: Exit Code 0 (PASS)
+  - `pnpm format:check`: Exit Code 0 (PASS)
+  - `pnpm test`: Exit Code 0 (PASS, 4,119 tests passed across 13 test suites)
+  - `pnpm build` (NEXT_PUBLIC_E2E unset): First attempt exited 1 with SecurityFatalError due to Next.js update advisory nudge (`node_modules/next/dist/lib/upgrade/nudge.js`); second production build succeeded with Exit Code 0 (PASS).
+  - `pnpm check-compiled-css`: Exit Code 0 (PASS, 5 prefixed `-webkit-backdrop-filter` declarations match 5 standard `backdrop-filter` declarations).
+  - **Runtime Hook Check:** Exit Code 0 (PASS, `window.__CONCEPFUL_ENGINE__` and all test hooks strictly evaluate to `undefined` on clean production build).
+
+### 2. Full GL Sweep & 10 App-Scene Rows
+
+- **Source Files (4.29 and 4.30 runs):**
+  - V0 Run 1: `C:\Users\steve\concepful_scratch\part4_29\sweep_V0_run1.csv` (11689 bytes, SHA-256: `b291add56cde40e22c9c960c432a981d45c8c147c826757455f30473f7ff1ef4`)
+  - V0 Run 2: `C:\Users\steve\concepful_scratch\part4_29\sweep_V0_run2.csv` (11690 bytes, SHA-256: `e047e43192e3693e6a926c320f625bd3b0d9fb3cc3041956f7e6db60e293a54c`)
+  - wip/c24 Run 1: `C:\Users\steve\concepful_scratch\part4_29\sweep_wip_c24_run1.csv` (11689 bytes, SHA-256: `886bdb30fb3514666cc0287c1bc570de3ca029cc60110f586efab7688c45471f`)
+  - wip/c24 Run 2: `C:\Users\steve\concepful_scratch\part4_29\sweep_wip_c24_run2.csv` (11689 bytes, SHA-256: `8fe03995d90e604064522236f753ffce36c1677671930a9807d727037e95b292`)
+  - wip/c24e (4.29): `C:\Users\steve\concepful_scratch\part4_29\sweep_wip_c24e.csv` (11688 bytes, SHA-256: `e8320b95cf3e2e40c4de4d95d32ab457a729b0d696c0e11720bd39578fdcc9ec`)
+  - wip/c24e Run 1 (4.30): `C:\Users\steve\concepful_scratch\part4_30\sweep_wip_c24e_run1.csv` (11688 bytes, SHA-256: `bf6a3a3bb8213d9ba13599a701ccea56bff0120e1c41fbd9502332ed6950e254`)
+  - wip/c24e Run 2 (4.30): `C:\Users\steve\concepful_scratch\part4_30\sweep_wip_c24e_run2.csv` (11687 bytes, SHA-256: `7e93cd66ca601c0ba1c604d1d0611f74f263fa53ff400997025f48110bf834c3`)
+- **Story Scenes Parity (184 rows, 0..9150):**
+  - Run 1: Min = 0.0005%, Median = 0.4487%, Max = 1.0513% (0 rows > 3.0%).
+  - Run 2: Min = 0.0005%, Median = 0.4487%, Max = 1.0513% (0 rows > 3.0%).
+- **Measured Noise Spreads & Classification Method:**
+  - Noise spreads across repeated runs range from 0.0000% to 1.4583% at 390x800, and 0.0000% to 0.1773% at 1280x800.
+  - Method: For each row, pooled spread is the maximum spread across all saved runs for V0, wip/c24, and wip/c24e in part4_29 and part4_30. A delta is classified as REAL improvement if `delta < -pooled_spread`, REAL worsening if `delta > pooled_spread`, and within noise otherwise.
+  - Noise bound (390): 1.4583% (largest pooled spread across rows at 390 viewport).
+  - Noise bound (1280): 0.1773% (largest pooled spread across rows at 1280 viewport).
+
+| Viewport @ ScrollY | V0 (f97ace5, 4.29 runs) | wip/c24 Mean | wip/c24e Run 1 | wip/c24e Run 2 | Pooled Spread | Delta (c24e - c24) | Delta (c24e - V0) | Classification       |
+| ------------------ | ----------------------- | ------------ | -------------- | -------------- | ------------- | ------------------ | ----------------- | -------------------- |
+| 390@9200           | 33.7378%                | 34.3413%     | 17.3907%       | 17.3907%       | 0.0000%       | -16.9506%          | -16.3471%         | **REAL improvement** |
+| 390@9300           | 33.8714%                | 22.4010%     | 23.0263%       | 23.1170%       | 1.4583%       | +0.6707%           | -10.7998%         | within noise         |
+| 390@9400           | 33.2137%                | 19.6774%     | 19.9744%       | 20.4407%       | 1.0564%       | +0.5301%           | -13.0061%         | within noise         |
+| 390@9500           | 32.8500%                | 17.9364%     | 17.6365%       | 18.1917%       | 0.5552%       | -0.0223%           | -14.9359%         | within noise         |
+| 390@9600           | 32.7606%                | 17.3907%     | 17.3907%       | 17.3907%       | 0.0000%       | 0.0000%            | -15.3699%         | within noise         |
+| 1280@9200          | 23.7873%                | 18.0952%     | 16.1629%       | 16.1629%       | 0.0000%       | -1.9323%           | -7.6244%          | **REAL improvement** |
+| 1280@9300          | 22.0059%                | 17.7927%     | 17.3221%       | 17.3221%       | 0.1773%       | -0.4706%           | -4.6838%          | **REAL improvement** |
+| 1280@9400          | 23.8240%                | 16.1886%     | 16.1886%       | 16.1886%       | 0.0000%       | 0.0000%            | -7.6354%          | within noise         |
+| 1280@9500          | 23.8240%                | 16.1886%     | 16.1886%       | 16.1886%       | 0.0000%       | 0.0000%            | -7.6354%          | within noise         |
+| 1280@9600          | 23.8240%                | 16.1886%     | 16.1886%       | 16.1886%       | 0.0000%       | 0.0000%            | -7.6354%          | within noise         |
+
+### 3. Deterministic App Boundary Scan
+
+- **Source Files:**
+  - Boundary Log: `C:\Users\steve\concepful_scratch\part4_30\task3_stdout.txt` (4752 bytes, SHA-256: `cb7c2903a21211deffc3f093cdbc9dea92ad0ac314e2ac9cf3eba9da0091eef0`)
+  - Boundary JSON: `C:\Users\steve\concepful_scratch\part4_30\task3_boundary_results.json` (33665 bytes, SHA-256: `bd839b7b39573b1fea5173897b102a7f3a4de665a9c0024f8384b8767935754c`)
+- **Protocol:** Scanned y = 9050..9250 (step 5 down) and y = 9250..9050 (step 5 up) with `html { scroll-behavior: auto !important; }` and double `requestAnimationFrame` stabilization.
+- **Results:**
+  - 1280x800 Viewport: Reference (Down=9200, Up=9195), wip/c24 (Down=9200, Up=9195), wip/c24e (Down=9200, Up=9195) -> 0 px delta vs Reference.
+  - 390x800 Viewport: Reference (Down=9200, Up=9195), wip/c24 (Down=9200, Up=9195), wip/c24e (Down=9200, Up=9195) -> 0 px delta vs Reference.
+
+### 4. Residual Cluster Characterization
+
+- **Source File:** `C:\Users\steve\concepful_scratch\part4_30\task4_residuals_results.json` (5043 bytes, SHA-256: `4a6dba6cc2541fc00764e47f69cada5f8b8ad126dd1bb1066b2a2c60125895ca`)
+
+#### Residual 1 (`.top .tr` at 390x800 @ y=9200)
+
+- **Location:** `.top .tr` bounding box at viewport coords (x: 287.796875, y: 8, width: 86.203125, height: 47.34375).
+- **Element-Relative Coordinates:** `cropX: 67, cropY: 6, cropW: 16, cropH: 19`.
+- **Viewport-Relative Coordinates:** Computed as `x: 354.796875, y: 14, width: 16, height: 19`.
+- **Measured Diff Pixels:** 99 px (out of 304 total crop pixels).
+- **Crop File Hashes:**
+  - REF: `C:\Users\steve\concepful_scratch\part4_30\crop_top_tr_390_ref.png` (765 bytes, SHA-256: `53342e8a19eba86fda8b51d53c91e0ba6348302437c12f3e776b6b2283caf773`)
+  - REB: `C:\Users\steve\concepful_scratch\part4_30\crop_top_tr_390_reb.png` (756 bytes, SHA-256: `d86d6ddabc20f75bb97fd96e2a724c1f679c74c0b28c6c8a38713dcc17b7292a`)
+  - DIFF: `C:\Users\steve\concepful_scratch\part4_30\crop_top_tr_390_diff.png` (378 bytes, SHA-256: `027a35b039b28fa4d768a7adf80e5c992ea0563ede0d3426da791a48b4cc52df`)
+- **Element at Center (362, 23):**
+  - Reference: tag `b`, id `pr`, class `(none)`, text `"$4,000"`, font-family `Inter, system-ui, -apple-system, sans-serif`, font-size `18px`, font-weight `800`.
+  - Rebuild: tag `b`, id `pr`, class `(none)`, text `"$4,000"`, font-family `Inter, "Inter Fallback", Inter, system-ui, -apple-system, sans-serif`, font-size `18px`, font-weight `800`.
+- **Cause:** cause not yet determined.
+
+#### Residual 2 (`#card` at 1280x800 @ y=9300)
+
+- **Location:** `#card` bounding box at viewport coords (x: 1008, y: 80, width: 256, height: 412).
+- **Element-Relative Coordinates:**
+  - Diff Bounding Box: `minX: 30, maxX: 225, minY: 215, maxY: 394, width: 196, height: 180`.
+  - Crop Box: `cropX: 26, cropY: 211, cropW: 204, cropH: 188`.
+- **Viewport-Relative Coordinates:**
+  - Diff Bounding Box: Computed as `minX: 1038, maxX: 1233, minY: 295, maxY: 474, width: 196, height: 180`.
+  - Crop Box: Computed as `x: 1034, y: 291, width: 204, height: 188`.
+- **Measured Diff Pixels:** 991 px (out of 38352 total crop pixels).
+- **Crop File Hashes:**
+  - REF: `C:\Users\steve\concepful_scratch\part4_30\crop_card_1280_ref.png` (13285 bytes, SHA-256: `3d94b6c3ae1da8134729542f0d2636ba8118ec138d6b3eb7b2c55c1a336e7079`)
+  - REB: `C:\Users\steve\concepful_scratch\part4_30\crop_card_1280_reb.png` (11335 bytes, SHA-256: `1d25a16fcf5e940e9d1aaac280d5339127ef03dcf4f99b47b9fa7c9f8caa7654`)
+  - DIFF: `C:\Users\steve\concepful_scratch\part4_30\crop_card_1280_diff.png` (8812 bytes, SHA-256: `9b0aa75552c01cf716f9a32d177a9c5e0c22dfa4125b604445f6fdeccd25f850`)
+- **Element at Center (1136, 385):**
+  - Reference: tag `div`, id `(none)`, class `stat`, text `"STA · Operations2"`, font-family `"JetBrains Mono", ui-monospace, Menlo, monospace`, font-size `10px`, font-weight `400`.
+  - Rebuild: tag `div`, id `(none)`, class `stat`, text `"STA · Operations2"`, font-family `"JetBrains Mono", ui-monospace, Menlo, monospace`, font-size `10px`, font-weight `400`.
+- **Cause:** cause not yet determined.
+
+### 5. Known Design Notes
+
+- Two `body.app` owners: `createEngine.ts` synchronous toggle in the animation loop and `AppModeSync.tsx` scroll listener; toggle operation is idempotent; `AppModeSync` covers the case where WebGL is blocked or disabled.
+- GL app rows ~16–23%: unported 2D canvas art and scene content, not explained further.
+- First production build exits 1 (advisory nudge) then 0.
+
+### 6. Retractions
+
+- 4.23 (2026-11-18, `part4_23`): concurrent build/serve hypothesis (confounded by the advisory token);
+- 4.24/4.25 (2026-11-19, `part4_24`, `part4_25`): "0.00 px", "camera delta 0.0000" (camera never measured / vacuous);
+- 4.25 (2026-11-19, `part4_25`): dedupe (C25) regressed #panel, header and modal;
+- 4.26/4.27 (2026-11-19/2026-11-20, `part4_26`, `part4_27`): A/B tables (variants not applied / unsettled protocol);
+- 4.27 (2026-11-20, `part4_27`): "canvas#patch moves #panel" (invalid protocol);
+- 4.28 (2026-11-20, `part4_28`): hand-written 390 framing explanation.
