@@ -1,26 +1,68 @@
 /**
- * Concepful Mech Builder - Complete Configurator Stylesheet (Phase 6.2 Provenance)
- * Generated from reference/Concepful_Mech_Builder.html via CSSOM rule matching.
- * Total Rules: 150
+ * Concepful Mech Builder - Configurator & App-Mode Stylesheet (Task 3 Provenance)
+ * Source: reference/Concepful_Mech_Builder.html
+ * Matched Rules Count: 188
+ * Generated mechanically by task3_provenance.mjs. DO NOT EDIT BY HAND.
  */
 
-/* Lines 77-79 */
+/* Line 32-32 */
+[hidden]:not([hidden="until-found" i]) {
+  display: none !important;
+}
+
+/* Line 49-49 */
 * {
   box-sizing: border-box;
 }
 
-/* Lines 80-82 */
+/* Line 80-80 */
 [hidden] {
   display: none !important;
 }
 
-/* Lines 121-124 */
+/* Line 98-98 */
+.navl {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px;
+  border-radius: 999px;
+}
+
+/* Line 105-105 */
+.navl a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+/* Line 113-113 */
+.navl a:hover {
+  color: var(--fg);
+}
+
+/* Line 116-116 */
+.navl a.fu {
+  color: rgb(255, 255, 255);
+  padding: 9px 16px;
+  font-size: 13px;
+}
+
+/* Line 121-121 */
 body:not(.app) .seg,
 body:not(.app) .tr {
   display: none;
 }
 
-/* Lines 128-134 */
+/* Line 125-125 */
+body.app .navl {
+  display: none;
+}
+
+/* Line 128-128 */
 .panel,
 .card,
 .boxart {
@@ -29,7 +71,7 @@ body:not(.app) .tr {
     transform 0.35s;
 }
 
-/* Lines 135-141 */
+/* Line 135-135 */
 body:not(.app) .panel,
 body:not(.app) .card,
 body:not(.app) .boxart {
@@ -38,38 +80,28 @@ body:not(.app) .boxart {
   transform: translateY(14px);
 }
 
-/* Lines 142-145 */
+/* Line 142-142 */
 body:not(.app) .panel *,
 body:not(.app) .card * {
   visibility: hidden;
 }
 
-/* Lines 231-239 */
-.ghost {
-  color: var(--fg);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 13.5px;
-  border: 1px solid var(--line2);
-  border-radius: 999px;
-  padding: 10px 16px;
+@media (max-width: 900px) {
+  /* Line 486-486 */
+  .navl a:not(.fu) {
+    display: none;
+  }
 }
 
-/* Lines 240-243 */
-.ghost:hover {
-  border-color: var(--pro);
-  color: var(--pro);
-}
-
-/* Lines 563-568 */
+/* Line 563-563 */
 h1,
 h2,
 h3 {
-  margin: 0;
+  margin: 0px;
   text-wrap: balance;
 }
 
-/* Lines 569-574 */
+/* Line 569-569 */
 button,
 input,
 select {
@@ -77,21 +109,51 @@ select {
   color: inherit;
 }
 
-/* Lines 575-577 */
+/* Line 569-569 */
 button {
   cursor: pointer;
 }
 
-/* Lines 606-611 */
+/* Line 578-578 */
+:focus-visible {
+  outline: 2px solid var(--pro);
+  outline-offset: 2px;
+}
+
+/* Line 606-606 */
 .glass {
   background: var(--glass);
   border: 1px solid var(--line);
   -webkit-backdrop-filter: blur(12px) saturate(1.1);
-
   backdrop-filter: blur(12px) saturate(1.1);
 }
 
-/* Lines 641-646 */
+/* Line 613-613 */
+.top {
+  position: fixed;
+  z-index: 10;
+  top: calc(12px + var(--st));
+  left: var(--gl);
+  right: var(--gr);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Line 624-624 */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
+/* Line 641-641 */
 .seg {
   display: flex;
   gap: 2px;
@@ -99,9 +161,9 @@ button {
   border-radius: 999px;
 }
 
-/* Lines 647-656 */
+/* Line 647-647 */
 .seg button {
-  border: 0;
+  border: 0px;
   background: transparent;
   border-radius: 999px;
   padding: 7px 16px;
@@ -111,18 +173,18 @@ button {
   white-space: nowrap;
 }
 
-/* Lines 657-659 */
+/* Line 657-657 */
 .seg button:hover {
   color: var(--fg);
 }
 
-/* Lines 660-663 */
+/* Line 660-660 */
 .seg button.on {
   background: var(--red);
-  color: #fff;
+  color: rgb(255, 255, 255);
 }
 
-/* Lines 664-672 */
+/* Line 664-664 */
 .seg button small {
   display: block;
   font-family: var(--mono);
@@ -133,7 +195,7 @@ button {
   text-transform: uppercase;
 }
 
-/* Lines 673-679 */
+/* Line 673-673 */
 .tr {
   display: flex;
   align-items: center;
@@ -142,53 +204,53 @@ button {
   border-radius: 999px;
 }
 
-/* Lines 680-684 */
+/* Line 680-680 */
 .tot {
   text-align: right;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 
-/* Lines 685-689 */
+/* Line 685-685 */
 .tot b {
   display: block;
   font-size: 18px;
   font-weight: 800;
 }
 
-/* Lines 690-693 */
+/* Line 690-690 */
 .tot small {
   font-size: 10.5px;
   color: var(--muted);
 }
 
-/* Lines 694-706 */
+/* Line 694-694 */
 .fu {
-  border: 0;
+  border: 0px;
   border-radius: 999px;
   background: var(--red);
-  color: #fff;
+  color: rgb(255, 255, 255);
   font-family: var(--display);
   font-size: 14px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 10px 18px;
-  box-shadow: 0 3px 0 #8e1c29;
+  box-shadow: rgb(142, 28, 41) 0px 3px 0px;
   transition: transform 0.1s;
 }
 
-/* Lines 707-709 */
+/* Line 707-707 */
 .fu:hover {
   transform: translateY(-1px);
 }
 
-/* Lines 710-713 */
+/* Line 710-710 */
 .fu:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 #8e1c29;
+  box-shadow: rgb(142, 28, 41) 0px 1px 0px;
 }
 
-/* Lines 715-726 */
+/* Line 715-715 */
 .panel {
   position: fixed;
   z-index: 9;
@@ -202,18 +264,18 @@ button {
   padding: 18px 18px 22px;
 }
 
-/* Lines 727-729 */
+/* Line 727-727 */
 .panel::-webkit-scrollbar {
   width: 8px;
 }
 
-/* Lines 730-733 */
+/* Line 730-730 */
 .panel::-webkit-scrollbar-thumb {
   background: var(--line2);
   border-radius: 8px;
 }
 
-/* Lines 734-740 */
+/* Line 734-734 */
 .intro .eyebrow {
   font-family: var(--mono);
   font-size: 10.5px;
@@ -222,7 +284,7 @@ button {
   color: var(--pro);
 }
 
-/* Lines 741-748 */
+/* Line 741-741 */
 .intro .mt {
   display: none;
   font-family: var(--display);
@@ -232,28 +294,28 @@ button {
   margin-top: 6px;
 }
 
-/* Lines 749-753 */
+/* Line 749-749 */
 .intro p {
   color: var(--muted);
-  margin: 6px 0 0;
+  margin: 6px 0px 0px;
   font-size: 13.5px;
 }
 
-/* Lines 754-758 */
+/* Line 754-754 */
 .step {
   padding-top: 20px;
   margin-top: 18px;
   border-top: 1px solid var(--line);
 }
 
-/* Lines 759-763 */
+/* Line 759-759 */
 .sh {
   display: flex;
   align-items: baseline;
   gap: 10px;
 }
 
-/* Lines 764-769 */
+/* Line 764-764 */
 .sh .n {
   font-family: var(--mono);
   font-size: 11px;
@@ -261,7 +323,7 @@ button {
   color: var(--red);
 }
 
-/* Lines 770-776 */
+/* Line 770-770 */
 .sh h2 {
   font-family: var(--display);
   font-size: 19px;
@@ -270,21 +332,21 @@ button {
   font-weight: 400;
 }
 
-/* Lines 777-781 */
+/* Line 777-777 */
 .hint {
   color: var(--muted);
   font-size: 12.5px;
-  margin: 4px 0 12px;
+  margin: 4px 0px 12px;
 }
 
-/* Lines 782-786 */
+/* Line 782-782 */
 .tiers {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-/* Lines 787-798 */
+/* Line 782-782 */
 .tier {
   position: relative;
   display: grid;
@@ -298,19 +360,19 @@ button {
   transition: border-color 0.15s;
 }
 
-/* Lines 799-801 */
+/* Line 799-799 */
 .tier:hover {
   border-color: var(--line2);
 }
 
-/* Lines 802-806 */
+/* Line 802-802 */
 .tier.on {
   border-color: var(--red);
   background: var(--red-soft);
   box-shadow: inset 0 0 0 1px var(--red);
 }
 
-/* Lines 807-812 */
+/* Line 807-807 */
 .tier .t {
   font-family: var(--display);
   font-size: 16px;
@@ -318,7 +380,7 @@ button {
   text-transform: uppercase;
 }
 
-/* Lines 813-820 */
+/* Line 813-813 */
 .tier .k {
   font-family: var(--mono);
   font-size: 10px;
@@ -328,57 +390,83 @@ button {
   margin-left: 6px;
 }
 
-/* Lines 821-825 */
+/* Line 821-821 */
 .tier .p {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* Lines 826-830 */
+/* Line 826-826 */
 .tier .p small {
   font-weight: 600;
   color: var(--muted);
   font-size: 11px;
 }
 
-/* Lines 831-836 */
+/* Line 831-831 */
 .tier .d {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
   font-size: 12px;
   color: var(--muted);
   line-height: 1.4;
 }
 
-/* Lines 837-840 */
+/* Line 837-837 */
 .tier.mini {
   padding: 8px 12px;
   opacity: 0.78;
 }
 
-/* Lines 841-843 */
+/* Line 841-841 */
 .tier.mini:hover {
   opacity: 1;
 }
 
-/* Lines 844-847 */
+/* Line 844-844 */
 .tier.mini .d,
 .tier.mini .k {
   display: none;
 }
 
-/* Lines 848-850 */
+/* Line 848-848 */
 .tier.mini .t {
   font-size: 14px;
 }
 
-/* Lines 871-884 */
+/* Line 851-851 */
+#groups.swap,
+#st-ship.swap,
+#st-buffs.swap {
+  animation: 0.45s ease 0s 1 normal both running swap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Line 851-851 */
+  #groups.swap {
+    animation: auto ease 0s 1 normal none running none;
+  }
+}
+
+/* Line 856-856 */
+@keyframes swap {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Line 871-871 */
 .tier .badge {
   position: absolute;
   top: -8px;
   right: 10px;
   background: var(--pro);
-  color: #1a1206;
+  color: rgb(26, 18, 6);
   font-family: var(--display);
   font-size: 9.5px;
   letter-spacing: 0.06em;
@@ -388,17 +476,17 @@ button {
   transform: rotate(2deg);
 }
 
-/* Lines 885-887 */
+/* Line 885-885 */
 .grp {
   margin-top: 16px;
 }
 
-/* Lines 888-890 */
+/* Line 888-888 */
 .grp:first-child {
-  margin-top: 0;
+  margin-top: 0px;
 }
 
-/* Lines 891-896 */
+/* Line 891-891 */
 .gh {
   display: flex;
   align-items: center;
@@ -406,16 +494,16 @@ button {
   margin-bottom: 8px;
 }
 
-/* Lines 897-903 */
+/* Line 897-897 */
 .gh i {
   width: 10px;
   height: 10px;
   border-radius: 2px;
   transform: rotate(45deg);
-  flex: none;
+  flex: 0 0 auto;
 }
 
-/* Lines 904-910 */
+/* Line 904-904 */
 .gh b {
   font-family: var(--display);
   font-weight: 400;
@@ -424,40 +512,20 @@ button {
   text-transform: uppercase;
 }
 
-/* Lines 911-914 */
+/* Line 911-911 */
 .gh span {
   font-size: 11.5px;
   color: var(--muted);
 }
 
-/* Lines 915-926 */
-.gh em {
-  margin-left: auto;
-  font-style: normal;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--line);
-  color: var(--dim);
-  white-space: nowrap;
-}
-
-/* Lines 927-930 */
-.gh em.live {
-  color: var(--ops);
-  border-color: rgba(85, 194, 184, 0.4);
-}
-
-/* Lines 931-935 */
+/* Line 931-931 */
 .opts {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* Lines 936-949 */
+/* Line 931-931 */
 .opt {
   display: grid;
   grid-template-columns: 16px 1fr auto;
@@ -473,12 +541,12 @@ button {
     background 0.15s;
 }
 
-/* Lines 950-952 */
+/* Line 950-950 */
 .opt:hover {
   border-color: var(--line2);
 }
 
-/* Lines 953-961 */
+/* Line 953-953 */
 .opt .ck {
   width: 16px;
   height: 16px;
@@ -489,57 +557,58 @@ button {
   place-items: center;
 }
 
-/* Lines 962-965 */
+/* Line 962-962 */
 .opt.on {
   border-color: var(--red);
   background: var(--red-soft);
 }
 
-/* Lines 966-969 */
+/* Line 966-966 */
 .opt.on .ck {
   background: var(--red);
   border-color: var(--red);
 }
 
-/* Lines 970-978 */
+/* Line 970-970 */
 .opt.on .ck::after {
   content: "";
   width: 7px;
   height: 4px;
-  border: 2px solid #fff;
-  border-top: 0;
-  border-right: 0;
+  border-width: 0px 0px 2px 2px;
+  border-style: none none solid solid;
+  border-color: currentcolor currentcolor rgb(255, 255, 255) rgb(255, 255, 255);
+  border-image: none;
   transform: rotate(-45deg) translate(1px, -1px);
 }
 
-/* Lines 979-981 */
+/* Line 979-979 */
 .opts.radio .opt .ck {
   border-radius: 50%;
 }
 
-/* Lines 982-989 */
+/* Line 982-982 */
 .opts.radio .opt.on .ck::after {
   width: 6px;
   height: 6px;
-  border: 0;
-  background: #fff;
+  border: 0px;
+  background: rgb(255, 255, 255);
   border-radius: 50%;
   transform: none;
 }
 
-/* Lines 990-992 */
+/* Line 990-990 */
 .opt .ot {
-  min-width: 0;
+  min-width: 0px;
 }
 
-/* Lines 993-997 */
+/* Line 993-993 */
 .opt b {
   display: block;
   font-size: 13px;
   font-weight: 700;
 }
 
-/* Lines 998-1003 */
+/* Line 998-998 */
 .opt small {
   display: block;
   font-size: 11.5px;
@@ -547,7 +616,7 @@ button {
   line-height: 1.35;
 }
 
-/* Lines 1004-1013 */
+/* Line 1004-1004 */
 .opt em {
   display: block;
   font-style: normal;
@@ -559,12 +628,12 @@ button {
   margin-top: 3px;
 }
 
-/* Lines 1014-1016 */
+/* Line 1014-1014 */
 .opt.on em {
   color: var(--pro);
 }
 
-/* Lines 1017-1023 */
+/* Line 1017-1017 */
 .opt .op {
   font-family: var(--mono);
   font-size: 11px;
@@ -573,12 +642,12 @@ button {
   color: var(--muted);
 }
 
-/* Lines 1024-1026 */
+/* Line 1024-1024 */
 .opt.on .op {
   color: var(--fg);
 }
 
-/* Lines 1027-1038 */
+/* Line 1027-1027 */
 .dom {
   display: inline-block;
   font-family: var(--mono);
@@ -592,7 +661,27 @@ button {
   vertical-align: 1px;
 }
 
-/* Lines 1055-1063 */
+/* Line 1039-1039 */
+.lock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1px dashed var(--line2);
+  border-radius: 10px;
+  padding: 11px 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* Line 1051-1051 */
+.lock b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* Line 1055-1055 */
 .lock button,
 .nudge button {
   background: transparent;
@@ -603,14 +692,14 @@ button {
   font-weight: 700;
 }
 
-/* Lines 1064-1068 */
+/* Line 1064-1064 */
 .lock button:hover,
 .nudge button:hover {
   border-color: var(--pro);
   color: var(--pro);
 }
 
-/* Lines 1069-1078 */
+/* Line 1065-1065 */
 .nudge {
   display: none;
   margin-top: 12px;
@@ -619,10 +708,10 @@ button {
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 12.5px;
-  color: #ffd98a;
+  color: rgb(255, 217, 138);
 }
 
-/* Lines 1079-1085 */
+/* Line 1079-1079 */
 .nudge.show {
   display: flex;
   justify-content: space-between;
@@ -631,7 +720,7 @@ button {
   flex-wrap: wrap;
 }
 
-/* Lines 1086-1093 */
+/* Line 1086-1086 */
 .toggle {
   display: inline-flex;
   background: var(--glass2);
@@ -641,9 +730,9 @@ button {
   margin-bottom: 10px;
 }
 
-/* Lines 1094-1102 */
+/* Line 1094-1094 */
 .toggle button {
-  border: 0;
+  border: 0px;
   background: transparent;
   border-radius: 999px;
   padding: 5px 12px;
@@ -652,13 +741,13 @@ button {
   color: var(--muted);
 }
 
-/* Lines 1103-1106 */
+/* Line 1103-1103 */
 .toggle button.on {
   background: var(--fg);
-  color: #16161c;
+  color: rgb(22, 22, 28);
 }
 
-/* Lines 1107-1113 */
+/* Line 1107-1107 */
 .toggle em {
   font-style: normal;
   font-size: 10px;
@@ -667,7 +756,7 @@ button {
   font-weight: 700;
 }
 
-/* Lines 1114-1119 */
+/* Line 1114-1114 */
 .bp {
   background: var(--glass2);
   border: 1px solid var(--line);
@@ -675,63 +764,63 @@ button {
   padding: 4px 12px;
 }
 
-/* Lines 1120-1127 */
+/* Line 1120-1120 */
 .bl {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  padding: 8px 0;
+  padding: 8px 0px;
   border-bottom: 1px solid var(--line);
   font-size: 12.5px;
 }
 
-/* Lines 1128-1130 */
+/* Line 1128-1128 */
 .bl:last-child {
-  border-bottom: 0;
+  border-bottom: 0px;
 }
 
-/* Lines 1131-1136 */
+/* Line 1131-1131 */
 .bl .l {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
+  min-width: 0px;
 }
 
-/* Lines 1137-1143 */
+/* Line 1137-1137 */
 .bl .l i {
   width: 7px;
   height: 7px;
   border-radius: 1px;
   transform: rotate(45deg);
-  flex: none;
+  flex: 0 0 auto;
 }
 
-/* Lines 1144-1148 */
+/* Line 1144-1144 */
 .bl .n {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* Lines 1149-1151 */
+/* Line 1149-1149 */
 .bl.mut {
   color: var(--muted);
 }
 
-/* Lines 1152-1154 */
+/* Line 1152-1152 */
 .bl.save {
   color: var(--ok);
 }
 
-/* Lines 1155-1159 */
+/* Line 1155-1155 */
 .bl.total {
   font-weight: 800;
   font-size: 14.5px;
   padding-block: 11px;
 }
 
-/* Lines 1160-1166 */
+/* Line 1160-1160 */
 .fu.wide {
   width: 100%;
   margin-top: 12px;
@@ -740,15 +829,15 @@ button {
   border-radius: 12px;
 }
 
-/* Lines 1167-1172 */
+/* Line 1167-1167 */
 .fine {
   font-size: 11.5px;
   color: var(--dim);
-  margin: 14px 0 0;
+  margin: 14px 0px 0px;
   line-height: 1.5;
 }
 
-/* Lines 1174-1182 */
+/* Line 1174-1174 */
 .card {
   position: fixed;
   z-index: 8;
@@ -759,10 +848,10 @@ button {
   overflow: hidden;
 }
 
-/* Lines 1183-1193 */
+/* Line 1183-1183 */
 .card .hd {
   background: var(--red);
-  color: #fff;
+  color: rgb(255, 255, 255);
   font-family: var(--display);
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -772,12 +861,12 @@ button {
   justify-content: space-between;
 }
 
-/* Lines 1194-1196 */
+/* Line 1194-1194 */
 .card .bd {
   padding: 12px;
 }
 
-/* Lines 1197-1202 */
+/* Line 1197-1197 */
 .card .cn {
   font-family: var(--display);
   font-size: 22px;
@@ -785,7 +874,7 @@ button {
   text-transform: uppercase;
 }
 
-/* Lines 1203-1208 */
+/* Line 1203-1203 */
 .card .cc {
   font-family: var(--mono);
   font-size: 10.5px;
@@ -793,7 +882,7 @@ button {
   margin-top: 4px;
 }
 
-/* Lines 1209-1214 */
+/* Line 1209-1209 */
 .stats {
   display: flex;
   flex-direction: column;
@@ -801,7 +890,7 @@ button {
   margin-top: 12px;
 }
 
-/* Lines 1215-1225 */
+/* Line 1209-1209 */
 .stat {
   display: grid;
   grid-template-columns: 112px 1fr 18px;
@@ -814,38 +903,38 @@ button {
   color: var(--muted);
 }
 
-/* Lines 1226-1230 */
+/* Line 1226-1226 */
 .stat .bar {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 2px;
 }
 
-/* Lines 1231-1235 */
+/* Line 1231-1231 */
 .stat .bar i {
   height: 8px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 1px;
 }
 
-/* Lines 1236-1238 */
+/* Line 1236-1236 */
 .stat .bar i.on {
   background: var(--pro);
 }
 
-/* Lines 1239-1243 */
+/* Line 1239-1239 */
 .stat b {
   color: var(--fg);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-/* Lines 1244-1246 */
+/* Line 1244-1244 */
 .motto {
   margin-top: 12px;
 }
 
-/* Lines 1247-1254 */
+/* Line 1247-1247 */
 .motto span {
   font-family: var(--mono);
   font-size: 9.5px;
@@ -855,13 +944,13 @@ button {
   display: block;
 }
 
-/* Lines 1255-1258 */
+/* Line 1255-1255 */
 .motto q {
   font-size: 12px;
   font-style: italic;
 }
 
-/* Lines 1266-1276 */
+/* Line 1266-1266 */
 .boxart {
   position: fixed;
   z-index: 7;
@@ -874,7 +963,7 @@ button {
   gap: 16px;
 }
 
-/* Lines 1277-1288 */
+/* Line 1277-1277 */
 .title {
   font-family: var(--display);
   font-weight: 400;
@@ -884,34 +973,34 @@ button {
   transform: skewX(-8deg);
   color: var(--bone);
   text-shadow:
-    3px 3px 0 #8e1c29,
-    0 0 18px rgba(0, 0, 0, 0.35);
+    rgb(142, 28, 41) 3px 3px 0px,
+    rgba(0, 0, 0, 0.35) 0px 0px 18px;
 }
 
-/* Lines 1289-1292 */
+/* Line 1289-1289 */
 .title span {
   color: var(--red);
-  text-shadow: 3px 3px 0 #2a292f;
+  text-shadow: rgb(42, 41, 47) 3px 3px 0px;
 }
 
-/* Lines 1293-1301 */
+/* Line 1293-1293 */
 .fp {
   font-family: var(--mono);
   font-size: 10.5px;
-  color: #d9dce3;
+  color: rgb(217, 220, 227);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 8px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  text-shadow: rgba(0, 0, 0, 0.6) 0px 1px 2px;
 }
 
-/* Lines 1302-1335 */
+/* Line 1302-1302 */
 .burst {
-  flex: none;
+  flex: 0 0 auto;
   width: 92px;
   height: 92px;
   background: var(--pro);
-  color: #1a1206;
+  color: rgb(26, 18, 6);
   display: grid;
   place-items: center;
   text-align: center;
@@ -941,10 +1030,10 @@ button {
   );
 }
 
-/* Lines 1337-1346 */
+/* Line 1337-1337 */
 .modal {
   position: fixed;
-  inset: 0;
+  inset: 0px;
   z-index: 20;
   display: grid;
   place-items: center;
@@ -952,7 +1041,7 @@ button {
   padding: calc(16px + var(--st)) var(--gr) calc(16px + var(--sb)) var(--gl);
 }
 
-/* Lines 1347-1353 */
+/* Line 1347-1347 */
 .mcard {
   width: min(460px, 100%);
   max-height: 100%;
@@ -961,7 +1050,7 @@ button {
   position: relative;
 }
 
-/* Lines 1354-1361 */
+/* Line 1354-1354 */
 .mcard .hd {
   background: var(--red);
   font-family: var(--display);
@@ -971,12 +1060,12 @@ button {
   padding: 9px 16px;
 }
 
-/* Lines 1362-1364 */
+/* Line 1362-1362 */
 .mcard .bd {
   padding: 18px;
 }
 
-/* Lines 1365-1371 */
+/* Line 1365-1365 */
 .mcard h3 {
   font-family: var(--display);
   font-weight: 400;
@@ -985,47 +1074,47 @@ button {
   line-height: 1.05;
 }
 
-/* Lines 1372-1376 */
+/* Line 1372-1372 */
 .mcard p {
   color: var(--muted);
   font-size: 13px;
-  margin: 6px 0 14px;
+  margin: 6px 0px 14px;
 }
 
-/* Lines 1377-1387 */
+/* Line 1377-1377 */
 .x {
   position: absolute;
   top: 4px;
   right: 6px;
-  border: 0;
+  border: 0px;
   background: transparent;
-  color: #fff;
+  color: rgb(255, 255, 255);
   font-size: 22px;
   line-height: 1;
   padding: 4px 8px;
 }
 
-/* Lines 1388-1392 */
+/* Line 1388-1388 */
 .form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-/* Lines 1393-1398 */
+/* Line 1393-1393 */
 .fld {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-width: 0;
+  min-width: 0px;
 }
 
-/* Lines 1399-1401 */
+/* Line 1399-1399 */
 .fld.full {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
 }
 
-/* Lines 1402-1408 */
+/* Line 1402-1402 */
 .fld label {
   font-family: var(--mono);
   font-size: 10px;
@@ -1034,7 +1123,7 @@ button {
   color: var(--muted);
 }
 
-/* Lines 1409-1417 */
+/* Line 1409-1409 */
 .fld input,
 .fld select {
   background: var(--glass2);
@@ -1045,32 +1134,32 @@ button {
   width: 100%;
 }
 
-/* Lines 1418-1422 */
+/* Line 1418-1418 */
 .fld input:focus,
 .fld select:focus {
   border-color: var(--pro);
   outline: none;
 }
 
-/* Lines 1423-1427 */
+/* Line 1423-1423 */
 .fld input[type="file"] {
   padding: 8px;
   font-size: 12px;
   color: var(--muted);
 }
 
-/* Lines 1428-1434 */
+/* Line 1428-1428 */
 .form .fu {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
   margin-top: 4px;
   padding: 13px;
   font-size: 16px;
   border-radius: 12px;
 }
 
-/* Lines 1435-1443 */
+/* Line 1435-1435 */
 .done ol {
-  margin: 10px 0 0;
+  margin: 10px 0px 0px;
   padding-left: 18px;
   color: var(--muted);
   display: flex;
@@ -1079,12 +1168,78 @@ button {
   font-size: 13px;
 }
 
-/* Lines 1444-1446 */
+/* Line 1444-1444 */
 .done ol b {
   color: var(--fg);
 }
 
-/* Lines 1503-1508 */
+@media (max-width: 1023px) {
+  /* Line 1449-1449 */
+  .card {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Line 1454-1454 */
+  .top {
+    flex-wrap: wrap;
+    gap: 8px;
+    top: calc(8px + var(--st));
+  }
+
+  /* Line 1459-1459 */
+  .seg {
+    order: 3;
+    width: 100%;
+  }
+
+  /* Line 1463-1463 */
+  .seg button {
+    flex: 1 1 0%;
+    padding: 7px 6px;
+  }
+
+  /* Line 1467-1467 */
+  .tr .fu {
+    display: none;
+  }
+
+  /* Line 1470-1470 */
+  .panel {
+    inset: auto 0px 0px;
+    height: 50%;
+    width: auto;
+    border-radius: 18px 18px 0px 0px;
+    padding: 16px var(--gr) calc(18px + var(--sb)) var(--gl);
+  }
+
+  /* Line 1480-1480 */
+  .boxart {
+    display: none;
+  }
+
+  /* Line 1483-1483 */
+  .intro .mt {
+    display: block;
+  }
+
+  /* Line 1486-1486 */
+  .form {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Line 1491-1491 */
+  .fu,
+  .tier,
+  .opt {
+    transition: none;
+  }
+}
+
+/* Line 1503-1503 */
 .party {
   margin-top: 12px;
   display: flex;
@@ -1092,15 +1247,100 @@ button {
   gap: 5px;
 }
 
-/* Lines 1576-1581 */
+/* Line 1509-1509 */
+.party .ph {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Line 1518-1518 */
+.pf {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 7px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+/* Line 1528-1528 */
+.pf i {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-family: var(--display);
+  font-size: 10px;
+  color: rgb(22, 22, 28);
+}
+
+/* Line 1539-1539 */
+.pf .nm {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Line 1546-1546 */
+.pf .nm small {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Line 1554-1554 */
+.pf .bars {
+  display: grid;
+  gap: 2px;
+  margin-top: 3px;
+}
+
+/* Line 1559-1559 */
+.pf .bars span {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  display: block;
+}
+
+/* Line 1566-1566 */
+.pf .bars b {
+  display: block;
+  height: 100%;
+}
+
+/* Line 1570-1570 */
+.more {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Line 1576-1576 */
 #patch {
   width: 132px;
   height: 132px;
   display: block;
-  margin: 0 auto 10px;
+  margin: 0px auto 10px;
 }
 
-/* Lines 1582-1587 */
+/* Line 1582-1582 */
 #patch2 {
   width: 150px;
   height: 150px;
@@ -1108,13 +1348,90 @@ button {
   margin: 4px auto 10px;
 }
 
-/* Lines 1588-1591 */
+/* Line 1588-1588 */
 .card .cn,
 .card .cc {
   text-align: center;
 }
 
-/* Lines 1649-1656 */
+/* Line 1592-1592 */
+.flag {
+  background: var(--glass2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Line 1598-1598 */
+.fl-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Line 1605-1605 */
+.fl-top b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Line 1612-1612 */
+.fl-top span {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ok);
+}
+
+/* Line 1617-1617 */
+.pips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 10px 0px 8px;
+}
+
+/* Line 1623-1623 */
+.pips span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Line 1633-1633 */
+.pips i {
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Line 1638-1638 */
+.pips .on i {
+  background: var(--pro);
+}
+
+/* Line 1641-1641 */
+.pips .cur {
+  color: var(--fg);
+}
+
+/* Line 1644-1644 */
+.flag p {
+  margin: 0px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Line 1649-1649 */
 .done .unl {
   text-align: center;
   font-family: var(--mono);
@@ -1124,107 +1441,99 @@ button {
   color: var(--pro);
 }
 
-/* Lines 1680-1683 */
+/* Line 1680-1680 */
 .big,
 .title {
   text-shadow: 3px 3px 0 var(--redLo);
 }
 
-/* Lines 1684-1687 */
+/* Line 1684-1684 */
 .big span,
 .title span {
-  text-shadow: 3px 3px 0 #141624;
+  text-shadow: rgb(20, 22, 36) 3px 3px 0px;
 }
 
-/* Lines 1688-1690 */
+/* Line 1688-1688 */
 .fu {
   box-shadow: 0 3px 0 var(--redLo);
 }
 
-/* Lines 1691-1693 */
+/* Line 1691-1691 */
 .fu:active {
   box-shadow: 0 1px 0 var(--redLo);
 }
 
-/* Lines 1694-1697 */
+/* Line 1694-1694 */
 .tier .badge,
 .burst {
   background: var(--sun);
 }
 
-/* Lines 1698-1700 */
+/* Line 1698-1698 */
 .stat .bar i.on {
   background: var(--red);
 }
 
-/* Lines 1792-1799 */
+/* Line 1701-1701 */
+.logo {
+  gap: 9px;
+  padding: 7px 15px 7px 9px;
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+}
+
+/* Line 1707-1707 */
+.logo .mk {
+  width: 24px;
+  height: 27px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+/* Line 1713-1713 */
+.logo .wm {
+  height: 16px;
+  width: auto;
+  display: block;
+}
+
+/* Line 1718-1718 */
+.collapsed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Line 1723-1723 */
+.incl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Line 1728-1728 */
+.incl span {
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: var(--glass2);
+  border: 1px solid var(--line2);
+}
+
+/* Line 1736-1736 */
+.incl span i {
+  font-style: normal;
+  color: var(--red);
+  margin-right: 5px;
+}
+
+/* Line 1792-1792 */
 .opt .say {
   display: block;
   font-size: 12px;
-  color: #fff;
+  color: rgb(255, 255, 255);
   font-style: italic;
   opacity: 0.85;
   margin-top: 2px;
-}
-
-@media (max-width: 1023px) {
-  /* Lines 1449-1451 */
-  .card {
-    display: none;
-  }
-}
-
-@media (max-width: 900px) {
-  /* Lines 1459-1462 */
-  .seg {
-    order: 3;
-    width: 100%;
-  }
-
-  /* Lines 1463-1466 */
-  .seg button {
-    flex: 1;
-    padding: 7px 6px;
-  }
-
-  /* Lines 1467-1469 */
-  .tr .fu {
-    display: none;
-  }
-
-  /* Lines 1470-1479 */
-  .panel {
-    top: auto;
-    height: 50%;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: auto;
-    border-radius: 18px 18px 0 0;
-    padding: 16px var(--gr) calc(18px + var(--sb)) var(--gl);
-  }
-
-  /* Lines 1480-1482 */
-  .boxart {
-    display: none;
-  }
-
-  /* Lines 1483-1485 */
-  .intro .mt {
-    display: block;
-  }
-
-  /* Lines 1486-1488 */
-  .form {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Lines 1491-1495 */
-  .fu,
-  .tier,
-  .opt {
-    transition: none;
-  }
 }

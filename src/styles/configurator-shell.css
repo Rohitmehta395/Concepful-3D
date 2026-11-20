@@ -1,12 +1,17 @@
 /**
- * Concepful Mech Builder - CSS Normalization Rules
- * Only includes rules necessary to normalize against Tailwind CSS user-agent overrides.
- * All original component styling is fully hosted in configurator.css via CSSOM provenance.
+ * Configurator Shell Styles (Tailwind Normalization only)
+ * Normalizes against Tailwind CSS user-agent resets to achieve bit-for-bit styling parity.
  */
 
-/* Normalize against Tailwind CSS button font-size reset (Tailwind forces 14px on button; reference relies on UA 13.3333px) */
-button.tier,
-button.opt {
+/* Normalize Tailwind button resets */
+#panel button,
+.panel button {
   font-size: 13.3333px;
   line-height: normal;
+}
+
+/* Normalize Tailwind canvas reset (Tailwind sets vertical-align: middle; UA default is baseline) */
+canvas#patch,
+canvas#patch2 {
+  vertical-align: baseline;
 }
