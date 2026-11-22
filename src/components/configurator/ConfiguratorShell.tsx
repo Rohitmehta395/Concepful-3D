@@ -46,7 +46,11 @@ export function ConfiguratorShell() {
             Server: Concepful · Creative Department as a Service
           </div>
           <div className="mt">Assemble your creative department.</div>
-          <p id="intro-p">{TIERS[state.tier].pitch}</p>
+          <p id="intro-p">
+            {solo
+              ? "Choose a game mode, pick your mission, watch your build come online. Every part is priced before you commit."
+              : TIERS[state.tier].pitch}
+          </p>
         </div>
 
         {/* Step 01: Game Mode */}
