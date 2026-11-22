@@ -5,7 +5,7 @@ import { useConfigurator } from "@/components/configurator/ConfiguratorProvider"
 import { Logo } from "./Logo";
 
 export function Header() {
-  const { state, dispatch, q } = useConfigurator();
+  const { state, dispatch, q, priceLabel, prsLabel } = useConfigurator();
 
   return (
     <header className="top" id="top">
@@ -36,6 +36,7 @@ export function Header() {
           type="button"
           data-tier="squad"
           className={state.tier === "squad" ? "on" : ""}
+          onClick={() => dispatch({ type: "SET_TIER", tier: "squad" })}
         >
           {TIERS.squad.name}
           <small>{TIERS.squad.sub}</small>
@@ -44,6 +45,7 @@ export function Header() {
           type="button"
           data-tier="combine"
           className={state.tier === "combine" ? "on" : ""}
+          onClick={() => dispatch({ type: "SET_TIER", tier: "combine" })}
         >
           {TIERS.combine.name}
           <small>{TIERS.combine.sub}</small>
@@ -51,8 +53,8 @@ export function Header() {
       </div>
       <div className="tr glass">
         <div className="tot">
-          <b id="pr">${q.total.toLocaleString("en-US")}</b>
-          <small id="prs">fixed fee</small>
+          <b id="pr">{priceLabel}</b>
+          <small id="prs">{prsLabel}</small>
         </div>
         <button className="fu" type="button" data-formup="">
           {q.T.fu}

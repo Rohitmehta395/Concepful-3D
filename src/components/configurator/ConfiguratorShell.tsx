@@ -1,22 +1,42 @@
 "use client";
 
-import { BUFFS, GEAR, QUESTS, TIERS, type TierId } from "@/content";
+import { BUFFS, GEAR, OBJECTIVES, QUESTS, TIERS, type TierId } from "@/content";
+import { fmt } from "@/domain/labels";
 import { useConfigurator } from "./ConfiguratorProvider";
+import { ENCD } from "./encounters";
 
 /**
- * ConfiguratorShell Component (Phase 6.2 - Solo Interactivity)
+ * ConfiguratorShell Component (Phase 6.3b - Squad Tier Interactivity)
  *
- * Renders the configurator DOM shell with solo tier interactivity:
- * - #panel with steps 01 (mode), 02 (pick mission/gear), 03 (flagship, hidden), 04 (buffs, hidden), 03 (loadout/blueprint)
- * - #card with hero character sheet and live stats/level
+ * Renders the configurator DOM shell with solo and squad tier interactivity:
+ * - #panel with steps 01 (mode), 02 (pick mission/objective), 03 (flagship, hidden in solo/squad), 04 (buffs, hidden in solo/squad), 03/05 (loadout/blueprint)
+ * - #card with live header (#chd), level (#cid), hero/squad name (#cn), class/leader (#cc), stats (#stats), party frames (#party), and motto (#motto)
  * - #boxart with title, server lead, and burst badge
  *
- * Wired to ConfiguratorProvider (useReducer + configReducer + quote).
+ * Wired to ConfiguratorProvider (useReducer + configReducer + quote + domain label helpers).
  */
 export function ConfiguratorShell() {
-  const { state, dispatch, q, currentQuest, level, stats } = useConfigurator();
+  const {
+    state,
+    dispatch,
+    q,
+    currentQuest,
+    level,
+    stats,
+    exOn,
+    heroName,
+    priceLabel,
+    cardHeaderDesc,
+    cardClassDesc,
+    party,
+  } = useConfigurator();
 
-  const soloTier = TIERS.solo;
+  const solo = state.tier === "solo";
+  const raid = state.tier === "combine";
+
+  const baseLineItem = solo
+    ? `Mission · ${currentQuest.hero}`
+    : `${q.T.name} · ${q.T.sub.split(" · ")[1]}`;
 
   return (
     <>
@@ -26,10 +46,7 @@ export function ConfiguratorShell() {
             Server: Concepful · Creative Department as a Service
           </div>
           <div className="mt">Assemble your creative department.</div>
-          <p id="intro-p">
-            Choose a game mode, pick your mission, watch your build come online.
-            Every part is priced before you commit.
-          </p>
+          <p id="intro-p">{TIERS[state.tier].pitch}</p>
         </div>
 
         {/* Step 01: Game Mode */}
@@ -45,7 +62,10 @@ export function ConfiguratorShell() {
             {(Object.entries(TIERS) as [TierId, (typeof TIERS)[TierId]][]).map(
               ([id, tItem]) => {
                 const on = state.tier === id;
-                const p = tItem.base;
+                const p =
+                  !tItem.one && state.billing === "yr"
+                    ? Math.round(tItem.base * 0.9)
+                    : tItem.base;
                 const formattedPrice = `$${p.toLocaleString("en-US")}`;
                 return (
                   <button
@@ -76,104 +96,195 @@ export function ConfiguratorShell() {
           </div>
         </section>
 
-        {/* Step 02: Pick Mission & Gear */}
+        {/* Step 02: Pick Mission / Objective / Department */}
         <section className="step" id="st-pick">
           <div className="sh">
             <span className="n">02</span>
-            <h2 id="lo-h">Mission</h2>
+            <h2 id="lo-h">
+              {solo ? "Mission" : raid ? "Department" : "Objective"}
+            </h2>
           </div>
           <p className="hint" id="lo-hint">
-            Pick a mission. It summons your hero.
+            {solo
+              ? "Pick a mission. It summons your hero."
+              : raid
+                ? "Full Force runs every objective at once. You and your lead set the priorities each month."
+                : "Pick what you’re trying to do. The party forms around it, and specialists are confirmed at kickoff."}
           </p>
-          <div id="groups">
-            <div className="grp">
-              <div className="gh">
-                <i style={{ background: "var(--red)" }}></i>
-                <b>Missions</b>
-                <span>Pick one</span>
+          <div id="groups" className="swap">
+            {solo ? (
+              <>
+                <div className="grp">
+                  <div className="gh">
+                    <i style={{ background: "var(--red)" }}></i>
+                    <b>Missions</b>
+                    <span>Pick one</span>
+                  </div>
+                  <div className="opts radio">
+                    {QUESTS.map((qItem) => {
+                      const on = state.mission === qItem.id;
+                      return (
+                        <button
+                          key={qItem.id}
+                          type="button"
+                          className={`opt${on ? " on" : ""}`}
+                          data-mission={qItem.id}
+                          aria-pressed={on}
+                          onClick={() =>
+                            dispatch({ type: "SET_MISSION", mission: qItem.id })
+                          }
+                        >
+                          <span className="ck" aria-hidden="true"></span>
+                          <span className="ot">
+                            <b>{qItem.name}</b>
+                            <small>{qItem.desc}</small>
+                            <em>
+                              Summons · {qItem.hero}{" "}
+                              <span className="dom">
+                                {qItem.cls.toUpperCase()}
+                              </span>
+                            </em>
+                          </span>
+                          <span className="op">
+                            {qItem.p > 0
+                              ? `+$${qItem.p.toLocaleString("en-US")}`
+                              : "incl."}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="grp">
+                  <div className="gh">
+                    <i style={{ background: "var(--sun)" }}></i>
+                    <b>Gear</b>
+                    <span>Optional</span>
+                  </div>
+                  <div className="opts">
+                    {GEAR.filter((e) => e.not !== state.mission).map((e) => {
+                      const on = exOn(e.id);
+                      return (
+                        <button
+                          key={e.id}
+                          type="button"
+                          className={`opt${on ? " on" : ""}`}
+                          data-extra={e.id}
+                          aria-pressed={on}
+                          onClick={() =>
+                            dispatch({ type: "TOGGLE_EXTRA", gearId: e.id })
+                          }
+                        >
+                          <span className="ck" aria-hidden="true"></span>
+                          <span className="ot">
+                            <b>{e.name}</b>
+                            <small>{e.desc}</small>
+                            <em>Adds · {e.fx}</em>
+                          </span>
+                          <span className="op">
+                            {"+$" + e.p.toLocaleString("en-US")}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : !raid ? (
+              <>
+                <div className="grp">
+                  <div className="gh">
+                    <i style={{ background: "var(--red)" }}></i>
+                    <b>Objectives</b>
+                    <span>Pick one or more</span>
+                  </div>
+                  <div className="opts" id="squad-objs">
+                    {OBJECTIVES.map((o) => {
+                      const enc = ENCD[o.id];
+                      const on = state.objectives.has(o.id);
+                      return (
+                        <button
+                          key={o.id}
+                          type="button"
+                          className={`opt${on ? " on" : ""}`}
+                          data-obj={o.id}
+                          aria-pressed={on}
+                          onClick={() =>
+                            dispatch({
+                              type: "TOGGLE_OBJECTIVE",
+                              objectiveId: o.id,
+                            })
+                          }
+                        >
+                          <span className="ck" aria-hidden="true"></span>
+                          <span className="ot">
+                            <b>{o.name}</b>
+                            <span className="say">{o.say}</span>
+                            <small>{o.desc}</small>
+                            <em>{`Encounter · ${enc.team} vs ${enc.boss}`}</em>
+                          </span>
+                          <span className="op">incl.</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="grp">
+                  <div className="gh">
+                    <i style={{ background: "var(--ops)" }}></i>
+                    <b>Always in your party</b>
+                  </div>
+                  <div className="lock" style={{ borderStyle: "solid" }}>
+                    <span>
+                      <b>Nexus</b> runs project management. <b>Hub</b> runs your
+                      Context™ workspace and links every unit.
+                    </span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="collapsed">
+                <div className="lock" style={{ borderStyle: "solid" }}>
+                  <span>
+                    <b>Everything in Full Crew, all at once.</b> All four
+                    objectives, plus Nexus and Hub.
+                  </span>
+                </div>
+                <div className="incl">
+                  {OBJECTIVES.map((o) => (
+                    <span key={o.id}>
+                      <i>✓</i>
+                      {o.name}
+                    </span>
+                  ))}
+                  <span>
+                    <i>✓</i>Project management
+                  </span>
+                  <span>
+                    <i>✓</i>Context™ workspace
+                  </span>
+                </div>
               </div>
-              <div className="opts radio">
-                {QUESTS.map((qItem) => {
-                  const on = state.mission === qItem.id;
-                  return (
-                    <button
-                      key={qItem.id}
-                      type="button"
-                      className={`opt${on ? " on" : ""}`}
-                      data-mission={qItem.id}
-                      aria-pressed={on}
-                      onClick={() =>
-                        dispatch({ type: "SET_MISSION", mission: qItem.id })
-                      }
-                    >
-                      <span className="ck" aria-hidden="true"></span>
-                      <span className="ot">
-                        <b>{qItem.name}</b>
-                        <small>{qItem.desc}</small>
-                        <em>
-                          Summons · {qItem.hero}{" "}
-                          <span className="dom">{qItem.cls.toUpperCase()}</span>
-                        </em>
-                      </span>
-                      <span className="op">
-                        {qItem.p > 0
-                          ? `+$${qItem.p.toLocaleString("en-US")}`
-                          : "incl."}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="grp">
-              <div className="gh">
-                <i style={{ background: "var(--sun)" }}></i>
-                <b>Gear</b>
-                <span>Optional</span>
-              </div>
-              <div className="opts">
-                {GEAR.filter((e) => e.not !== state.mission).map((e) => {
-                  const on = state.extras.has(e.id);
-                  return (
-                    <button
-                      key={e.id}
-                      type="button"
-                      className={`opt${on ? " on" : ""}`}
-                      data-extra={e.id}
-                      aria-pressed={on}
-                      onClick={() =>
-                        dispatch({ type: "TOGGLE_EXTRA", gearId: e.id })
-                      }
-                    >
-                      <span className="ck" aria-hidden="true"></span>
-                      <span className="ot">
-                        <b>{e.name}</b>
-                        <small>{e.desc}</small>
-                        <em>Adds · {e.fx}</em>
-                      </span>
-                      <span className="op">
-                        +${e.p.toLocaleString("en-US")}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            )}
           </div>
+
           <div
-            className={`nudge${state.tier === "solo" && state.extras.size >= 2 ? " show" : ""}`}
+            className={`nudge${solo && state.extras.size >= 2 ? " show" : ""}`}
             id="nudge"
           >
             <span>Bigger mission than one hero can carry? Bring a party.</span>
-            <button type="button" data-tier="squad">
+            <button
+              type="button"
+              data-tier="squad"
+              onClick={() => dispatch({ type: "SET_TIER", tier: "squad" })}
+            >
               Form a Full Crew
             </button>
           </div>
         </section>
 
-        {/* Step 03: Flagship (Hidden in Solo mode) */}
-        <section className="step" id="st-ship" hidden>
+        {/* Step 03: Flagship (visible only in combine/raid) */}
+        <section className="step swap" id="st-ship" hidden={!raid}>
           <div className="sh">
             <span className="n">03</span>
             <h2>Flagship</h2>
@@ -185,8 +296,8 @@ export function ConfiguratorShell() {
           <div id="ships"></div>
         </section>
 
-        {/* Step 04: Raid Buffs (Hidden in Solo mode) */}
-        <section className="step" id="st-buffs" hidden>
+        {/* Step 04: Raid buffs (visible only in combine/raid) */}
+        <section className="step swap" id="st-buffs" hidden={!raid}>
           <div className="sh">
             <span className="n">04</span>
             <h2>Raid buffs</h2>
@@ -200,9 +311,10 @@ export function ConfiguratorShell() {
               <button
                 key={b.id}
                 type="button"
-                className="opt"
+                className={`opt${state.buffs.has(b.id) ? " on" : ""}`}
                 data-buff={b.id}
-                aria-pressed="false"
+                aria-pressed={state.buffs.has(b.id)}
+                onClick={() => dispatch({ type: "TOGGLE_BUFF", buffId: b.id })}
               >
                 <span className="ck" aria-hidden="true"></span>
                 <span className="ot">
@@ -216,21 +328,31 @@ export function ConfiguratorShell() {
           </div>
         </section>
 
-        {/* Step 05 (numbered 03 in solo): Loadout & Blueprint */}
+        {/* Loadout & Blueprint (numbered 05 in raid, 03 in solo/squad) */}
         <section className="step" id="st-load">
           <div className="sh">
-            <span className="n">03</span>
+            <span className="n">{raid ? "05" : "03"}</span>
             <h2>Loadout</h2>
           </div>
           <p className="hint">
             Itemized, and a ceiling. No hidden microtransactions. We confirm the
             final number after reviewing your materials.
           </p>
-          <div className="toggle" id="bill" hidden>
-            <button type="button" id="b-mo" className="on">
+          <div className="toggle" id="bill" hidden={solo}>
+            <button
+              type="button"
+              id="b-mo"
+              className={state.billing === "mo" ? "on" : ""}
+              onClick={() => dispatch({ type: "SET_BILLING", billing: "mo" })}
+            >
               Monthly
             </button>
-            <button type="button" id="b-yr">
+            <button
+              type="button"
+              id="b-yr"
+              className={state.billing === "yr" ? "on" : ""}
+              onClick={() => dispatch({ type: "SET_BILLING", billing: "yr" })}
+            >
               Annual <em>−10%</em>
             </button>
           </div>
@@ -238,16 +360,20 @@ export function ConfiguratorShell() {
             <div className="bl">
               <span className="l">
                 <i style={{ background: "var(--fg)" }}></i>
-                {`Mission · ${currentQuest.hero}`}
+                {baseLineItem}
               </span>
               <span className="n">
-                {"$" + q.T.base.toLocaleString("en-US")}
+                {fmt(q.T.base) + (q.T.one ? "" : "/mo")}
               </span>
             </div>
             <div className="bl mut">
               <span className="l">
                 <i style={{ background: "var(--dim)" }}></i>
-                {"Mission included"}
+                {solo
+                  ? "Mission included"
+                  : raid
+                    ? "Objectives, support & flagship included"
+                    : "Objectives & support included"}
               </span>
               <span className="n">incl.</span>
             </div>
@@ -257,16 +383,30 @@ export function ConfiguratorShell() {
                   <i style={{ background: l.c }}></i>
                   {l.name}
                 </span>
-                <span className="n">{"+$" + l.p.toLocaleString("en-US")}</span>
+                <span className="n">
+                  {"+" + fmt(l.p) + (q.T.one ? "" : "/mo")}
+                </span>
               </div>
             ))}
+            {q.disc > 0 && (
+              <div className="bl save">
+                <span>Annual billing</span>
+                <span className="n">−{fmt(q.disc)}/mo</span>
+              </div>
+            )}
             <div className="bl total">
-              <span>Estimated fixed fee</span>
-              <span className="n">{"$" + q.total.toLocaleString("en-US")}</span>
+              <span>Estimated {q.T.one ? "fixed fee" : "monthly"}</span>
+              <span className="n">{priceLabel}</span>
             </div>
+            {q.T.min && (
+              <div className="bl mut">
+                <span>{q.T.min}</span>
+                <span className="n">{raid ? "flagship incl." : ""}</span>
+              </div>
+            )}
           </div>
           <button className="fu wide" type="button" data-formup="">
-            {soloTier.fu}
+            {q.T.fu}
           </button>
           <p className="fine">
             Fast kickoff · Senior lead on every build · IP transfers on
@@ -280,7 +420,7 @@ export function ConfiguratorShell() {
       {/* Character Sheet Card */}
       <section className="card glass" id="card" aria-label="Character sheet">
         <div className="hd">
-          <span id="chd">Character</span>
+          <span id="chd">{cardHeaderDesc}</span>
           <span id="cid">LV {level}</span>
         </div>
         <div className="bd">
@@ -291,10 +431,10 @@ export function ConfiguratorShell() {
             width="132"
           ></canvas>
           <div className="cn" id="cn">
-            {currentQuest.hero}
+            {heroName}
           </div>
           <div className="cc" id="cc">
-            {currentQuest.cls}
+            {cardClassDesc}
           </div>
           <div className="stats" id="stats">
             {stats.map(([code, name, val]) => (
@@ -309,7 +449,52 @@ export function ConfiguratorShell() {
               </div>
             ))}
           </div>
-          <div className="party" id="party"></div>
+          <div className="party" id="party">
+            {party && (
+              <>
+                <div className="ph">
+                  <span>Party frames</span>
+                  <span>
+                    {party.total}/{party.total}
+                  </span>
+                </div>
+                {party.frames.map((f) => (
+                  <div key={f.id} className="pf">
+                    <i style={{ background: f.badgeBg }}>{f.badge}</i>
+                    <div>
+                      <div className="nm">
+                        {f.name}
+                        <small>{f.roleName}</small>
+                      </div>
+                      <div className="bars">
+                        <span>
+                          <b
+                            style={{
+                              width: `${f.hp}%`,
+                              background: "#4CC58A",
+                            }}
+                          ></b>
+                        </span>
+                        <span>
+                          <b
+                            style={{
+                              width: `${f.mp}%`,
+                              background: "#5A8FE0",
+                            }}
+                          ></b>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {party.moreCount > 0 && (
+                  <div className="more">
+                    +{party.moreCount} more in the party
+                  </div>
+                )}
+              </>
+            )}
+          </div>
           <div className="motto">
             <span>Motto</span>
             <q id="motto">{TIERS[state.tier].motto}</q>

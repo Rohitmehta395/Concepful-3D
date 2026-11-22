@@ -14,8 +14,19 @@ import {
   configReducer,
 } from "@/domain/config";
 import { type Quote, quote } from "@/domain/quote";
+import { levelFor } from "@/domain/level";
+import {
+  cardClassDescFor,
+  cardHeaderDescFor,
+  heroNameFor,
+  partyFor,
+  type PartyData,
+  priceLabelFor,
+  prsLabelFor,
+  statsFor,
+} from "@/domain/labels";
 import { GEAR, QUESTS } from "@/content";
-import type { Quest } from "@/content/types";
+import type { GearId, Quest } from "@/content/types";
 
 interface ConfiguratorContextValue {
   state: ConfigState;
@@ -23,8 +34,14 @@ interface ConfiguratorContextValue {
   q: Quote;
   currentQuest: Quest;
   level: number;
-  stats: [string, string, number][];
-  exOn: (id: string) => boolean;
+  stats: readonly [string, string, number][];
+  exOn: (id: GearId) => boolean;
+  prsLabel: string;
+  heroName: string;
+  priceLabel: string;
+  cardHeaderDesc: string;
+  cardClassDesc: string;
+  party: PartyData | null;
 }
 
 const ConfiguratorContext = createContext<ConfiguratorContextValue | null>(
@@ -61,41 +78,35 @@ export function ConfiguratorProvider({
           tier: state.tier,
           reach: state.reach,
           mission: state.mission,
-          objective: "gtm",
+          objective: Array.from(state.objectives)[0] ?? "gtm",
         });
       }
     }
-  }, [state.tier, state.reach, state.mission]);
+  }, [state.tier, state.reach, state.mission, state.objectives]);
 
   const value = useMemo(() => {
     const q = quote(state);
     const currentQuest =
       QUESTS.find((item) => item.id === state.mission) ?? QUESTS[0]!;
 
-    const exOn = (id: string) => {
+    const exOn = (id: GearId) => {
       const item = GEAR.find((e) => e.id === id);
       return (
         state.tier === "solo" &&
-        state.extras.has(id as never) &&
+        state.extras.has(id) &&
         item !== undefined &&
         item.not !== state.mission
       );
     };
 
-    // Original lines 14804-14811:
-    // const lv = solo ? 12 + [...extras].filter(exOn).length * 6 + (qq.p ? 6 : 0) : ...
-    const activeExtrasCount = Array.from(state.extras).filter(exOn).length;
-    const level = 12 + activeExtrasCount * 6 + (currentQuest.p ? 6 : 0);
-
-    // Original lines 14829-14841:
-    const desQ = ["brand", "uiux", "decks", "copy"].includes(state.mission);
-    const stats: [string, string, number][] = [
-      ["INT", "Strategy", 2],
-      ["DEX", "Design", (desQ ? 7 : 2) + (exOn("x-illus") ? 2 : 0)],
-      ["STR", "Production", (desQ ? 2 : 7) + (exOn("x-motion") ? 2 : 0)],
-      ["STA", "Operations", 2],
-      ["SPD", "Speed", exOn("x-rush") ? 10 : 6],
-    ];
+    const level = levelFor(state);
+    const prsLabel = prsLabelFor(q);
+    const heroName = heroNameFor(state);
+    const priceLabel = priceLabelFor(q);
+    const cardHeaderDesc = cardHeaderDescFor(state);
+    const cardClassDesc = cardClassDescFor(state);
+    const stats = statsFor(state);
+    const party = partyFor(state);
 
     return {
       state,
@@ -105,6 +116,12 @@ export function ConfiguratorProvider({
       level,
       stats,
       exOn,
+      prsLabel,
+      heroName,
+      priceLabel,
+      cardHeaderDesc,
+      cardClassDesc,
+      party,
     };
   }, [state]);
 

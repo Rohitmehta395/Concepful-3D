@@ -3,5 +3,4 @@ node_modules
 pnpm-lock.yaml
 reference
 scratch
-
-
+tests/fixtures/*.html
