@@ -20,11 +20,13 @@ import { createLogiStage } from "./stages/logiStage";
 import { createRulesStage } from "./stages/rulesStage";
 import { createStagesStage } from "./stages/stagesStage";
 import { createOutroStage } from "./stages/outroStage";
+import { createAppStage } from "./stages/appStage";
+import { type BuildState, DEFAULT_BUILD_STATE } from "./buildState";
 import {
-  createAppStage,
-  type BuildState,
-  DEFAULT_BUILD_STATE,
-} from "./stages/appStage";
+  registerEncStage,
+  registerRaidStage,
+  registerOverlay,
+} from "./stages/slots";
 import { createOverlay, type OverlayManager } from "./overlay";
 
 export interface EngineOptions {
@@ -120,26 +122,27 @@ export function createEngine(
       renderFrame(performance.now());
     }
   });
-  const stageManager = createStageManager(
+  const stageContext = {
+    three,
     scene,
-    {
-      three,
-      scene,
-      mats: materials,
-      camera,
-      orbitCtrl: orbitController,
-      getBuildState: () => buildState,
-    },
-    {
-      intro: createIntroStage,
-      classes: createClassesStage,
-      logi: createLogiStage,
-      rules: createRulesStage,
-      stages: createStagesStage,
-      outro: createOutroStage,
-      app: createAppStage,
-    }
-  );
+    mats: materials,
+    camera,
+    orbitCtrl: orbitController,
+    getBuildState: () => buildState,
+  };
+  const stageManager = createStageManager(scene, stageContext, {
+    intro: createIntroStage,
+    classes: createClassesStage,
+    logi: createLogiStage,
+    rules: createRulesStage,
+    stages: createStagesStage,
+    outro: createOutroStage,
+    app: createAppStage,
+  });
+
+  registerEncStage(stageManager, stageContext);
+  registerRaidStage(stageManager, stageContext);
+  registerOverlay(stageManager, stageContext);
 
   // Framing box & scroll driver
   const scrollDriver = createScrollDriver();
@@ -664,3 +667,5 @@ export function createEngine(
     getBuildState: () => buildState,
   };
 }
+
+export { type BuildState, DEFAULT_BUILD_STATE } from "./buildState";

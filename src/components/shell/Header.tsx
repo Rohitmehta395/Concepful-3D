@@ -2,10 +2,12 @@
 
 import { BRAND, NAV_CTA, NAV_LINKS, TIERS } from "@/content";
 import { useConfigurator } from "@/components/configurator/ConfiguratorProvider";
+import { useLeadModal } from "@/components/modal";
 import { Logo } from "./Logo";
 
 export function Header() {
   const { state, dispatch, q, priceLabel, prsLabel } = useConfigurator();
+  const { open } = useLeadModal();
 
   return (
     <header className="top" id="top">
@@ -56,7 +58,12 @@ export function Header() {
           <b id="pr">{priceLabel}</b>
           <small id="prs">{prsLabel}</small>
         </div>
-        <button className="fu" type="button" data-formup="">
+        <button
+          className="fu"
+          type="button"
+          data-formup=""
+          onClick={() => open()}
+        >
           {q.T.fu}
         </button>
       </div>

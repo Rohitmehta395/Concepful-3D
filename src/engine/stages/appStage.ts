@@ -5,29 +5,8 @@ import { createStreakField, type StreakField } from "../world/streakField";
 import { H3 } from "../models/hVehiclesC";
 import type { VehicleHandle } from "../models/hVehiclesA";
 import type { Stage, StageBuildContext, StageUpdateParams } from "./types";
-
-export interface BuildState {
-  tier: "solo" | "squad" | "combine";
-  reach: "local" | "regional" | "national" | "global";
-  mission:
-    | "brand"
-    | "web"
-    | "uiux"
-    | "decks"
-    | "copy"
-    | "motion"
-    | "3d"
-    | "fab"
-    | "ai";
-  objective: "gtm" | "dir" | "research" | "product";
-}
-
-export const DEFAULT_BUILD_STATE: BuildState = {
-  tier: "solo",
-  reach: "local",
-  mission: "brand",
-  objective: "gtm",
-};
+import { DEFAULT_BUILD_STATE } from "../buildState";
+export { type BuildState, DEFAULT_BUILD_STATE } from "../buildState";
 
 export interface EnvConfig {
   readonly name: string;

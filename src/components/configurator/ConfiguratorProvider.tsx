@@ -79,10 +79,12 @@ export function ConfiguratorProvider({
           reach: state.reach,
           mission: state.mission,
           objective: Array.from(state.objectives)[0] ?? "gtm",
+          objectives: Array.from(state.objectives),
+          buffs: Array.from(state.buffs),
         });
       }
     }
-  }, [state.tier, state.reach, state.mission, state.objectives]);
+  }, [state.tier, state.reach, state.mission, state.objectives, state.buffs]);
 
   const value = useMemo(() => {
     const q = quote(state);

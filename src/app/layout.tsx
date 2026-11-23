@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Russo_One } from "next/font/google";
 import { Footer } from "@/components/shell/Footer";
-import { GuildModal } from "@/components/shell/GuildModal";
+import { LeadModal, LeadModalProvider } from "@/components/modal";
 import { Header } from "@/components/shell/Header";
 import { SceneHost } from "@/components/scene/SceneHost";
 import { AppModeSync } from "@/components/scene/AppModeSync";
@@ -72,13 +72,15 @@ export default function RootLayout({
         <SceneHost />
         <AppModeSync />
         <SkipLink />
-        <ConfiguratorProvider>
-          <Header />
-          <ConfiguratorShell />
-          {children}
-        </ConfiguratorProvider>
-        <Footer />
-        <GuildModal />
+        <LeadModalProvider>
+          <ConfiguratorProvider>
+            <Header />
+            <ConfiguratorShell />
+            {children}
+          </ConfiguratorProvider>
+          <Footer />
+          <LeadModal />
+        </LeadModalProvider>
       </body>
     </html>
   );
