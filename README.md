@@ -4,83 +4,26 @@ A production Next.js rebuild of the **Concepful Mech Builder** prototype. Concep
 
 ---
 
-## 1. Visual Source of Truth
+## 1. Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org/) `16.4.3` (App Router, Turbopack)
+- **UI & Runtime:** [React](https://react.dev/) `19.3.0` & React DOM `19.3.0`
+- **3D Graphics:** [Three.js](https://threejs.org/) `0.128.0` (pinned for exact mathematical and shader parity)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) `v4` with CSS design tokens (`src/styles/tokens.css`)
+- **Typography:** `next/font/google` loading Russo One, Inter, and JetBrains Mono
+- **Testing & Verification:** [Playwright](https://playwright.dev/) `1.64.1` & [Vitest](https://vitest.dev/) `3.2.7`
+- **Language & Tooling:** TypeScript `5.9.3` (strict mode), ESLint `9.x`, Prettier `3.9.x`, pnpm `11.9.x`
+
+---
+
+## 2. Visual Source of Truth
 
 - **Original Standalone HTML:** Archived for reference at [`reference/Concepful_Mech_Builder.html`](file:///d:/Projects/Pete/Concepful-3D/reference/Concepful_Mech_Builder.html) (SHA-256: `6DDD1EFDD493A245F2556FA71440D8693F837275FCD4E232DE24D527F8E88802`).
 - **Baseline Capture Archive:** 36 high-resolution reference screenshots across four standard viewports (`390px`, `768px`, `1280px`, `1920px`) located in [`reference/baseline/`](file:///d:/Projects/Pete/Concepful-3D/reference/baseline/).
 
 ---
 
-## 2. Project Status: Phase 1 Completed
-
-The project is being developed across 10 structured phases:
-
-- [x] **Part 1.1:** Project Foundation (Next.js, TypeScript strict, Tailwind v4, ESLint, Prettier) — _Approved_
-- [x] **Part 1.2:** Reference Baseline Capture (36 Playwright screenshots across 4 viewports) — _Approved_
-- [x] **Part 1.3:** Design Tokens Extraction (`src/styles/tokens.css`, `docs/design-system.md`) — _Approved_
-- [x] **Part 1.4:** Font Integration (`next/font/google` for Russo One, Inter, JetBrains Mono) — _Approved_
-- [x] **Part 1.5:** Documentation Skeleton (`docs/` suite and architectural decision records) — _Implemented (Awaiting User Review and Approval)_
-- [ ] **Phases 2–10:** Content, Domain, Shell, 3D Engine, Configurator, Optimization, and Production — _Pending Approval_
-
-Detailed tracking is maintained in [`docs/progress.md`](file:///d:/Projects/Pete/Concepful-3D/docs/progress.md).
-
----
-
-## 3. Documentation Suite
-
-The complete architectural documentation is organized in [`docs/`](file:///d:/Projects/Pete/Concepful-3D/docs/):
-
-- [`docs/requirements.md`](file:///d:/Projects/Pete/Concepful-3D/docs/requirements.md) — Functional, visual, and non-functional requirements and scope boundaries.
-- [`docs/architecture.md`](file:///d:/Projects/Pete/Concepful-3D/docs/architecture.md) — Next.js App Router boundaries, decoupled scene engine, and pure domain state.
-- [`docs/design-system.md`](file:///d:/Projects/Pete/Concepful-3D/docs/design-system.md) — Design tokens, color cascade resolution, typography stacks, radii, and shadows.
-- [`docs/implementation-roadmap.md`](file:///d:/Projects/Pete/Concepful-3D/docs/implementation-roadmap.md) — Phased 10-phase redevelopment breakdown and acceptance criteria.
-- [`docs/progress.md`](file:///d:/Projects/Pete/Concepful-3D/docs/progress.md) — Milestone tracking, verification logs, and integrity checksums.
-- **Architectural Decision Records (ADRs):**
-  - [`docs/decisions/0001-no-r3f.md`](file:///d:/Projects/Pete/Concepful-3D/docs/decisions/0001-no-r3f.md) — Imperative Three.js scene engine instead of React Three Fiber.
-  - [`docs/decisions/0002-pin-three-r128.md`](file:///d:/Projects/Pete/Concepful-3D/docs/decisions/0002-pin-three-r128.md) — Pin Three.js r128 initially for visual and mathematical parity.
-  - [`docs/decisions/0003-no-animation-library.md`](file:///d:/Projects/Pete/Concepful-3D/docs/decisions/0003-no-animation-library.md) — Omit external animation libraries (GSAP, Motion) in favor of native rAF loop.
-
----
-
-## 4. Prerequisites
-
-- **Node.js**: `v20.x` or `v22.x` (tested on `v22.15.0`)
-- **Package Manager**: [pnpm](https://pnpm.io/) (`v11.x`+)
-
----
-
-## 5. Getting Started
-
-### Installation
-
-```bash
-pnpm install
-```
-
-### Running the Development Server
-
-```bash
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Environment Variables
-
-| Variable               | Description                                                                                                                                 | Default  |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
-| `NEXT_PUBLIC_SITE_URL` | Base URL used to resolve absolute OpenGraph and metadata URLs (e.g. `https://concepful.com`). When unset, `metadataBase` remains undefined. | _(none)_ |
-
-### Production Build
-
-```bash
-pnpm build
-pnpm start
-```
-
----
-
-## 6. Available Scripts
+## 3. Available Scripts
 
 All scripts in `package.json`:
 
@@ -93,3 +36,74 @@ All scripts in `package.json`:
 | `pnpm typecheck`    | Executes TypeScript type-checking without emitting files (`tsc --noEmit`) |
 | `pnpm format`       | Formats all source files and markdown documents with Prettier             |
 | `pnpm format:check` | Verifies formatting compliance against Prettier rules                     |
+| `pnpm test`         | Runs unit and integration tests with Vitest                               |
+
+---
+
+## 4. Environment Variables & E2E Build Flag
+
+Configuration options supported across development, test, and production:
+
+| Variable               | Description                                                                                                                                                                                                       | Default                 |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Base URL used to resolve absolute OpenGraph metadata, canonical tags, `robots.txt`, and `sitemap.xml`.                                                                                                            | `https://concepful.com` |
+| `NEXT_PUBLIC_E2E`      | Test hook gate flag. When set to `"1"`, diagnostic runtime hooks (`__CONCEPFUL*`) are mounted on `window` for automation harnesses. In production builds (`NEXT_PUBLIC_E2E="0"` or unset), all hooks are omitted. | `0`                     |
+
+---
+
+## 5. Harness Overview
+
+The project relies on multiple automated test and verification harnesses to ensure strict parity against the reference prototype:
+
+1. **Click Parity Harness (`click_parity_harness.mjs`):**
+   - Drives interactive sequences across Solo and Squad configurator tiers on both desktop (`1280x800`) and mobile (`390x800`).
+   - Extracts 14 DOM state properties per step (price labels, cycle rate, encounter header, selected objectives/extras, card items, stats, motto, and active controls).
+   - Validates 0 mismatches against `reference/Concepful_Mech_Builder.html`.
+
+2. **Pixel Protocol Harness (`measure_protocol.mjs`):**
+   - Headless Playwright capture protocol executing settling loops (100ms screenshots until consecutive identical frames) under auto-scroll and disabled canvas backgrounds (`#gl`, `#cv`, `#patch`).
+   - Evaluates `.top`, `.hero`, and `#card` across viewports.
+
+3. **Golden Snapshot Differential Suite (`tests/differential.test.ts`):**
+   - Automated Vitest snapshot regression test suite comparing DOM state representations across tiers against pre-generated reference fixtures (`tests/fixtures/reference-states.json`).
+
+4. **Compiled CSS Token Guard (`scripts/check-compiled-css.mjs`):**
+   - Verifies the compiled CSS artifact contains zero unresolved CSS custom properties or illegal overrides.
+
+---
+
+## 6. Known Residuals
+
+Documented differences from baseline measurements (Parts 4.28–4.30):
+
+1. **Sub-pixel Font Rasterization:**
+   - Chrome headless font antialiasing differences between native inline SVG/DOM text and canvas rendering account for small sub-pixel border smoothing deltas on high-DPI displays.
+2. **Mobile Configurator Card Visibility:**
+   - At mobile breakpoints (`<= 1023px`, e.g. `390px`), the right-hand `#card` is styled with `display: none` per original prototype CSS rules (lines 1449–1449). Configurator telemetry is instead surfaced via the mobile summary overlay (`.mcard`).
+
+---
+
+## 7. Getting Started
+
+### Installation
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+### Running the Development Server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Production Build & Launch
+
+```bash
+pnpm build
+pnpm start
+```
+
+For detailed deployment instructions, see [`docs/deploy.md`](file:///d:/Projects/Pete/lanes/prod/docs/deploy.md).
