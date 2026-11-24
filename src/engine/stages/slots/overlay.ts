@@ -1,16 +1,105 @@
-import type { StageBuildContext } from "../types";
+import type { Stage, StageBuildContext, StageUpdateParams } from "../types";
 import type { StageManager } from "../StageManager";
+import { createPatchManager } from "../../overlay/patch";
+import { createEnvbManager } from "../../overlay/envb";
+import { createHudManager } from "../../overlay/hud";
+import type {
+  PatchManager,
+  EnvbManager,
+  HudManager,
+} from "../../overlay/types";
+
+export interface ActiveOverlayHandles {
+  readonly patch: PatchManager;
+  readonly envb?: EnvbManager;
+  readonly hud: HudManager;
+}
+
+let activeHandles: ActiveOverlayHandles | null = null;
+
+export function getActiveOverlayHandles(): ActiveOverlayHandles | null {
+  return activeHandles;
+}
 
 /**
  * Overlay slot.
  *
  * Owned by lane overlay.
- * Future implementation will register overlay elements or stages.
- * In Phase p0, this registration is a no-op contract placeholder.
+ * Wires Phase 7 2D overlays (#patch, #patch2, #cv HUD/callouts) and ENVB drifters
+ * to the engine lifecycle and stages.
  */
 export function registerOverlay(
-  _manager: StageManager,
-  _ctx: StageBuildContext
+  manager: StageManager,
+  ctx: StageBuildContext
 ): void {
-  // No-op in lane p0; implemented in lane overlay
+  const patchMgr = createPatchManager(ctx.three, ctx.mats);
+  const hudMgr = createHudManager();
+
+  let envbMgr: EnvbManager | null = null;
+  let isAppAttached = false;
+
+  function attachToAppStage(appStage: Stage): void {
+    if (isAppAttached) return;
+    isAppAttached = true;
+
+    envbMgr = createEnvbManager(ctx.three, ctx.mats, appStage.group);
+    const initialMission = ctx.getBuildState
+      ? ctx.getBuildState()?.mission || "brand"
+      : "brand";
+    envbMgr.setMission(initialMission);
+
+    const origUpdate = appStage.update.bind(appStage);
+    appStage.update = (params: StageUpdateParams) => {
+      origUpdate(params);
+
+      const bState = ctx.getBuildState ? ctx.getBuildState() : undefined;
+      const mission = bState?.mission || "brand";
+      if (envbMgr) {
+        envbMgr.setMission(mission);
+        envbMgr.update(params.t, params.dt, params.reduceMotion);
+      }
+
+      // Update #patch and #patch2 canvases
+      patchMgr.update(
+        params.t,
+        bState || { mission: "brand" },
+        params.reduceMotion
+      );
+    };
+
+    const origDispose = appStage.dispose.bind(appStage);
+    appStage.dispose = () => {
+      if (envbMgr) {
+        envbMgr.dispose();
+        envbMgr = null;
+      }
+      patchMgr.dispose();
+      hudMgr.dispose();
+      origDispose();
+    };
+  }
+
+  // Check if app stage already exists in cache
+  const existingApp = manager.getBuiltStage("app");
+  if (existingApp) {
+    attachToAppStage(existingApp);
+  }
+
+  // Intercept manager.select to attach to appStage whenever it is built
+  const origSelect = manager.select.bind(manager);
+  manager.select = (key: string): Stage | null => {
+    const stage = origSelect(key);
+    if (key === "app" && stage && !isAppAttached) {
+      attachToAppStage(stage);
+    }
+    return stage;
+  };
+
+  activeHandles = {
+    patch: patchMgr,
+    get envb() {
+      return envbMgr || undefined;
+    },
+    hud: hudMgr,
+  };
 }
