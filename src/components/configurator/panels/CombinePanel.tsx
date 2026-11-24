@@ -1,6 +1,8 @@
 "use client";
 
-import { BUFFS, OBJECTIVES } from "@/content";
+import { useEffect, useState } from "react";
+import { BUFFS, CLASSES, OBJECTIVES } from "@/content";
+import { shipFor } from "@/domain/ship";
 import { useConfigurator } from "../ConfiguratorProvider";
 
 export function CombineGroups() {
@@ -33,6 +35,17 @@ export function CombineGroups() {
 export function CombinePanel() {
   const { state, dispatch } = useConfigurator();
   const raid = state.tier === "combine";
+  const [hasVisitedCombine, setHasVisitedCombine] = useState(false);
+
+  useEffect(() => {
+    if (raid) {
+      setHasVisitedCombine(true);
+    }
+  }, [raid]);
+
+  const reach = shipFor(state.buffs);
+  const activeClassIndex = CLASSES.findIndex((c) => c.id === reach);
+  const currentClass = CLASSES[activeClassIndex] ?? CLASSES[0]!;
 
   return (
     <>
@@ -45,7 +58,28 @@ export function CombinePanel() {
           Included with Full Force. It upgrades on its own as you add raid
           buffs.
         </p>
-        <div id="ships"></div>
+        <div id="ships">
+          {hasVisitedCombine && (
+            <div className="flag">
+              <div className="fl-top">
+                <b>{currentClass.ship}</b>
+                <span>{currentClass.code} · included</span>
+              </div>
+              <div className="pips">
+                {CLASSES.map((k, j) => (
+                  <span
+                    key={k.id}
+                    className={`${j <= activeClassIndex ? "on" : ""}${j === activeClassIndex ? " cur" : ""}`}
+                  >
+                    <i />
+                    {k.ship}
+                  </span>
+                ))}
+              </div>
+              <p>{currentClass.desc} Add raid buffs and it grows.</p>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Step 04: Raid buffs (visible only in combine/raid) */}
