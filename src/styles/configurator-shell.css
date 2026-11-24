@@ -3,11 +3,17 @@
  * Normalizes against Tailwind CSS user-agent resets to achieve bit-for-bit styling parity.
  */
 
-/* Normalize Tailwind button resets */
+/* Normalize Tailwind button resets for configurator options */
 #panel button,
 .panel button {
-  font-size: 13.3333px;
   line-height: normal;
+}
+
+#panel .tier,
+#panel .opt,
+.panel .tier,
+.panel .opt {
+  font-size: 13.3333px;
 }
 
 /* Normalize Tailwind canvas reset (Tailwind sets vertical-align: middle; UA default is baseline) */

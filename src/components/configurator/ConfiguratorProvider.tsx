@@ -2,10 +2,12 @@
 
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from "react";
 import {
   type ConfigAction,
@@ -25,7 +27,7 @@ import {
   prsLabelFor,
   statsFor,
 } from "@/domain/labels";
-import { GEAR, QUESTS } from "@/content";
+import { GEAR, QUESTS, TIERS } from "@/content";
 import type { GearId, Quest } from "@/content/types";
 
 interface ConfiguratorContextValue {
@@ -42,6 +44,7 @@ interface ConfiguratorContextValue {
   cardHeaderDesc: string;
   cardClassDesc: string;
   party: PartyData | null;
+  introText: string;
 }
 
 const ConfiguratorContext = createContext<ConfiguratorContextValue | null>(
@@ -63,7 +66,18 @@ export function ConfiguratorProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [state, dispatch] = useReducer(configReducer, INITIAL_CONFIG_STATE);
+  const [state, rawDispatch] = useReducer(configReducer, INITIAL_CONFIG_STATE);
+  const [hasChangedTier, setHasChangedTier] = useState(false);
+
+  const dispatch = useCallback(
+    (action: ConfigAction) => {
+      if (action.type === "SET_TIER" && action.tier !== state.tier) {
+        setHasChangedTier(true);
+      }
+      rawDispatch(action);
+    },
+    [state.tier]
+  );
 
   // Sync state to 3D engine in test/E2E environment
   useEffect(() => {
@@ -109,6 +123,9 @@ export function ConfiguratorProvider({
     const cardClassDesc = cardClassDescFor(state);
     const stats = statsFor(state);
     const party = partyFor(state);
+    const introText = hasChangedTier
+      ? TIERS[state.tier].pitch
+      : "Choose a game mode, pick your mission, watch your build come online. Every part is priced before you commit.";
 
     return {
       state,
@@ -124,8 +141,9 @@ export function ConfiguratorProvider({
       cardHeaderDesc,
       cardClassDesc,
       party,
+      introText,
     };
-  }, [state]);
+  }, [state, dispatch, hasChangedTier]);
 
   return (
     <ConfiguratorContext.Provider value={value}>

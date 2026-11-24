@@ -23,7 +23,7 @@ import { CardSheet } from "./panels/CardSheet";
  * - #boxart
  */
 export function ConfiguratorShell() {
-  const { state, dispatch } = useConfigurator();
+  const { state, dispatch, introText } = useConfigurator();
 
   const solo = state.tier === "solo";
   const raid = state.tier === "combine";
@@ -36,11 +36,7 @@ export function ConfiguratorShell() {
             Server: Concepful · Creative Department as a Service
           </div>
           <div className="mt">Assemble your creative department.</div>
-          <p id="intro-p">
-            {solo
-              ? "Choose a game mode, pick your mission, watch your build come online. Every part is priced before you commit."
-              : TIERS[state.tier].pitch}
-          </p>
+          <p id="intro-p">{introText}</p>
         </div>
 
         {/* Step 01: Game Mode */}
