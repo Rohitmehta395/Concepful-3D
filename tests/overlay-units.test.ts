@@ -5,7 +5,6 @@ import {
   createPatchManager,
   createEnvbManager,
   createHudManager,
-  drawCallouts,
   toScreen,
   STAGE_C,
 } from "@/engine/overlay/index";
@@ -107,9 +106,11 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
           counts.Matrix4++;
         }
       };
-    (THREE as unknown as { Color: unknown }).Color = class extends origCol {
-      constructor(r?: any, g?: any, b?: any) {
-        super(r, g, b);
+    (THREE as unknown as { Color: typeof origCol }).Color = class extends (
+      origCol
+    ) {
+      constructor(c?: THREE.Color | string | number) {
+        super(c);
         counts.Color++;
       }
     };
@@ -205,9 +206,11 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
           counts.Matrix4++;
         }
       };
-    (THREE as unknown as { Color: unknown }).Color = class extends origCol {
-      constructor(r?: any, g?: any, b?: any) {
-        super(r, g, b);
+    (THREE as unknown as { Color: typeof origCol }).Color = class extends (
+      origCol
+    ) {
+      constructor(c?: THREE.Color | string | number) {
+        super(c);
         counts.Color++;
       }
     };
@@ -297,7 +300,9 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
       scene,
       mats,
       camera,
-      orbitCtrl: orbitCtrl as any,
+      orbitCtrl: orbitCtrl as unknown as Parameters<
+        typeof createStageManager
+      >[1]["orbitCtrl"],
       getBuildState: () => buildState,
     };
 

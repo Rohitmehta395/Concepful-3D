@@ -17,3 +17,9 @@
 - **Target File**: `docs/lanes/next-report.md`
 - **Reason**: `pnpm format:check` flags style issues in `docs/lanes/next-report.md`. As a lane-owned file of lane `next`, lane `overlay` cannot edit it.
 - **Requested Change**: Run `prettier --write docs/lanes/next-report.md`.
+
+## 4. src/engine/createEngine.ts or src/engine/overlay.ts — Hook drawCallouts into post-vignette pass
+
+- **Target File**: `src/engine/createEngine.ts` / `src/engine/overlay.ts`
+- **Reason**: `overlay.render(time, fadeT)` clears `#cv` on line 63 of `src/engine/overlay.ts` (`ctx.clearRect(0, 0, w, h)`) during every frame. Any callouts drawn during stage updates prior to `overlay.render()` are cleared by the vignette pass.
+- **Requested Change**: Call `drawCallouts` directly after vignette rendering in `overlay.render` or `createEngine.ts:343` when `STORY.mode !== "app"`.

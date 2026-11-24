@@ -277,14 +277,16 @@ export function createPatchManager(
 
     if (renderer && typeof renderer.setRenderTarget === "function") {
       renderer.setRenderTarget(rt);
-      if (typeof renderer.setClearColor === "function") renderer.setClearColor(0x000000, 0);
+      if (typeof renderer.setClearColor === "function")
+        renderer.setClearColor(0x000000, 0);
       if (typeof renderer.clear === "function") renderer.clear();
       if (typeof renderer.render === "function") renderer.render(sc, cam);
       if (typeof renderer.readRenderTargetPixels === "function") {
         renderer.readRenderTargetPixels(rt, 0, 0, 256, 256, buf);
       }
       renderer.setRenderTarget(null);
-      if (typeof renderer.setClearColor === "function") renderer.setClearColor(0x000000, 1);
+      if (typeof renderer.setClearColor === "function")
+        renderer.setClearColor(0x000000, 1);
 
       if (img && x && typeof x.putImageData === "function") {
         const D = img.data;
@@ -310,7 +312,10 @@ export function createPatchManager(
         : 1;
     const defaultSz = targetCanvas.id === "patch2" ? 150 : 132;
     const expectedPx = Math.round(defaultSz * dpr);
-    if (targetCanvas.width !== expectedPx || targetCanvas.height !== expectedPx) {
+    if (
+      targetCanvas.width !== expectedPx ||
+      targetCanvas.height !== expectedPx
+    ) {
       targetCanvas.width = targetCanvas.height = expectedPx;
     }
     const size = defaultSz;
@@ -443,7 +448,11 @@ export function createPatchManager(
     if (rt && typeof rt.dispose === "function") {
       rt.dispose();
     }
-    if (renderer && renderer !== customRenderer && typeof renderer.dispose === "function") {
+    if (
+      renderer &&
+      renderer !== customRenderer &&
+      typeof renderer.dispose === "function"
+    ) {
       renderer.dispose();
       renderer = null;
     }
