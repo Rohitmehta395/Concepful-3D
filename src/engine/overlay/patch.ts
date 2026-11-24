@@ -157,7 +157,7 @@ export function createPatchManager(
     c.width = 256;
     c.height = 256;
     x = c.getContext("2d");
-    if (x) {
+    if (x && typeof x.createImageData === "function") {
       img = x.createImageData(256, 256);
     }
   } else {
@@ -275,16 +275,18 @@ export function createPatchManager(
     cam.position.copy(fc).addScaledVector(dir, d);
     cam.lookAt(fc);
 
-    if (renderer) {
+    if (renderer && typeof renderer.setRenderTarget === "function") {
       renderer.setRenderTarget(rt);
-      renderer.setClearColor(0x000000, 0);
-      renderer.clear();
-      renderer.render(sc, cam);
-      renderer.readRenderTargetPixels(rt, 0, 0, 256, 256, buf);
+      if (typeof renderer.setClearColor === "function") renderer.setClearColor(0x000000, 0);
+      if (typeof renderer.clear === "function") renderer.clear();
+      if (typeof renderer.render === "function") renderer.render(sc, cam);
+      if (typeof renderer.readRenderTargetPixels === "function") {
+        renderer.readRenderTargetPixels(rt, 0, 0, 256, 256, buf);
+      }
       renderer.setRenderTarget(null);
-      renderer.setClearColor(0x000000, 1);
+      if (typeof renderer.setClearColor === "function") renderer.setClearColor(0x000000, 1);
 
-      if (img && x) {
+      if (img && x && typeof x.putImageData === "function") {
         const D = img.data;
         // Flip rows vertically from WebGL framebuffer into ImageData
         for (let y = 0; y < 256; y++) {
@@ -306,7 +308,12 @@ export function createPatchManager(
       typeof window !== "undefined"
         ? Math.min(2, window.devicePixelRatio || 1)
         : 1;
-    const size = targetCanvas.width / dpr;
+    const defaultSz = targetCanvas.id === "patch2" ? 150 : 132;
+    const expectedPx = Math.round(defaultSz * dpr);
+    if (targetCanvas.width !== expectedPx || targetCanvas.height !== expectedPx) {
+      targetCanvas.width = targetCanvas.height = expectedPx;
+    }
+    const size = defaultSz;
     if (!size) return;
 
     const ctx = targetCanvas.getContext("2d");
@@ -423,14 +430,20 @@ export function createPatchManager(
     if (isDisposed) return;
     isDisposed = true;
     if (currentModel) {
-      sc.remove(currentModel.g);
+      if (typeof sc.remove === "function") sc.remove(currentModel.g);
       currentModel = null;
     }
-    while (sc.children.length > 0) {
-      sc.remove(sc.children[0]!);
+    while (sc.children && sc.children.length > 0) {
+      if (typeof sc.remove === "function") {
+        sc.remove(sc.children[0]!);
+      } else {
+        sc.children.shift();
+      }
     }
-    rt.dispose();
-    if (renderer && renderer !== customRenderer) {
+    if (rt && typeof rt.dispose === "function") {
+      rt.dispose();
+    }
+    if (renderer && renderer !== customRenderer && typeof renderer.dispose === "function") {
       renderer.dispose();
       renderer = null;
     }

@@ -107,11 +107,9 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
           counts.Matrix4++;
         }
       };
-    (THREE as unknown as { Color: typeof THREE.Color }).Color = class extends (
-      origCol
-    ) {
-      constructor(...args: ConstructorParameters<typeof origCol>) {
-        super(...args);
+    (THREE as unknown as { Color: unknown }).Color = class extends origCol {
+      constructor(r?: any, g?: any, b?: any) {
+        super(r, g, b);
         counts.Color++;
       }
     };
@@ -207,11 +205,9 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
           counts.Matrix4++;
         }
       };
-    (THREE as unknown as { Color: typeof THREE.Color }).Color = class extends (
-      origCol
-    ) {
-      constructor(...args: ConstructorParameters<typeof origCol>) {
-        super(...args);
+    (THREE as unknown as { Color: unknown }).Color = class extends origCol {
+      constructor(r?: any, g?: any, b?: any) {
+        super(r, g, b);
         counts.Color++;
       }
     };
