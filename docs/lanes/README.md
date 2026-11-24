@@ -1,24 +1,30 @@
-# Parallel Lanes Architecture & Integration Guide
+# Parallel Feature Lanes (Concepful 3D)
 
-## Overview
+This directory contains specifications and contract documents for concurrent multi-agent development lanes on Concepful 3D.
 
-Lane `p0` restructures the Concepful-3D codebase so five parallel feature lanes can execute concurrently without file collisions or merge contention.
+## Execution Waves
 
-## Recommended Merge & Integration Sequence
+- **Wave 0**: `p0` (baseline decoupling & contracts), `next` (Next.js security upgrade, merged), `prod` (metadata, error pages, docs, accessibility audit)
+- **Wave 1**: `combine` (squad/combine tier UI, buffs, flagship parity), `modal` (lead intake modal, validation & flow), `enc` (encounter stage 3D visuals), `raid` (raid stage 3D flagship visuals), `overlay` (3D overlay HUD elements)
+- **Wave 2**: `integrator` (cross-lane merge, request application, final validation)
 
-1. **p0** (Baseline restructuring, panels extraction, modal contract, engine buildState contract & slot placeholders)
-2. **next** (Next.js config & platform updates)
-3. **prod** (Production hardening)
-4. **combine** (Full Force Combine department tier UI in `CombinePanel.tsx`)
-5. **modal** (Lead intake form validation & submission handling in `LeadModal.tsx`)
-6. **enc** (3D encounter scenes in `src/engine/stages/enc/`)
-7. **raid** (3D raid carrier visualization in `src/engine/stages/raid/`)
-8. **overlay** (3D overlay HUD elements in `src/engine/overlay/`)
-9. **integrator** (Integration audit, full gate validation, release tagging)
+## Lane Topology & Port Assignments
 
-## Contracts Established by Lane p0
+| Lane         | Branch            | Port | Description                                      |
+| :----------- | :---------------- | :--- | :----------------------------------------------- |
+| `p0`         | `lane/p0`         | 3100 | Architectural decoupling & contracts baseline    |
+| `next`       | `lane/next`       | 3101 | Next.js security upgrade, merged                 |
+| `prod`       | `lane/prod`       | 3102 | Metadata, error pages, docs, accessibility audit |
+| `combine`    | `lane/combine`    | 3111 | Combine tier UI, buffs, flagship parity          |
+| `modal`      | `lane/modal`      | 3112 | Guild lead capture modal validation & flow       |
+| `enc`        | `lane/enc`        | 3113 | 3D Encounter stage procedural animation          |
+| `raid`       | `lane/raid`       | 3114 | 3D Raid stage flagship visualization             |
+| `overlay`    | `lane/overlay`    | 3115 | 3D/DOM canvas post-processing & overlay          |
+| `integrator` | `lane/integrator` | 3120 | Lane integration, conflict resolution & merge    |
 
-- **Panels Decomposition**: `src/components/configurator/panels/` contains discrete sub-panels (`TierPicker`, `SoloPanel`, `SquadPanel`, `CombinePanel`, `LoadoutStep`, `CardSheet`).
-- **Modal Contract**: `LeadModalProvider` provides React Context `{ isOpen, open, close }`. `Header` and `LoadoutStep` wire `open()` to `[data-formup]`.
-- **Engine Build State Contract**: `BuildState` defines `tier`, `reach`, `mission`, `objective`, `objectives`, `buffs`. `createEngine` supports partial updates without mutating other properties.
-- **Engine Stage Slots**: Slot hooks (`registerEncStage`, `registerRaidStage`, `registerOverlay`) allow lanes `enc`, `raid`, and `overlay` to register stages without modifying `createEngine.ts`.
+## Rules of Engagement
+
+1. **Strict File Ownership**: Never modify files outside your lane's ownership table defined in [CONTRACT.md](./CONTRACT.md).
+2. **Dedicated clone (git clone, never git worktree)**: Each lane operates in a separate clone at `D:\Projects\Pete\lanes\<LANE>` on its designated port. Free ports only by PID (`taskkill /F /PID`).
+3. **No External Regression**: All lanes must preserve passing baseline tests (`tests/reference-parity.test.ts`) and pixel parity protocols.
+4. **Requests & Blockers**: If a lane requires changes to a file owned by another lane or core, log the request in `docs/lanes/<LANE>-requests.md` without editing forbidden files.
