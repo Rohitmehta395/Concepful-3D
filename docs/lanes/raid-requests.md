@@ -75,3 +75,15 @@
   }
   ```
   _(Note: Lane raid implements a zero-conflict wrapper on `manager.select` in `src/engine/stages/slots/raid.ts` so raid stage functionality is fully operational immediately without violating Rule L5)._
+
+---
+
+## 3. Request to Next Lane / Integrator: Format `docs/lanes/next-report.md`
+
+- **Target File:** `docs/lanes/next-report.md`
+- **Context:**
+  Running `pnpm format:check` (`prettier --check .`) fails with:
+  `[warn] docs/lanes/next-report.md`
+  Per Rule L4/L5, lane raid does not edit other lanes' files. All files owned by lane raid strictly pass `prettier --check`.
+- **Proposed Solution:**
+  Run `pnpm prettier --write docs/lanes/next-report.md` on main or integrator branch.
