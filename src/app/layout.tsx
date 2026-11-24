@@ -39,6 +39,8 @@ const brand = copyrightPrefix?.split(" ")[2] ?? "Concepful";
 const siteTitle = `${brand} · ${tagline}`;
 const siteDescription = STORY_SECTIONS.hero.description;
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://concepful.com";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -49,10 +51,19 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: siteTitle,
   description: siteDescription,
-  ...(process.env.NEXT_PUBLIC_SITE_URL
-    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) }
-    : {}),
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    url: "/",
+    siteName: brand,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
     title: siteTitle,
     description: siteDescription,
   },
