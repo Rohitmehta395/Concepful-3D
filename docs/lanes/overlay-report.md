@@ -17,7 +17,8 @@ Numbers that got worse than before: None.
 - `989c168`: `feat(overlay): port Phase 7 2D overlays and ENVB drifters`
 - `7eeb999`: `fix(overlay): guard renderer methods in patch and update patch dimensions`
 - `8cae00a`: `docs(overlay): update initial draft of overlay report and requests`
-- `d79ab01`: `fix(overlay): typecheck Color mock in unit test and format files`
+- `b57b558`: `docs(overlay): complete final acceptance report, gate checks, and requests`
+- `bb4f0ca`: `fix(overlay): import explicitly from overlay/index in slots/overlay.ts`
 
 ### Owned Files Created & Modified
 
@@ -57,12 +58,12 @@ All gate checks were executed against the clone at `D:\Projects\Pete\lanes\overl
 
 All results are directly read from scratch files generated during verification runs on port 3115:
 
-- `verify_acceptance.mjs` (SHA-256: `b7963f75e64a997601a609e9522b70fb6c3da4dc0572fcbdb639333adc7255a4`, 24,033 bytes)
+- `verify_acceptance.mjs` (SHA-256: `b0839c6d9c966d037f52a39b8fe37b3a0894282ba2254bbfc776c7fb07993df9`, 24,525 bytes)
 - `part4_13_sweep.mjs` (SHA-256: `0b8c5341a93578e9924a75f344b8fe4dacc758427fbcbb0da855a0783c76610f`, 10,640 bytes)
 
 ### A. #patch and #patch2 Canvas Pixels across 12 States (`patch_pixels.json`)
 
-File: `C:\Users\steve\concepful_scratch\lane_overlay\patch_pixels.json` (5,564 bytes, SHA-256: `d28cd4afbb08533cc96c4dad382ca0cb388108a06d871a9ef2568854f170c76c`)
+File: `C:\Users\steve\concepful_scratch\lane_overlay\patch_pixels.json` (5,580 bytes, SHA-256: `ffb0b62c534277f1b1b8939de2deba4988310914bfd21706b7714fcbabfe2e1b`)
 
 | State ID        | Tier    | Billing | Level / Hero        | #patch Diff (px)          | #patch Noise (Ref/Reb) | #patch Status | #patch2 Diff (px)         | #patch2 Noise (Ref/Reb) | #patch2 Status |
 | :-------------- | :------ | :------ | :------------------ | :------------------------ | :--------------------- | :------------ | :------------------------ | :---------------------- | :------------- |
