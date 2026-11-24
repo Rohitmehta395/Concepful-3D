@@ -1,13 +1,13 @@
 import type { Stage, StageBuildContext, StageUpdateParams } from "../types";
 import type { StageManager } from "../StageManager";
-import { createPatchManager } from "../../overlay/patch";
-import { createEnvbManager } from "../../overlay/envb";
-import { createHudManager } from "../../overlay/hud";
-import type {
-  PatchManager,
-  EnvbManager,
-  HudManager,
-} from "../../overlay/types";
+import {
+  createPatchManager,
+  createEnvbManager,
+  createHudManager,
+  type PatchManager,
+  type EnvbManager,
+  type HudManager,
+} from "../../overlay/index";
 
 export interface ActiveOverlayHandles {
   readonly patch: PatchManager;
