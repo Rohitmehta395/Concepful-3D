@@ -13,6 +13,10 @@ import {
   getActiveOverlayHandles,
 } from "@/engine/stages/slots/overlay";
 import { createStageManager } from "@/engine/stages/StageManager";
+import type {
+  StageBuildContext,
+  StageUpdateParams,
+} from "@/engine/stages/types";
 import { createAppStage } from "@/engine/stages/appStage";
 
 describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
@@ -365,5 +369,143 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
     });
 
     manager.dispose();
+  });
+
+  it("attaches ENVB only to base appStage on solo, hides on enc/raid, and updates #patch across all three stages", () => {
+    const mockBox = {
+      x0: 0,
+      x1: 1280,
+      y0: 0,
+      y1: 800,
+      w: 1280,
+      h: 800,
+      cx: 640,
+      cy: 400,
+    };
+    const appGroup = new THREE.Group();
+    const encGroup = new THREE.Group();
+    const raidGroup = new THREE.Group();
+
+    let appUpdateCount = 0;
+    let encUpdateCount = 0;
+    let raidUpdateCount = 0;
+
+    const makeStage = (
+      key: string,
+      group: THREE.Group,
+      onUpdate: (_params: StageUpdateParams) => void
+    ) => ({
+      key,
+      group,
+      backgroundTexture: new THREE.CanvasTexture(
+        null as unknown as HTMLCanvasElement
+      ),
+      fog: null,
+      setVisible: (v: boolean) => {
+        group.visible = v;
+      },
+      update: onUpdate,
+      dispose: () => {},
+    });
+
+    const baseAppStage = makeStage("app", appGroup, () => appUpdateCount++);
+    const encStage = makeStage("enc", encGroup, () => encUpdateCount++);
+    const raidStage = makeStage("raid", raidGroup, () => raidUpdateCount++);
+
+    let buildState: { mission: string; tier?: string } = {
+      mission: "uiux",
+      tier: "squad",
+    };
+
+    let builtApp: typeof baseAppStage | undefined;
+    const mockManager = {
+      hasBuilder: () => true,
+      getBuiltStage: (k: string) => (k === "app" ? builtApp : undefined),
+      getActiveStage: () => null,
+      select: (k: string) => {
+        if (k !== "app") return null;
+        if (buildState.tier === "squad") return encStage;
+        if (buildState.tier === "combine") return raidStage;
+        if (!builtApp) builtApp = baseAppStage;
+        return builtApp;
+      },
+      clearActive: () => {},
+      dispose: () => {},
+    };
+
+    const mats = createMaterialRegistry(THREE);
+    const ctx = {
+      three: THREE,
+      scene: new THREE.Scene(),
+      mats,
+      camera: new THREE.PerspectiveCamera(45, 1, 0.1, 100),
+      orbitCtrl: {
+        drag: { yaw: 0, pitch: 0 },
+        aim: () => {},
+      } as unknown as StageBuildContext["orbitCtrl"],
+      getBuildState: () => buildState,
+    };
+
+    registerOverlay(mockManager, ctx);
+    const handles = getActiveOverlayHandles()!;
+
+    // First visit is squad -> encStage selected, ENVB must NOT attach yet
+    const s1 = mockManager.select("app");
+    expect(s1).toBe(encStage);
+    expect(handles.envb).toBeUndefined();
+    expect(encGroup.children.length).toBe(0);
+    s1!.update({
+      t: 100,
+      dt: 16.6,
+      p: 0.5,
+      kk: 1,
+      box: mockBox,
+      viewportH: 800,
+      reduceMotion: false,
+    });
+    expect(encUpdateCount).toBe(1);
+
+    // Switch to combine -> raidStage selected, ENVB still NOT attached
+    buildState = { mission: "uiux", tier: "combine" };
+    const s2 = mockManager.select("app");
+    expect(s2).toBe(raidStage);
+    expect(handles.envb).toBeUndefined();
+    s2!.update({
+      t: 116.6,
+      dt: 16.6,
+      p: 0.5,
+      kk: 1,
+      box: mockBox,
+      viewportH: 800,
+      reduceMotion: false,
+    });
+    expect(raidUpdateCount).toBe(1);
+
+    // Switch to solo -> baseAppStage selected, ENVB attaches and uiux has 15 children (1 moon + 9 mountains + 5 UI planes)
+    buildState = { mission: "uiux", tier: "solo" };
+    const s3 = mockManager.select("app");
+    expect(s3).toBe(baseAppStage);
+    expect(handles.envb).toBeDefined();
+    expect(handles.envb!.group.visible).toBe(true);
+    s3!.update({
+      t: 133.3,
+      dt: 16.6,
+      p: 0.5,
+      kk: 1,
+      box: mockBox,
+      viewportH: 800,
+      reduceMotion: false,
+    });
+    expect(appUpdateCount).toBe(1);
+    const activeUiux = handles.envb!.group.children.find((c) => c.visible);
+    expect(activeUiux).toBeDefined();
+    expect(activeUiux!.children.length).toBe(15);
+
+    // Switch back to squad -> ENVB must hide
+    buildState = { mission: "uiux", tier: "squad" };
+    mockManager.select("app");
+    expect(handles.envb!.group.visible).toBe(false);
+
+    mockManager.dispose();
   });
 });

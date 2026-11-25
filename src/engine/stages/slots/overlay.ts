@@ -36,63 +36,103 @@ export function registerOverlay(
   const hudMgr = createHudManager();
 
   let envbMgr: EnvbManager | null = null;
-  let isAppAttached = false;
+  let baseAppStageRef: Stage | null = null;
+  const hookedPatchStages = new WeakSet<Stage>();
 
-  function attachToAppStage(appStage: Stage): void {
-    if (isAppAttached) return;
-    isAppAttached = true;
+  function getMissionAndTier() {
+    const bState = ctx.getBuildState ? ctx.getBuildState() : undefined;
+    return {
+      bState,
+      mission: bState?.mission || "brand",
+      tier: bState?.tier || "solo",
+    };
+  }
 
-    envbMgr = createEnvbManager(ctx.three, ctx.mats, appStage.group);
-    const initialMission = ctx.getBuildState
-      ? ctx.getBuildState()?.mission || "brand"
-      : "brand";
-    envbMgr.setMission(initialMission);
+  function attachPatchToStage(stage: Stage): void {
+    if (hookedPatchStages.has(stage)) return;
+    hookedPatchStages.add(stage);
 
-    const origUpdate = appStage.update.bind(appStage);
-    appStage.update = (params: StageUpdateParams) => {
+    const origUpdate = stage.update.bind(stage);
+    stage.update = (params: StageUpdateParams) => {
       origUpdate(params);
 
-      const bState = ctx.getBuildState ? ctx.getBuildState() : undefined;
-      const mission = bState?.mission || "brand";
+      const { bState, mission, tier } = getMissionAndTier();
       if (envbMgr) {
-        envbMgr.setMission(mission);
-        envbMgr.update(params.t, params.dt, params.reduceMotion);
+        const isBaseAppSolo = stage === baseAppStageRef && tier === "solo";
+        envbMgr.group.visible = isBaseAppSolo;
+        if (isBaseAppSolo) {
+          envbMgr.setMission(mission);
+          envbMgr.update(params.t, params.dt, params.reduceMotion);
+        }
       }
 
-      // Update #patch and #patch2 canvases
+      // Update #patch and #patch2 canvases across all app-mode stages (appStage, encStage, raidStage)
       patchMgr.update(
         params.t,
         bState || { mission: "brand" },
         params.reduceMotion
       );
     };
+  }
 
-    const origDispose = appStage.dispose.bind(appStage);
-    appStage.dispose = () => {
+  function attachEnvbToBaseAppStage(baseAppStage: Stage): void {
+    if (envbMgr) return;
+    baseAppStageRef = baseAppStage;
+    envbMgr = createEnvbManager(ctx.three, ctx.mats, baseAppStage.group);
+    const { mission, tier } = getMissionAndTier();
+    envbMgr.setMission(mission);
+    envbMgr.group.visible = tier === "solo";
+
+    const origDispose = baseAppStage.dispose.bind(baseAppStage);
+    baseAppStage.dispose = () => {
       if (envbMgr) {
         envbMgr.dispose();
         envbMgr = null;
       }
-      patchMgr.dispose();
-      hudMgr.dispose();
+      baseAppStageRef = null;
       origDispose();
     };
   }
 
-  // Check if app stage already exists in cache
+  // Check if base app stage already exists in cache
   const existingApp = manager.getBuiltStage("app");
   if (existingApp) {
-    attachToAppStage(existingApp);
+    attachEnvbToBaseAppStage(existingApp);
+    attachPatchToStage(existingApp);
   }
 
-  // Intercept manager.select to attach to appStage whenever it is built
+  // Intercept manager.select to attach ENVB only to base createAppStage,
+  // hide ENVB when enc/raid/other stages are active, and hook #patch/#patch2 on all app stages.
   const origSelect = manager.select.bind(manager);
   manager.select = (key: string): Stage | null => {
     const stage = origSelect(key);
-    if (key === "app" && stage && !isAppAttached) {
-      attachToAppStage(stage);
+    const { tier } = getMissionAndTier();
+    const baseAppStage = manager.getBuiltStage("app");
+
+    if (key === "app" && stage) {
+      if (baseAppStage && stage === baseAppStage && !envbMgr) {
+        attachEnvbToBaseAppStage(baseAppStage);
+      }
+      attachPatchToStage(stage);
+      if (envbMgr) {
+        envbMgr.group.visible = stage === baseAppStageRef && tier === "solo";
+      }
+    } else if (envbMgr) {
+      envbMgr.group.visible = false;
     }
+
     return stage;
+  };
+
+  const origManagerDispose = manager.dispose.bind(manager);
+  manager.dispose = () => {
+    if (envbMgr) {
+      envbMgr.dispose();
+      envbMgr = null;
+    }
+    patchMgr.dispose();
+    hudMgr.dispose();
+    origManagerDispose();
   };
 
   activeHandles = {

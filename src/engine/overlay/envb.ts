@@ -1,7 +1,17 @@
 import type * as THREE from "three";
 import type { MaterialRegistry } from "../world/materials";
 import { HX } from "../world/materials";
-import { Bx, Cy, Co, Ic, flat, glowS, holoEdges, mk } from "../world/geometry";
+import {
+  Bx,
+  Cy,
+  Co,
+  Ic,
+  flat,
+  glowS,
+  holoEdges,
+  mk,
+  plane,
+} from "../world/geometry";
 import { createCRND } from "../world/prng";
 import type { EnvbManager } from "./types";
 
@@ -172,10 +182,25 @@ export function createEnvbManager(
           );
           mt.push({ m, v: 0.3 });
         }
+        const ui: DrifterItem[] = [];
+        for (let i = 0; i < 5; i++) {
+          const m = plane(
+            three,
+            g,
+            1.4,
+            1,
+            mats.TX("ui"),
+            [(RND() - 0.5) * 20, (RND() - 0.2) * 7, -6 - RND() * 5],
+            [0, (RND() - 0.5) * 0.6, 0],
+            0.8
+          );
+          ui.push({ m, v: 0.8 });
+        }
         return {
           g,
           upd: (t: number, dt: number, reduceMotion: boolean) => {
             drifters(mt, dt, 1, 32, reduceMotion);
+            drifters(ui, dt, 1.5, 14, reduceMotion);
             if (!reduceMotion) {
               moon.rotation.y = t / 20000;
             }

@@ -1,4 +1,4 @@
-Numbers that got worse than before: None.
+Solo app rows worse than before (7 of 10 in part4_13 sweep, due to ENVB drifters on top of camera): 390@9200 (+0.2590%), 390@9300 (+0.1452%), 390@9600 (+0.2590%), 1280@9200 (+0.2733%), 1280@9400 (+0.2678%), 1280@9500 (+0.2678%), 1280@9600 (+0.2678%).
 
 # Lane Overlay Report
 
@@ -63,22 +63,22 @@ All results are directly read from scratch files generated during verification r
 
 ### A. #patch and #patch2 Canvas Pixels across 12 States (`patch_pixels.json`)
 
-File: `C:\Users\steve\concepful_scratch\lane_overlay\patch_pixels.json` (5,580 bytes, SHA-256: `ffb0b62c534277f1b1b8939de2deba4988310914bfd21706b7714fcbabfe2e1b`)
+File: `C:\Users\steve\concepful_scratch\lane_overlay\patch_pixels.json` (5,508 bytes, SHA-256: `dbf71b6ce4a8e6abcce308ceb315858f8e85493934634ddb66f116ea9a986b0c`)
 
-| State ID        | Tier    | Billing | Level / Hero        | #patch Diff (px)          | #patch Noise (Ref/Reb) | #patch Status | #patch2 Diff (px)         | #patch2 Noise (Ref/Reb) | #patch2 Status |
-| :-------------- | :------ | :------ | :------------------ | :------------------------ | :--------------------- | :------------ | :------------------------ | :---------------------- | :------------- |
-| `solo_idx286`   | solo    | mo      | LV 12 Laser Dolphin | 11 / 17,424 (0.0631%)     | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%)     | 0 / 0                   | **VALID**      |
-| `solo_idx287`   | solo    | mo      | LV 18 Laser Dolphin | 11 / 17,424 (0.0631%)     | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%)     | 0 / 0                   | **VALID**      |
-| `solo_idx289`   | solo    | mo      | LV 24 Laser Dolphin | 11 / 17,424 (0.0631%)     | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%)     | 0 / 0                   | **VALID**      |
-| `solo_idx290`   | solo    | mo      | LV 18 Laser Dolphin | 11 / 17,424 (0.0631%)     | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%)     | 0 / 0                   | **VALID**      |
-| `squad_idx0`    | squad   | mo      | LV 41 Full Crew     | 3,471 / 17,424 (19.9208%) | 0 / 0                  | **VALID**     | 4,882 / 22,500 (21.6978%) | 0 / 0                   | **VALID**      |
-| `squad_idx1`    | squad   | yr      | LV 41 Full Crew     | 3,471 / 17,424 (19.9208%) | 0 / 0                  | **VALID**     | 4,882 / 22,500 (21.6978%) | 0 / 0                   | **VALID**      |
-| `squad_idx2`    | squad   | mo      | LV 53 Full Crew     | 3,471 / 17,424 (19.9208%) | 0 / 0                  | **VALID**     | 4,882 / 22,500 (21.6978%) | 0 / 0                   | **VALID**      |
-| `squad_idx4`    | squad   | mo      | LV 53 Full Crew     | 3,471 / 17,424 (19.9208%) | 0 / 0                  | **VALID**     | 4,882 / 22,500 (21.6978%) | 0 / 0                   | **VALID**      |
-| `combine_idx30` | combine | mo      | LV 76 Sub vessel    | 2,622 / 17,424 (15.0482%) | 0 / 0                  | **VALID**     | 3,493 / 22,500 (15.5244%) | 0 / 0                   | **VALID**      |
-| `combine_idx31` | combine | yr      | LV 76 Sub vessel    | 2,622 / 17,424 (15.0482%) | 0 / 0                  | **VALID**     | 3,493 / 22,500 (15.5244%) | 0 / 0                   | **VALID**      |
-| `combine_idx32` | combine | mo      | LV 89 Sky cruiser   | 3,073 / 17,424 (17.6366%) | 0 / 0                  | **VALID**     | 4,234 / 22,500 (18.8178%) | 0 / 0                   | **VALID**      |
-| `combine_idx34` | combine | mo      | LV 89 Sky cruiser   | 3,073 / 17,424 (17.6366%) | 0 / 0                  | **VALID**     | 4,234 / 22,500 (18.8178%) | 0 / 0                   | **VALID**      |
+| State ID        | Tier    | Billing | Level / Hero        | #patch Diff (px)      | #patch Noise (Ref/Reb) | #patch Status | #patch2 Diff (px)     | #patch2 Noise (Ref/Reb) | #patch2 Status |
+| :-------------- | :------ | :------ | :------------------ | :-------------------- | :--------------------- | :------------ | :-------------------- | :---------------------- | :------------- |
+| `solo_idx286`   | solo    | mo      | LV 12 Laser Dolphin | 11 / 17,424 (0.0631%) | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%) | 0 / 0                   | **VALID**      |
+| `solo_idx287`   | solo    | mo      | LV 18 Laser Dolphin | 11 / 17,424 (0.0631%) | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%) | 0 / 0                   | **VALID**      |
+| `solo_idx289`   | solo    | mo      | LV 24 Laser Dolphin | 11 / 17,424 (0.0631%) | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%) | 0 / 0                   | **VALID**      |
+| `solo_idx290`   | solo    | mo      | LV 18 Laser Dolphin | 11 / 17,424 (0.0631%) | 0 / 0                  | **VALID**     | 12 / 22,500 (0.0533%) | 0 / 0                   | **VALID**      |
+| `squad_idx0`    | squad   | mo      | LV 41 Full Crew     | 17 / 17,424 (0.0976%) | 0 / 0                  | **VALID**     | 25 / 22,500 (0.1111%) | 0 / 0                   | **VALID**      |
+| `squad_idx1`    | squad   | yr      | LV 41 Full Crew     | 17 / 17,424 (0.0976%) | 0 / 0                  | **VALID**     | 25 / 22,500 (0.1111%) | 0 / 0                   | **VALID**      |
+| `squad_idx2`    | squad   | mo      | LV 53 Full Crew     | 17 / 17,424 (0.0976%) | 0 / 0                  | **VALID**     | 25 / 22,500 (0.1111%) | 0 / 0                   | **VALID**      |
+| `squad_idx4`    | squad   | mo      | LV 53 Full Crew     | 17 / 17,424 (0.0976%) | 0 / 0                  | **VALID**     | 25 / 22,500 (0.1111%) | 0 / 0                   | **VALID**      |
+| `combine_idx30` | combine | mo      | LV 76 Sub vessel    | 7 / 17,424 (0.0402%)  | 0 / 0                  | **VALID**     | 13 / 22,500 (0.0578%) | 0 / 0                   | **VALID**      |
+| `combine_idx31` | combine | yr      | LV 76 Sub vessel    | 7 / 17,424 (0.0402%)  | 0 / 0                  | **VALID**     | 13 / 22,500 (0.0578%) | 0 / 0                   | **VALID**      |
+| `combine_idx32` | combine | mo      | LV 89 Sky cruiser   | 12 / 17,424 (0.0689%) | 0 / 0                  | **VALID**     | 9 / 22,500 (0.0400%)  | 0 / 0                   | **VALID**      |
+| `combine_idx34` | combine | mo      | LV 89 Sky cruiser   | 12 / 17,424 (0.0689%) | 0 / 0                  | **VALID**     | 9 / 22,500 (0.0400%)  | 0 / 0                   | **VALID**      |
 
 _All noise floors strictly 0 px (< 50 px threshold). All 12 states status computed as VALID._
 
