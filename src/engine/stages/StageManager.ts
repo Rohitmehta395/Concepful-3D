@@ -3,6 +3,7 @@ import type { Stage, StageBuildContext, StageBuilder } from "./types";
 
 export interface StageManager {
   hasBuilder(key: string): boolean;
+  registerStage(key: string, builder: StageBuilder): void;
   getBuiltStage(key: string): Stage | undefined;
   getActiveStage(): Stage | null;
   select(key: string): Stage | null;
@@ -24,6 +25,10 @@ export function createStageManager(
 
   function hasBuilder(key: string): boolean {
     return Object.prototype.hasOwnProperty.call(builders, key);
+  }
+
+  function registerStage(key: string, builder: StageBuilder): void {
+    builders[key] = builder;
   }
 
   function getBuiltStage(key: string): Stage | undefined {
@@ -84,6 +89,7 @@ export function createStageManager(
 
   return {
     hasBuilder,
+    registerStage,
     getBuiltStage,
     getActiveStage,
     select,

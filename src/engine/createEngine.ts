@@ -27,6 +27,9 @@ import {
   registerRaidStage,
   registerOverlay,
 } from "./stages/slots";
+import { getActiveOverlayHandles } from "./stages/slots/overlay";
+import type { HudManager } from "./overlay/types";
+import { drawCallouts } from "./overlay/callouts";
 import { createOverlay, type OverlayManager } from "./overlay";
 
 export interface EngineOptions {
@@ -45,6 +48,7 @@ export interface Engine {
   readonly stageManager: StageManager;
   readonly materials: MaterialRegistry;
   readonly overlay?: OverlayManager | null;
+  readonly hud?: HudManager | null;
   start: () => void;
   stop: () => void;
   resize: () => void;
@@ -311,7 +315,15 @@ export function createEngine(
     const kk = reduceMotion || snap ? 1 : Math.min(1, dtMs / 220);
     snap = false;
 
-    const stage = stageManager.select(state.activeScene);
+    const activeSceneKey =
+      state.activeScene === "app"
+        ? buildState.tier === "combine"
+          ? "raid"
+          : buildState.tier === "squad"
+            ? "enc"
+            : "app"
+        : state.activeScene;
+    const stage = stageManager.select(activeSceneKey);
     if (stage) {
       if (!wasInPortedStage) {
         backgroundManager.setVisible(false);
@@ -340,6 +352,29 @@ export function createEngine(
     renderer.render(scene, camera);
     if (overlay) {
       overlay.render(time, fadeT);
+      if (overlay.ctx) {
+        const ov = getActiveOverlayHandles();
+        if (ov && state.activeScene === "app") {
+          ov.hud.render(overlay.ctx, time, currentBox, w, h, buildState.tier);
+        } else if (stage && state.activeScene === "stages") {
+          const stageIndex = Math.max(
+            0,
+            Math.min(3, Math.floor(state.activeProgress * 4))
+          );
+          drawCallouts(
+            three,
+            overlay.ctx,
+            time,
+            camera,
+            currentBox,
+            w,
+            h,
+            stageIndex,
+            stage.group,
+            reduceMotion
+          );
+        }
+      }
     }
     if (frameCount === 1 && canvas.classList) {
       canvas.classList.add("ready");
@@ -650,6 +685,9 @@ export function createEngine(
     stageManager,
     materials,
     overlay,
+    get hud() {
+      return getActiveOverlayHandles()?.hud ?? null;
+    },
     start,
     stop,
     resize,
@@ -659,7 +697,11 @@ export function createEngine(
     getScrollState: () => scrollDriver.getState(),
     getBox: () => currentBox,
     setBuildState: (state: Partial<BuildState>) => {
+      const prevTier = buildState.tier;
       buildState = { ...buildState, ...state };
+      if (state.tier && state.tier !== prevTier) {
+        snap = true;
+      }
       if (motionQuery && motionQuery.matches) {
         renderFrame(performance.now());
       }

@@ -5,6 +5,7 @@
 
 export interface OverlayManager {
   readonly canvas: HTMLCanvasElement;
+  readonly ctx: CanvasRenderingContext2D | null;
   resize: (width: number, height: number, maxPixelRatio?: number) => void;
   render: (time: number, fadeT: number | null) => void;
   dispose: () => void;
@@ -89,6 +90,7 @@ export function createOverlay(canvas: HTMLCanvasElement): OverlayManager {
 
   return {
     canvas,
+    ctx,
     resize,
     render,
     dispose,
