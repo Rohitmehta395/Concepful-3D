@@ -45,6 +45,7 @@ interface ConfiguratorContextValue {
   cardClassDesc: string;
   party: PartyData | null;
   introText: string;
+  hasVisitedCombine: boolean;
 }
 
 const ConfiguratorContext = createContext<ConfiguratorContextValue | null>(
@@ -68,11 +69,17 @@ export function ConfiguratorProvider({
 }) {
   const [state, rawDispatch] = useReducer(configReducer, INITIAL_CONFIG_STATE);
   const [hasChangedTier, setHasChangedTier] = useState(false);
+  const [hasVisitedCombine, setHasVisitedCombine] = useState(false);
 
   const dispatch = useCallback(
     (action: ConfigAction) => {
-      if (action.type === "SET_TIER" && action.tier !== state.tier) {
-        setHasChangedTier(true);
+      if (action.type === "SET_TIER") {
+        if (action.tier !== state.tier) {
+          setHasChangedTier(true);
+        }
+        if (action.tier === "combine") {
+          setHasVisitedCombine(true);
+        }
       }
       rawDispatch(action);
     },
@@ -142,8 +149,9 @@ export function ConfiguratorProvider({
       cardClassDesc,
       party,
       introText,
+      hasVisitedCombine,
     };
-  }, [state, dispatch, hasChangedTier]);
+  }, [state, dispatch, hasChangedTier, hasVisitedCombine]);
 
   return (
     <ConfiguratorContext.Provider value={value}>
