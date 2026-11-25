@@ -299,8 +299,8 @@ export function createAppStage(ctx: StageBuildContext): Stage {
         }
       }
 
-      // Aim camera
-      const dx = 0.15 + (reduceMotion ? 0 : Math.sin(t / 4000) * 0.12);
+      // Aim camera (reference line 14536: unguarded by reduce)
+      const dx = 0.15 + Math.sin(t / 4000) * 0.12;
       orbitCtrl.aim(
         camera,
         0,
