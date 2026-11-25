@@ -420,6 +420,7 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
     let builtApp: typeof baseAppStage | undefined;
     const mockManager = {
       hasBuilder: () => true,
+      registerStage: () => {},
       getBuiltStage: (k: string) => (k === "app" ? builtApp : undefined),
       getActiveStage: () => null,
       select: (k: string) => {

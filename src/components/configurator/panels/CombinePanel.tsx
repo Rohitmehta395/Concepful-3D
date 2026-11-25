@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BUFFS, CLASSES, OBJECTIVES } from "@/content";
 import { shipFor } from "@/domain/ship";
 import { useConfigurator } from "../ConfiguratorProvider";
@@ -35,13 +35,11 @@ export function CombineGroups() {
 export function CombinePanel() {
   const { state, dispatch } = useConfigurator();
   const raid = state.tier === "combine";
-  const [hasVisitedCombine, setHasVisitedCombine] = useState(false);
+  const [hasVisitedCombine, setHasVisitedCombine] = useState(raid);
 
-  useEffect(() => {
-    if (raid) {
-      setHasVisitedCombine(true);
-    }
-  }, [raid]);
+  if (raid && !hasVisitedCombine) {
+    setHasVisitedCombine(true);
+  }
 
   const reach = shipFor(state.buffs);
   const activeClassIndex = CLASSES.findIndex((c) => c.id === reach);
