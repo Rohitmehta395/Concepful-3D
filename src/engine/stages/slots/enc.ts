@@ -14,9 +14,44 @@ export function registerEncStage(
   ctx: StageBuildContext
 ): void {
   let encStage: Stage | null = null;
+  let encActive = false;
 
   const originalSelect = manager.select.bind(manager);
+  const originalClearActive = manager.clearActive.bind(manager);
+  const originalGetActiveStage = manager.getActiveStage.bind(manager);
+  const originalHasBuilder = manager.hasBuilder.bind(manager);
+  const originalGetBuiltStage = manager.getBuiltStage.bind(manager);
   const originalDispose = manager.dispose.bind(manager);
+
+  manager.hasBuilder = (key: string): boolean => {
+    return key === "enc" || originalHasBuilder(key);
+  };
+
+  manager.getBuiltStage = (key: string): Stage | undefined => {
+    if (key === "enc") {
+      return encStage ?? undefined;
+    }
+    const buildState = ctx.getBuildState ? ctx.getBuildState() : undefined;
+    if (key === "app" && buildState?.tier === "squad") {
+      return encStage ?? undefined;
+    }
+    return originalGetBuiltStage(key);
+  };
+
+  manager.getActiveStage = (): Stage | null => {
+    if (encActive && encStage) {
+      return encStage;
+    }
+    return originalGetActiveStage();
+  };
+
+  manager.clearActive = (): void => {
+    if (encActive && encStage) {
+      encStage.setVisible(false);
+      encActive = false;
+    }
+    originalClearActive();
+  };
 
   manager.select = (key: string): Stage | null => {
     const buildState = ctx.getBuildState ? ctx.getBuildState() : undefined;
@@ -37,25 +72,24 @@ export function registerEncStage(
         encStage.setVisible(false);
       }
 
-      const activeStage = manager.getActiveStage();
-      if (activeStage && activeStage !== encStage) {
-        activeStage.setVisible(false);
-      }
-
+      originalClearActive();
+      encActive = true;
       encStage.setVisible(true);
       ctx.scene.background = encStage.backgroundTexture;
       ctx.scene.fog = encStage.fog;
       return encStage;
     }
 
-    if (encStage && key !== "app") {
+    if (encActive && encStage) {
       encStage.setVisible(false);
+      encActive = false;
     }
 
     return originalSelect(key);
   };
 
   manager.dispose = (): void => {
+    encActive = false;
     if (encStage) {
       encStage.dispose();
       encStage = null;
