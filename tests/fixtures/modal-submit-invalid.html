@@ -1,0 +1,54 @@
+<div class="modal" id="modal">
+      <div class="mcard glass" role="dialog" aria-modal="true" aria-labelledby="m-h">
+        <div class="hd">Create your guild</div>
+        <button class="x" type="button" id="mx" aria-label="Close">×</button>
+        <div class="bd">
+          <div id="m-form" hidden="">
+            <h3 id="m-h">Your build is ready.</h3>
+            <p>
+              Name your guild and drop your intel. A senior lead picks it up
+              from here.
+            </p>
+            <form class="form" id="pilot">
+              <div class="fld">
+                <label for="co">Guild (company)</label><input id="co" type="text" maxlength="18" placeholder="Harbor &amp; Vane" autocomplete="organization">
+              </div>
+              <div class="fld">
+                <label for="ko">Server start</label><select id="ko">
+                  <option>This week</option>
+                  <option selected="">Within 2 weeks</option>
+                  <option>This month</option>
+                  <option>Just exploring</option>
+                </select>
+              </div>
+              <div class="fld full">
+                <label for="mi">Mission objective, in one line</label><input id="mi" type="text" placeholder="Rebrand ahead of our Series A launch">
+              </div>
+              <div class="fld full">
+                <label for="br">Attach intel: brief or materials (optional)</label><input id="br" type="file" multiple="">
+              </div>
+              <button class="fu" type="submit">Enter world</button>
+            </form>
+          </div>
+          <div class="done" id="m-done">
+            <canvas id="patch2" aria-hidden="true" height="150" width="150"></canvas>
+            <div class="unl">Patch unlocked</div>
+            <h3 id="d-h" style="text-align: center; margin-top: 6px">Welcome to the server</h3>
+            <ol>
+              <li>
+                <b>First,</b> a senior lead reviews your brief and confirms the
+                number.
+              </li>
+              <li>
+                <b>You get the SOW</b> and a secure Stripe link. IP transfers on
+                delivery.
+              </li>
+              <li>
+                <b>Your Context™ workspace opens</b> with this build loaded, and
+                the mission begins.
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>

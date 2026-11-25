@@ -1,23 +1,50 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface LeadModalContextValue {
   isOpen: boolean;
-  open: () => void;
+  tier: string | null;
+  open: (tier?: string) => void;
   close: () => void;
+  lastFocusedElementRef: React.MutableRefObject<HTMLElement | null>;
 }
 
 const LeadModalContext = createContext<LeadModalContextValue | null>(null);
 
 export function LeadModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [tier, setTier] = useState<string | null>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
+  const open = useCallback((selectedTier?: string) => {
+    if (
+      typeof document !== "undefined" &&
+      document.activeElement instanceof HTMLElement
+    ) {
+      lastFocusedElementRef.current = document.activeElement;
+    }
+    if (selectedTier) {
+      setTier(selectedTier);
+    }
+    setIsOpen(true);
+  }, []);
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   return (
-    <LeadModalContext.Provider value={{ isOpen, open, close }}>
+    <LeadModalContext.Provider
+      value={{ isOpen, tier, open, close, lastFocusedElementRef }}
+    >
       {children}
     </LeadModalContext.Provider>
   );
