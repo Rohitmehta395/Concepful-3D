@@ -1,13 +1,14 @@
 import type * as THREE from "three";
 import type { Stage, StageBuildContext, StageUpdateParams } from "../types";
 import { DEFAULT_BUILD_STATE, type BuildState } from "../../buildState";
-import { bgTex } from "../../world/materials";
+import { bgTex, HX } from "../../world/materials";
 import { createPlanet, type Planet } from "../../world/planet";
 import { createStreakField, type StreakField } from "../../world/streakField";
-import { createClouds, type Clouds } from "../../world/clouds";
+import type { Clouds } from "../../world/clouds";
 import { createBubbles, type Bubbles } from "../../world/bubbles";
-import { createCosmos, type CosmosLayer } from "../../world/cosmos";
-import { flick } from "../../world/geometry";
+import type { CosmosLayer } from "../../world/cosmos";
+import { createRaidCosmos } from "./raidCosmos";
+import { Ic, flick, mk } from "../../world/geometry";
 import {
   mJet,
   sMother,
@@ -124,9 +125,57 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
     0x6e7e92,
     true
   );
-  const clouds: Clouds = createClouds(three, group);
+  // Clouds matching reference lines 10394-10413 (tm(HX.cloud), mk(..., false))
+  const cloudsRoot = new three.Group();
+  group.add(cloudsRoot);
+  const cloudMat = mats.tm(HX.cloud);
+  const cloudGroups: THREE.Group[] = [];
+  for (let i = 0; i < 9; i++) {
+    const c = new three.Group();
+    for (let k = 0; k < 4; k++) {
+      mk(
+        three,
+        mats,
+        c,
+        Ic(three, 0.8 + Math.random() * 0.8),
+        cloudMat,
+        [k * 1.1 - 1.6, Math.random() * 0.6, Math.random() * 0.8],
+        null,
+        [1, 0.6, 1],
+        false
+      );
+    }
+    c.position.set(
+      -30 + i * 7,
+      -6 + Math.random() * 12,
+      -6 - Math.random() * 14
+    );
+    cloudsRoot.add(c);
+    cloudGroups.push(c);
+  }
+  const clouds: Clouds = {
+    group: cloudsRoot,
+    update: (dt: number, reduceMotion = false) => {
+      if (reduceMotion) return;
+      for (const c of cloudGroups) {
+        c.position.x -= dt * 0.004;
+        if (c.position.x < -32) {
+          c.position.x = 32;
+        }
+      }
+    },
+    dispose: () => {
+      group.remove(cloudsRoot);
+      for (const c of cloudGroups) {
+        c.traverse((o) => {
+          const m = o as THREE.Mesh;
+          if (m.geometry) m.geometry.dispose();
+        });
+      }
+    },
+  };
   const bubbles: Bubbles = createBubbles(three, group);
-  const cosmos: CosmosLayer = createCosmos(three, group, "raid");
+  const cosmos: CosmosLayer = createRaidCosmos(three, group);
 
   // Escort jets (6 instances of mJet at scale 0.6)
   const esc: VehicleHandle[] = [];

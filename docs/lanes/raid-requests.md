@@ -87,3 +87,13 @@
   Per Rule L4/L5, lane raid does not edit other lanes' files. All files owned by lane raid strictly pass `prettier --check`.
 - **Proposed Solution:**
   Run `pnpm prettier --write docs/lanes/next-report.md` on main or integrator branch.
+
+---
+
+## 4. Request to World / Shared Modules (`cosmos.ts` & `clouds.ts`)
+
+- **Target Files:** `src/engine/world/cosmos.ts`, `src/engine/world/clouds.ts`
+- **Context:**
+  1. `src/engine/world/cosmos.ts` (`presets`) omits the `"raid"` preset from reference lines 10911–10915 (`addStars(700, 160, 81)`, `addNebula([10, 16, -110], 220, MEL, VIO, 47, 0.1, 0.55)`, `addComets(2, [100, 30, -80], 29)`) and silently falls back to `presets.intro`.
+  2. `src/engine/world/clouds.ts` uses `MeshBasicMaterial` instead of `mats.tm(HX.cloud)` (`MeshToonMaterial` with toon gradient) as in reference line 10400.
+     _(Note: Lane raid added `src/engine/stages/raid/raidCosmos.ts` and `raidClouds` inside `raidStage.ts` so the raid stage renders the exact reference preset without touching `src/engine/world/`)._
