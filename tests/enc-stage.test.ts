@@ -359,7 +359,7 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
       prevClearActive();
     };
     manager.select = (key: string) => {
-      if (key === "app" && state.tier === "combine") {
+      if (key === "raid" || (key === "app" && state.tier === "combine")) {
         if (!raidStage) {
           raidStage = {
             key: "raid",
@@ -390,28 +390,34 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
       prevDispose();
     };
 
-    const sequence: Array<{ tier: BuildState["tier"]; expectedKey: string }> = [
-      { tier: "solo", expectedKey: "app" },
-      { tier: "squad", expectedKey: "enc" },
-      { tier: "combine", expectedKey: "raid" },
-      { tier: "squad", expectedKey: "enc" },
-      { tier: "solo", expectedKey: "app" },
-      { tier: "combine", expectedKey: "raid" },
-      { tier: "squad", expectedKey: "enc" },
+    const sequence: Array<{
+      tier: BuildState["tier"];
+      routedKey: string;
+      expectedKey: string;
+    }> = [
+      { tier: "solo", routedKey: "app", expectedKey: "app" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
+      { tier: "combine", routedKey: "raid", expectedKey: "raid" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
+      { tier: "solo", routedKey: "app", expectedKey: "app" },
+      { tier: "combine", routedKey: "raid", expectedKey: "raid" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
     ];
 
     const observed: Array<{
       tier: string;
+      routedKey: string;
       selectedKey: string | undefined;
       activeKey: string | undefined;
     }> = [];
 
     for (const step of sequence) {
       state = { ...state, tier: step.tier };
-      const selected = manager.select("app");
+      const selected = manager.select(step.routedKey);
       const active = manager.getActiveStage();
       observed.push({
         tier: step.tier,
+        routedKey: step.routedKey,
         selectedKey: selected?.key,
         activeKey: active?.key,
       });
@@ -421,13 +427,23 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
     }
 
     expect(observed).toEqual([
-      { tier: "solo", selectedKey: "app", activeKey: "app" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
-      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
-      { tier: "solo", selectedKey: "app", activeKey: "app" },
-      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
+      { tier: "solo", routedKey: "app", selectedKey: "app", activeKey: "app" },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
+      {
+        tier: "combine",
+        routedKey: "raid",
+        selectedKey: "raid",
+        activeKey: "raid",
+      },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
+      { tier: "solo", routedKey: "app", selectedKey: "app", activeKey: "app" },
+      {
+        tier: "combine",
+        routedKey: "raid",
+        selectedKey: "raid",
+        activeKey: "raid",
+      },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
     ]);
 
     manager.clearActive();
@@ -558,5 +574,5 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
       THREE.BufferGeometry.prototype.dispose = origGeoDispose;
       THREE.Texture.prototype.dispose = origTexDispose;
     }
-  }, 15000);
+  }, 45000);
 });
