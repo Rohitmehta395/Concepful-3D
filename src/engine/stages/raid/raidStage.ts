@@ -19,8 +19,19 @@ import {
 import type { VehicleHandle } from "../../models/hVehiclesA";
 import { sSky, type CarrierHandle } from "../../models/sCarriers";
 import { U3, type UnitHandle } from "../../models/uUnits";
+import {
+  sCarrier,
+  sTitan,
+  type CarrierShipHandle,
+  type TitanShipHandle,
+} from "./raidShips";
 
-export type RaidShipHandle = CarrierHandle | FlagshipHandle | MothershipHandle;
+export type RaidShipHandle =
+  | CarrierHandle
+  | FlagshipHandle
+  | MothershipHandle
+  | CarrierShipHandle
+  | TitanShipHandle;
 
 export const RBG_COLORS = {
   sea: { top: "#3A4A55", bot: "#12181F" },
@@ -139,9 +150,9 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
       } else if (reachKey === "regional") {
         ship = sSky(three, mats);
       } else if (reachKey === "national") {
-        ship = sStar(three, mats);
+        ship = sTitan(three, mats);
       } else {
-        ship = sMother(three, mats);
+        ship = sCarrier(three, mats);
       }
       shipsCache.set(reachKey, ship);
     }
@@ -235,9 +246,9 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
     stars.mesh.visible = bgKey !== "sea";
     stars.update(dt, bgKey === "sky" ? 1.8 : 1.2, reduceMotion);
 
-    // Crew deck (on sMother when global reach)
-    if ("crew" in ship && (ship as MothershipHandle).crew) {
-      const mMother = ship as MothershipHandle;
+    // Crew deck (on sCarrier / sMother when global reach)
+    if ("crew" in ship && ship.crew) {
+      const mCarrier = ship as CarrierShipHandle;
       const distinctUnits = new Set<string>();
       const objRosters = [
         ["gtm", "decks", "copy", "motion", "illus"],
@@ -261,7 +272,7 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
       const allUnits = Array.from(distinctUnits);
       const sig = allUnits.join(",");
       if (lastCrewSig !== sig) {
-        mMother.crew.clear();
+        mCarrier.crew.clear();
         crewHandles = [];
         const us = allUnits.slice(0, 12);
         for (let i = 0; i < us.length; i++) {
@@ -275,7 +286,7 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
               0,
               (i % 2) * 1.1 - 0.5
             );
-            mMother.crew.add(uObj.g);
+            mCarrier.crew.add(uObj.g);
             crewHandles.push(uObj);
           }
         }
@@ -300,7 +311,11 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
       0
     );
     ship.g.rotation.z = reduceMotion ? 0 : Math.sin(t / 1600) * 0.02;
-    ship.upd(t);
+    if ("titan" in ship && ship.titan) {
+      ship.upd(t, { shipT0: shipT0 && shipT0 >= 0 ? shipT0 : 0, reduceMotion });
+    } else {
+      ship.upd(t);
+    }
 
     const hasRush = buffs.includes("rush");
     if (ship.fl && ship.fl.length > 0) {
@@ -330,7 +345,7 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
 
     // Camera aim & framing
     const fitL = Math.max(ship.len * 0.6 + 15.6 * 0.4, ship.len * 1.22);
-    const dx = 0.28 + (reduceMotion ? 0 : Math.sin(t / 6000) * 0.1);
+    const dx = 0.28 + Math.sin(t / 6000) * 0.1;
     orbitCtrl.aim(
       camera,
       0,
@@ -354,6 +369,20 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
       -30
     );
     orbitCtrl.bgShift(parentScene);
+
+    if (
+      process.env.NEXT_PUBLIC_E2E === "1" &&
+      typeof window !== "undefined" &&
+      (window as unknown as { __RAID_HIDE_ACTORS__?: boolean })
+        .__RAID_HIDE_ACTORS__
+    ) {
+      ship.g.visible = false;
+      for (let i = 0; i < esc.length; i++) {
+        esc[i]!.g.visible = false;
+      }
+    } else {
+      ship.g.visible = true;
+    }
   }
 
   function dispose(): void {
@@ -490,6 +519,16 @@ export function renderRaidModelBench(
     s.upd(t);
     if (s.fl && s.fl.length > 0) flick(s.fl, t);
     obj = s.g;
+  } else if (model === "sCarrier") {
+    const s = sCarrier(three, mats);
+    s.upd(t);
+    if (s.fl && s.fl.length > 0) flick(s.fl, t);
+    obj = s.g;
+  } else if (model === "sTitan") {
+    const s = sTitan(three, mats);
+    s.upd(t, { shipT0: 0, reduceMotion: true });
+    if (s.fl && s.fl.length > 0) flick(s.fl, t);
+    obj = s.g;
   } else if (model === "mJet") {
     const j = mJet(three, mats);
     j.upd(t, { reduceMotion: true });
@@ -527,7 +566,15 @@ export function renderRaidModelBench(
     __CONCEPFUL_ENGINE__?: {
       renderer: THREE.WebGLRenderer;
     };
+    __RAID_BENCH_LAST__?: {
+      scene: THREE.Scene;
+      obj: THREE.Object3D;
+      camera: THREE.PerspectiveCamera;
+    };
   };
+  if (process.env.NEXT_PUBLIC_E2E === "1") {
+    win.__RAID_BENCH_LAST__ = { scene: sc, obj, camera: cam };
+  }
   const renderer = win.__CONCEPFUL_ENGINE__?.renderer;
   if (renderer) {
     renderer.setSize(800, 800, false);
