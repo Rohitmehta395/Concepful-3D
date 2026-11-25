@@ -281,13 +281,282 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
     const selected = manager.select("app");
     expect(selected).not.toBeNull();
     expect(selected?.key).toBe("enc");
+    expect(manager.getActiveStage()).toBe(selected);
+    expect(manager.hasBuilder("enc")).toBe(true);
+    expect(manager.getBuiltStage("enc")).toBe(selected);
 
     // Switch tier to solo: select("app") should return app stage
     state = { ...state, tier: "solo" };
     const soloSelected = manager.select("app");
     expect(soloSelected).not.toBeNull();
     expect(soloSelected?.key).toBe("app");
+    expect(manager.getActiveStage()).toBe(soloSelected);
 
     manager.dispose();
   });
+
+  it("maintains activeStage === selectedStage across solo>squad>combine>squad>solo>combine>squad", () => {
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(30, 1280 / 800, 0.1, 600);
+    const canvas = {
+      clientWidth: 1280,
+      clientHeight: 800,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    } as unknown as HTMLCanvasElement;
+    const orbit = createOrbitController(THREE, canvas, () => {});
+    const mats = createMaterialRegistry(THREE);
+
+    let state: BuildState = {
+      tier: "solo",
+      reach: "local",
+      mission: "brand",
+      objective: "gtm",
+      objectives: ["gtm"],
+      buffs: [],
+    };
+
+    const ctx: StageBuildContext = {
+      three: THREE,
+      scene,
+      mats,
+      camera: cam,
+      orbitCtrl: orbit,
+      getBuildState: () => state,
+    };
+
+    const manager = createStageManager(scene, ctx, {
+      app: () => ({
+        key: "app",
+        group: new THREE.Group(),
+        backgroundTexture: new THREE.CanvasTexture(
+          document.createElement("canvas")
+        ),
+        fog: null,
+        setVisible: () => {},
+        update: () => {},
+        dispose: () => {},
+      }),
+    });
+
+    registerEncStage(manager, ctx);
+
+    // Simulate raid slot wrapping after registerEncStage (matching createEngine.ts order)
+    let raidStage: ReturnType<typeof manager.select> = null;
+    let raidActive = false;
+    const prevSelect = manager.select.bind(manager);
+    const prevGetActive = manager.getActiveStage.bind(manager);
+    const prevClearActive = manager.clearActive.bind(manager);
+    const prevDispose = manager.dispose.bind(manager);
+
+    manager.getActiveStage = () =>
+      raidActive && raidStage ? raidStage : prevGetActive();
+    manager.clearActive = () => {
+      if (raidActive && raidStage) {
+        raidStage.setVisible(false);
+        raidActive = false;
+      }
+      prevClearActive();
+    };
+    manager.select = (key: string) => {
+      if (key === "app" && state.tier === "combine") {
+        if (!raidStage) {
+          raidStage = {
+            key: "raid",
+            group: new THREE.Group(),
+            backgroundTexture: new THREE.CanvasTexture(
+              document.createElement("canvas")
+            ),
+            fog: null,
+            setVisible: () => {},
+            update: () => {},
+            dispose: () => {},
+          };
+        }
+        prevClearActive();
+        raidActive = true;
+        raidStage.setVisible(true);
+        return raidStage;
+      }
+      if (raidActive && raidStage) {
+        raidStage.setVisible(false);
+        raidActive = false;
+      }
+      return prevSelect(key);
+    };
+    manager.dispose = () => {
+      raidActive = false;
+      raidStage = null;
+      prevDispose();
+    };
+
+    const sequence: Array<{ tier: BuildState["tier"]; expectedKey: string }> = [
+      { tier: "solo", expectedKey: "app" },
+      { tier: "squad", expectedKey: "enc" },
+      { tier: "combine", expectedKey: "raid" },
+      { tier: "squad", expectedKey: "enc" },
+      { tier: "solo", expectedKey: "app" },
+      { tier: "combine", expectedKey: "raid" },
+      { tier: "squad", expectedKey: "enc" },
+    ];
+
+    const observed: Array<{
+      tier: string;
+      selectedKey: string | undefined;
+      activeKey: string | undefined;
+    }> = [];
+
+    for (const step of sequence) {
+      state = { ...state, tier: step.tier };
+      const selected = manager.select("app");
+      const active = manager.getActiveStage();
+      observed.push({
+        tier: step.tier,
+        selectedKey: selected?.key,
+        activeKey: active?.key,
+      });
+      expect(selected).not.toBeNull();
+      expect(active).toBe(selected);
+      expect(active?.key).toBe(step.expectedKey);
+    }
+
+    expect(observed).toEqual([
+      { tier: "solo", selectedKey: "app", activeKey: "app" },
+      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
+      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
+      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
+      { tier: "solo", selectedKey: "app", activeKey: "app" },
+      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
+      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
+    ]);
+
+    manager.clearActive();
+    expect(manager.getActiveStage()).toBeNull();
+
+    manager.dispose();
+  });
+
+  it("returns geometries and textures to starting count after 20 cycles and does not grow in 20 more", () => {
+    const liveGeos = new Set<THREE.BufferGeometry>();
+    const liveTexs = new Set<THREE.Texture>();
+
+    const origGeoDispose = THREE.BufferGeometry.prototype.dispose;
+    const origTexDispose = THREE.Texture.prototype.dispose;
+
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(30, 1280 / 800, 0.1, 600);
+    const canvas = {
+      clientWidth: 1280,
+      clientHeight: 800,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    } as unknown as HTMLCanvasElement;
+    const orbit = createOrbitController(THREE, canvas, () => {});
+    const mats = createMaterialRegistry(THREE);
+
+    const recordStageResources = (stage: ReturnType<typeof createEncStage>) => {
+      if (stage.backgroundTexture) liveTexs.add(stage.backgroundTexture);
+      stage.group.traverse((child) => {
+        const r = child as unknown as {
+          geometry?: THREE.BufferGeometry;
+          material?: THREE.Material | THREE.Material[];
+        };
+        if (r.geometry) liveGeos.add(r.geometry);
+        if (r.material) {
+          const ms = Array.isArray(r.material) ? r.material : [r.material];
+          for (const m of ms) {
+            const withMap = m as unknown as { map?: THREE.Texture | null };
+            if (
+              withMap.map &&
+              withMap.map !== mats.GLOWT &&
+              withMap.map !== mats.TX("chart")
+            ) {
+              liveTexs.add(withMap.map);
+            }
+          }
+        }
+      });
+    };
+
+    THREE.BufferGeometry.prototype.dispose = function () {
+      liveGeos.delete(this);
+      return origGeoDispose.call(this);
+    };
+    THREE.Texture.prototype.dispose = function () {
+      liveTexs.delete(this);
+      return origTexDispose.call(this);
+    };
+
+    try {
+      const startGeos = liveGeos.size;
+      const startTexs = liveTexs.size;
+
+      const runBatch = (count: number) => {
+        for (let c = 0; c < count; c++) {
+          const stage = createEncStage({
+            three: THREE,
+            scene,
+            mats,
+            camera: cam,
+            orbitCtrl: orbit,
+            getBuildState: () => ({
+              tier: "squad",
+              reach: "local",
+              mission: "brand",
+              objective: "gtm",
+              objectives: ["gtm", "dir", "research", "product"],
+              buffs: [],
+            }),
+          });
+          for (let i = 0; i < 4; i++) {
+            stage.update({
+              t: 50000 + i * 12000,
+              dt: 16.67,
+              p: 0,
+              kk: 1,
+              box: {
+                x0: 0,
+                x1: 1280,
+                y0: 0,
+                y1: 800,
+                w: 1280,
+                h: 800,
+                cx: 640,
+                cy: 400,
+              },
+              viewportH: 800,
+              reduceMotion: false,
+            });
+          }
+          recordStageResources(stage);
+          stage.dispose();
+        }
+      };
+
+      runBatch(20);
+      const after20Geos = liveGeos.size;
+      const after20Texs = liveTexs.size;
+
+      runBatch(20);
+      const after40Geos = liveGeos.size;
+      const after40Texs = liveTexs.size;
+
+      console.log("20+20 cycle counts:", {
+        startGeos,
+        startTexs,
+        after20Geos,
+        after20Texs,
+        after40Geos,
+        after40Texs,
+      });
+
+      expect(after20Geos).toBe(startGeos);
+      expect(after20Texs).toBe(startTexs);
+      expect(after40Geos).toBe(after20Geos);
+      expect(after40Texs).toBe(after20Texs);
+    } finally {
+      THREE.BufferGeometry.prototype.dispose = origGeoDispose;
+      THREE.Texture.prototype.dispose = origTexDispose;
+    }
+  }, 15000);
 });

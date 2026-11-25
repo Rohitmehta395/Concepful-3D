@@ -422,6 +422,18 @@ export function createEncStage(ctx: StageBuildContext): Stage {
     );
   }
 
+  function disposeMaterial(m: THREE.Material): void {
+    const withMap = m as unknown as { map?: THREE.Texture | null };
+    if (
+      withMap.map &&
+      withMap.map !== mats.GLOWT &&
+      withMap.map !== mats.TX("chart")
+    ) {
+      withMap.map.dispose();
+    }
+    m.dispose();
+  }
+
   function dispose(): void {
     streak.dispose();
     cosmosLayer.dispose();
@@ -437,9 +449,9 @@ export function createEncStage(ctx: StageBuildContext): Stage {
         if (renderable.geometry) renderable.geometry.dispose();
         if (renderable.material) {
           if (Array.isArray(renderable.material)) {
-            renderable.material.forEach((m) => m.dispose());
+            renderable.material.forEach(disposeMaterial);
           } else {
-            renderable.material.dispose();
+            disposeMaterial(renderable.material);
           }
         }
       });
@@ -456,9 +468,9 @@ export function createEncStage(ctx: StageBuildContext): Stage {
         if (renderable.geometry) renderable.geometry.dispose();
         if (renderable.material) {
           if (Array.isArray(renderable.material)) {
-            renderable.material.forEach((m) => m.dispose());
+            renderable.material.forEach(disposeMaterial);
           } else {
-            renderable.material.dispose();
+            disposeMaterial(renderable.material);
           }
         }
       });
