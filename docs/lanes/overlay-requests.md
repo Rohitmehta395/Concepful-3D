@@ -18,8 +18,23 @@
 - **Reason**: `pnpm format:check` flags style issues in `docs/lanes/next-report.md`. As a lane-owned file of lane `next`, lane `overlay` cannot edit it.
 - **Requested Change**: Run `prettier --write docs/lanes/next-report.md`.
 
-## 4. src/engine/createEngine.ts or src/engine/overlay.ts — Hook drawCallouts into post-vignette pass
+## 4. src/engine/createEngine.ts — Hook HUD & drawCallouts into post-vignette pass
 
-- **Target File**: `src/engine/createEngine.ts` / `src/engine/overlay.ts`
-- **Reason**: `overlay.render(time, fadeT)` clears `#cv` on line 63 of `src/engine/overlay.ts` (`ctx.clearRect(0, 0, w, h)`) during every frame. Any callouts drawn during stage updates prior to `overlay.render()` are cleared by the vignette pass.
-- **Requested Change**: Call `drawCallouts` directly after vignette rendering in `overlay.render` or `createEngine.ts:343` when `STORY.mode !== "app"`.
+- **Target File**: `src/engine/createEngine.ts` (lines 341–344)
+- **Reason**: `overlay.render(time, fadeT)` clears `#cv` on line 63 of `src/engine/overlay.ts` (`ctx.clearRect(0, 0, w, h)`) during every frame. Without calling `hud.render` and `drawCallouts` after `overlay.render(time, fadeT)`, `#cv` draws 0 HUD/callout pixels in production even when `hud.call()` or `hud.triggerForm()` is triggered.
+- **Exact 3-line Diff**:
+
+```diff
+     if (overlay) {
+       overlay.render(time, fadeT);
++      const ov = getActiveOverlayHandles();
++      if (ov && state.activeScene === "app") ov.hud.render(cvCtx, time, currentBox, w, h, buildState.tier);
++      else if (stage) drawCallouts(cvCtx, state.activeScene, stage.group, camera, w, h, time);
+     }
+```
+
+## 5. src/engine/models/sCarriers.ts — Export S3.local, S3.national, S3.global
+
+- **Target File**: `src/engine/models/sCarriers.ts`
+- **Reason**: `S3` currently only exports `regional: sSky`. `patch.ts` worked around `S3.local` by importing `sSub` from `../models/hVehiclesC`, but `national` (`sTitan`) and `global` (`sCarrier`) await the `raid` lane models.
+- **Requested Change**: Wire `local: sSub`, `national: sTitan`, `global: sCarrier` in `S3` once `raid` merges.

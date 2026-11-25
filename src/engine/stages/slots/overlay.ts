@@ -102,4 +102,10 @@ export function registerOverlay(
     },
     hud: hudMgr,
   };
+
+  if (process.env.NEXT_PUBLIC_E2E === "1" && typeof window !== "undefined") {
+    (
+      window as unknown as { __CONCEPFUL_OVERLAY__?: ActiveOverlayHandles }
+    ).__CONCEPFUL_OVERLAY__ = activeHandles;
+  }
 }

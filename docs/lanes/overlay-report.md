@@ -110,8 +110,19 @@ File: `C:\Users\steve\concepful_scratch\lane_overlay\pt_portrait.json` (309 byte
 | Tier      | Total Pixels | Diff Pixels | Diff %      | Parity Match     |
 | :-------- | :----------- | :---------- | :---------- | :--------------- |
 | `solo`    | 17,424       | **11**      | **0.0631%** | **99.94% Match** |
-| `squad`   | 17,424       | 3,471       | 19.9208%    | Structure Parity |
-| `combine` | 17,424       | 2,622       | 15.0482%    | Structure Parity |
+| `squad`   | 17,424       | **18**      | **0.1033%** | **99.90% Match** |
+| `combine` | 17,424       | **7**       | **0.0402%** | **99.96% Match** |
+
+### C2. Follow-Up 2 Region-Split `#patch` & `#patch2` Diagnostics (`diag_patch_regions.json`)
+
+File: `C:\Users\steve\concepful_scratch\lane_overlay\diag_patch_regions.json`
+
+| State (`#patch` 132x132) | Total Diff | Ring | Text Arcs | Portrait Circle | Halftone Lower | Stars | Outside |
+| :----------------------- | :--------- | :--- | :-------- | :-------------- | :------------- | :---- | :------ |
+| `squad_default`          | **12 px**  | 0    | 5         | 5               | 2              | 0     | 0       |
+| `squad_gtm_dir`          | **12 px**  | 0    | 5         | 5               | 2              | 0     | 0       |
+| `combine_0buffs`         | **4 px**   | 0    | 4         | 0               | 0              | 0     | 0       |
+| `combine_2buffs`         | **8 px**   | 0    | 8         | 0               | 0              | 0     | 0       |
 
 ---
 

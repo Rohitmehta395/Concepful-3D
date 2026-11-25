@@ -31,6 +31,12 @@ export interface PatchManager {
   getPortraitCanvas: () => HTMLCanvasElement;
   getPortraitBuffer: () => Uint8Array;
   isReady: () => boolean;
+  getDebugInfo?: () => {
+    key: string | null;
+    fc: { x: number; y: number; z: number };
+    fr: number;
+    dims: { w?: number; h?: number; len?: number };
+  };
   dispose: () => void;
 }
 
