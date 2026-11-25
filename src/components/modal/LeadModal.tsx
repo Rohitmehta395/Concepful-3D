@@ -1,15 +1,27 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { MODAL_CONTENT } from "@/content/modal";
+import { validateLeadSubmission } from "@/domain/lead";
 import { useLeadModal } from "./LeadModalProvider";
 
 /**
  * LeadModal renders the guild registration modal dialogue.
- * In Phase p0, it preserves the exact DOM markup and attributes from GuildModal.tsx,
- * while being wired to LeadModalContext isOpen and close().
+ * In lane modal, it mirrors reference/Concepful_Mech_Builder.html (lines 2208-2283, 15029-15087):
+ * - Focus #co on open and restore previous focus on close
+ * - Backdrop click to close (when click target is #modal itself)
+ * - Escape key to close
+ * - Close button #mx
+ * - Pure validation logic in src/domain/lead.ts (no network request)
+ * - Submitting transitions #m-form to hidden and #m-done to unhidden, setting #d-h
  */
 export function LeadModal() {
   const { isOpen, close } = useLeadModal();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [welcomeHeading, setWelcomeHeading] = useState(
+    MODAL_CONTENT.success.heading
+  );
+  const coInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     header,
@@ -21,8 +33,55 @@ export function LeadModal() {
     success,
   } = MODAL_CONTENT;
 
+  // Focus #co on open matching reference openModal() ($("co").focus())
+  useEffect(() => {
+    if (isOpen) {
+      const timer = requestAnimationFrame(() => {
+        if (coInputRef.current) {
+          coInputRef.current.focus();
+        } else {
+          const co = document.getElementById("co");
+          if (co) co.focus();
+        }
+      });
+      return () => cancelAnimationFrame(timer);
+    }
+  }, [isOpen]);
+
+  // Escape key handler: reference line 15058-15060
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        close();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, close]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const coVal = coInputRef.current?.value ?? "";
+    const result = validateLeadSubmission({ company: coVal });
+    setWelcomeHeading(result.welcomeHeading);
+    setIsSubmitted(true);
+  };
+
   return (
-    <div className="modal" id="modal" hidden={!isOpen}>
+    <div
+      className="modal"
+      id="modal"
+      hidden={!isOpen}
+      onClick={(e) => {
+        // Reference line 15055-15057: $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
+        if (e.target === e.currentTarget) {
+          close();
+        }
+      }}
+    >
       <div
         className="mcard glass"
         role="dialog"
@@ -40,19 +99,16 @@ export function LeadModal() {
           ×
         </button>
         <div className="bd">
-          <div id="m-form">
+          <div id="m-form" hidden={isSubmitted}>
             <h3 id="m-h">{formHeading}</h3>
             <p>{formDescription}</p>
-            <form
-              className="form"
-              id="pilot"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="form" id="pilot" onSubmit={handleSubmit}>
               <div className="fld">
                 <label htmlFor={fields.company.id}>
                   {fields.company.label}
                 </label>
                 <input
+                  ref={coInputRef}
                   id={fields.company.id}
                   type={fields.company.type}
                   maxLength={fields.company.maxLength}
@@ -94,11 +150,11 @@ export function LeadModal() {
               </button>
             </form>
           </div>
-          <div className="done" id="m-done" hidden>
+          <div className="done" id="m-done" hidden={!isSubmitted}>
             <canvas id="patch2" aria-hidden="true" />
             <div className="unl">{success.badge}</div>
             <h3 id="d-h" style={{ textAlign: "center", marginTop: "6px" }}>
-              {success.heading}
+              {welcomeHeading}
             </h3>
             <ol>
               {success.steps.map((step, idx) => (
