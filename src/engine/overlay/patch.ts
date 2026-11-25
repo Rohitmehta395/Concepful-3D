@@ -1,11 +1,14 @@
 import type * as THREE from "three";
 import type { MaterialRegistry } from "../world/materials";
-import { H3 } from "../models/hVehiclesC";
+import { H3, sSub } from "../models/hVehiclesC";
 import { U3 } from "../models/uUnits";
 import { S3 } from "../models/sCarriers";
 import { flick } from "../world/geometry";
 import { QUESTS } from "@/content/quests";
 import { CLASSES } from "@/content/classes";
+import { OBJECTIVES } from "@/content/objectives";
+import type { BuffId } from "@/content";
+import { shipFor } from "@/domain/ship";
 import type { OverlayBuildState, PatchManager } from "./types";
 
 // Cached halftone patterns per context to guarantee 0 per-frame allocations
@@ -193,6 +196,7 @@ export function createPatchManager(
 
   // Cached unit handle
   let currentKey: string | null = null;
+  let lastDrawnP1Key: string | null = null;
   let currentModel: {
     g: THREE.Group;
     w?: number;
@@ -202,18 +206,49 @@ export function createPatchManager(
     fl?: unknown[];
   } | null = null;
 
+  function resolveLeader(buildState: OverlayBuildState): string {
+    if (buildState.leader) return buildState.leader;
+    const objs = buildState.objectives;
+    if (objs && objs.length > 0) {
+      for (let i = 0; i < OBJECTIVES.length; i++) {
+        const o = OBJECTIVES[i]!;
+        if (objs.includes(o.id) && o.roster[0]) {
+          return o.roster[0];
+        }
+      }
+    } else if (buildState.objective) {
+      for (let i = 0; i < OBJECTIVES.length; i++) {
+        const o = OBJECTIVES[i]!;
+        if (o.id === buildState.objective && o.roster[0]) {
+          return o.roster[0];
+        }
+      }
+    }
+    return "pm";
+  }
+
+  function resolveReach(buildState: OverlayBuildState): string {
+    const tier = buildState.tier || "solo";
+    if (tier === "combine" && buildState.buffs) {
+      return shipFor(buildState.buffs as readonly BuffId[]);
+    }
+    return buildState.reach || "local";
+  }
+
+  function computePatchKey(buildState: OverlayBuildState): string {
+    const tier = buildState.tier || "solo";
+    if (tier === "solo") {
+      return `h:${buildState.mission || "brand"}`;
+    }
+    if (tier === "squad") {
+      return `u:${resolveLeader(buildState)}`;
+    }
+    return `s:${resolveReach(buildState)}`;
+  }
+
   function patchModel(buildState: OverlayBuildState) {
     const tier = buildState.tier || "solo";
-    const mission = buildState.mission || "brand";
-    const leader = buildState.leader || "pm";
-    const reach = buildState.reach || "local";
-
-    const key =
-      tier === "solo"
-        ? `h:${mission}`
-        : tier === "squad"
-          ? `u:${leader}`
-          : `s:${reach}`;
+    const key = computePatchKey(buildState);
 
     if (currentKey !== key) {
       if (currentModel) {
@@ -227,7 +262,7 @@ export function createPatchManager(
         const builder = U3[id] || U3.pm;
         currentModel = builder ? builder(three, mats) : null;
       } else {
-        const builder = S3[id] || S3.local;
+        const builder = S3[id] || (id === "local" ? sSub : S3.local || sSub);
         currentModel = builder ? builder(three, mats) : null;
       }
 
@@ -379,7 +414,7 @@ export function createPatchManager(
     // Badge labels
     const tier = buildState.tier || "solo";
     const mission = (buildState.mission as keyof typeof QUESTS) || "brand";
-    const reach = buildState.reach || "local";
+    const reach = resolveReach(buildState);
 
     let nm = "SOLO";
     if (tier === "solo") {
@@ -412,14 +447,24 @@ export function createPatchManager(
     const modalOn = !!modal && !modal.hidden;
 
     const pOn = cardOn || modalOn;
-    if (pOn && (reduceMotion || frameCount % 4 === 1 || !ready)) {
+    const nextKey = computePatchKey(buildState);
+    const keyChanged = currentKey !== nextKey;
+
+    if (pOn && (reduceMotion || keyChanged || frameCount % 4 === 1 || !ready)) {
       renderPatch(time, buildState, reduceMotion);
     }
 
-    if (cardOn && (reduceMotion || frameCount % 2 === 0)) {
+    if (
+      cardOn &&
+      (reduceMotion ||
+        keyChanged ||
+        lastDrawnP1Key !== nextKey ||
+        frameCount % 2 === 0)
+    ) {
       const p1 = document.getElementById("patch") as HTMLCanvasElement | null;
       if (p1) {
         drawPatch(p1, time, buildState);
+        lastDrawnP1Key = nextKey;
       }
     }
 
@@ -468,6 +513,16 @@ export function createPatchManager(
     getPortraitCanvas: () => c,
     getPortraitBuffer: () => buf,
     isReady: () => ready,
+    getDebugInfo: () => ({
+      key: currentKey,
+      fc: { x: fc.x, y: fc.y, z: fc.z },
+      fr,
+      dims: {
+        w: currentModel?.w,
+        h: currentModel?.h,
+        len: currentModel?.len,
+      },
+    }),
     dispose,
   };
 }
