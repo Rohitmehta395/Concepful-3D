@@ -49,7 +49,7 @@ export function CombinePanel() {
 
   return (
     <>
-      <section className="step swap" id="st-ship" hidden={!raid}>
+      <section className="step" id="st-ship" hidden={!raid}>
         <div className="sh">
           <span className="n">03</span>
           <h2>Flagship</h2>
@@ -83,7 +83,7 @@ export function CombinePanel() {
       </section>
 
       {/* Step 04: Raid buffs (visible only in combine/raid) */}
-      <section className="step swap" id="st-buffs" hidden={!raid}>
+      <section className="step" id="st-buffs" hidden={!raid}>
         <div className="sh">
           <span className="n">04</span>
           <h2>Raid buffs</h2>

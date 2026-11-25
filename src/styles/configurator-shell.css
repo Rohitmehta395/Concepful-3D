@@ -21,3 +21,11 @@ canvas#patch,
 canvas#patch2 {
   vertical-align: baseline;
 }
+
+/* Disable swap compositor layer under reduced motion for #st-ship and #st-buffs (matching #groups.swap) */
+@media (prefers-reduced-motion: reduce) {
+  #st-ship.swap,
+  #st-buffs.swap {
+    animation: none;
+  }
+}

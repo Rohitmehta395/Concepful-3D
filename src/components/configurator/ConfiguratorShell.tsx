@@ -1,6 +1,6 @@
 "use client";
 
-import { TIERS } from "@/content";
+import { useEffect, useRef } from "react";
 import { useConfigurator } from "./ConfiguratorProvider";
 import { TierPicker } from "./panels/TierPicker";
 import { SoloPanel } from "./panels/SoloPanel";
@@ -24,13 +24,41 @@ import { CardSheet } from "./panels/CardSheet";
  */
 export function ConfiguratorShell() {
   const { state, dispatch, introText } = useConfigurator();
+  const panelRef = useRef<HTMLElement>(null);
+  const stPickRef = useRef<HTMLElement>(null);
+  const prevTierRef = useRef(state.tier);
+
+  useEffect(() => {
+    if (prevTierRef.current === state.tier) return;
+    prevTierRef.current = state.tier;
+
+    ["groups", "st-ship", "st-buffs"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("swap");
+      void el.offsetWidth;
+      el.classList.add("swap");
+    });
+
+    const panel = panelRef.current;
+    const pick = stPickRef.current;
+    if (panel && pick && panel.scrollTop > pick.offsetTop - 10) {
+      const reduce =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      panel.scrollTo({
+        top: Math.max(0, pick.offsetTop - 80),
+        behavior: reduce ? "auto" : "smooth",
+      });
+    }
+  }, [state.tier]);
 
   const solo = state.tier === "solo";
   const raid = state.tier === "combine";
 
   return (
     <>
-      <aside className="panel glass" id="panel">
+      <aside className="panel glass" id="panel" ref={panelRef}>
         <div className="intro">
           <div className="eyebrow">
             Server: Concepful · Creative Department as a Service
@@ -43,7 +71,7 @@ export function ConfiguratorShell() {
         <TierPicker />
 
         {/* Step 02: Pick Mission / Objective / Department */}
-        <section className="step" id="st-pick">
+        <section className="step" id="st-pick" ref={stPickRef}>
           <div className="sh">
             <span className="n">02</span>
             <h2 id="lo-h">
