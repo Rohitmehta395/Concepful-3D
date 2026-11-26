@@ -1,7 +1,17 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://concepful.com";
+  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const baseUrl = rawSiteUrl ? rawSiteUrl.replace(/\/+$/, "") : undefined;
+
+  if (!baseUrl) {
+    return {
+      rules: {
+        userAgent: "*",
+        disallow: "/",
+      },
+    };
+  }
 
   return {
     rules: {

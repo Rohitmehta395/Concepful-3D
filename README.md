@@ -44,10 +44,10 @@ All scripts in `package.json`:
 
 Configuration options supported across development, test, and production:
 
-| Variable               | Description                                                                                                                                                                                                       | Default                 |
-| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Base URL used to resolve absolute OpenGraph metadata, canonical tags, `robots.txt`, and `sitemap.xml`.                                                                                                            | `https://concepful.com` |
-| `NEXT_PUBLIC_E2E`      | Test hook gate flag. When set to `"1"`, diagnostic runtime hooks (`__CONCEPFUL*`) are mounted on `window` for automation harnesses. In production builds (`NEXT_PUBLIC_E2E="0"` or unset), all hooks are omitted. | `0`                     |
+| Variable               | Description                                                                                                                                                                                                                                                                                 | Default          |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------- |
+| `NEXT_PUBLIC_SITE_URL` | Optional canonical site base URL. **When set:** populates `metadataBase`, `<link rel="canonical">`, `Allow: /` + `Sitemap:` in `/robots.txt`, and the `/` entry in `/sitemap.xml`. **When unset:** omits canonical, sets `Disallow: /` in `/robots.txt`, and emits an empty `/sitemap.xml`. | _(unset / none)_ |
+| `NEXT_PUBLIC_E2E`      | Test hook gate flag. When set to `"1"`, diagnostic runtime hooks (`__CONCEPFUL*`) are mounted on `window` for automation harnesses. In production builds (`NEXT_PUBLIC_E2E="0"` or unset), all hooks are omitted.                                                                           | `0`              |
 
 ---
 

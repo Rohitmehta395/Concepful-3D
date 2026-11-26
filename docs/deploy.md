@@ -33,11 +33,11 @@ If static hosting (e.g., S3 + CloudFront, GitHub Pages, Cloudflare Pages) is req
 
 ## 2. Environment Variables
 
-| Variable               | Description                                                                                                                                                               | Default                 | Required in Production                |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------- | :------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL` | Base canonical URL used for canonical link tags, OpenGraph metadata, `robots.txt`, and `sitemap.xml`.                                                                     | `https://concepful.com` | Optional (defaults to production URL) |
-| `NEXT_PUBLIC_E2E`      | Test automation flag. When set to `"1"`, internal diagnostic hooks (`__CONCEPFUL*`) are mounted on `window` for test harnesses. Must remain `"0"` or unset in production. | `0`                     | No (leave unset or `0`)               |
-| `PORT`                 | Local network port for the Node.js server to bind to.                                                                                                                     | `3000`                  | Optional                              |
+| Variable               | Description                                                                                                                                                                                                                                                                           | Default          | Required in Production                       |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------- | :------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Optional canonical site base URL. **When set:** enables `metadataBase`, `<link rel="canonical">`, `Allow: /` + `Sitemap:` in `/robots.txt`, and the entry in `/sitemap.xml`. **When unset:** omits canonical, sets `Disallow: /` in `/robots.txt`, and emits an empty `/sitemap.xml`. | _(unset / none)_ | Recommended for public indexable deployments |
+| `NEXT_PUBLIC_E2E`      | Test automation flag. When set to `"1"`, internal diagnostic hooks (`__CONCEPFUL*`) are mounted on `window` for test harnesses. Must remain `"0"` or unset in production.                                                                                                             | `0`              | No (leave unset or `0`)                      |
+| `PORT`                 | Local network port for the Node.js server to bind to.                                                                                                                                                                                                                                 | `3000`           | Optional                                     |
 
 ---
 
