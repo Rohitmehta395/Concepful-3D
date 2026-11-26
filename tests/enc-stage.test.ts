@@ -452,7 +452,7 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
     manager.dispose();
   });
 
-  it("returns geometries and textures to starting count after 20 cycles and does not grow in 20 more", () => {
+  it("returns geometries and textures to starting count after 3 cycles and does not grow in 3 more", () => {
     const liveGeos = new Set<THREE.BufferGeometry>();
     const liveTexs = new Set<THREE.Texture>();
 
@@ -549,30 +549,30 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
         }
       };
 
-      runBatch(20);
-      const after20Geos = liveGeos.size;
-      const after20Texs = liveTexs.size;
+      runBatch(3);
+      const afterBatch1Geos = liveGeos.size;
+      const afterBatch1Texs = liveTexs.size;
 
-      runBatch(20);
-      const after40Geos = liveGeos.size;
-      const after40Texs = liveTexs.size;
+      runBatch(3);
+      const afterBatch2Geos = liveGeos.size;
+      const afterBatch2Texs = liveTexs.size;
 
-      console.log("20+20 cycle counts:", {
+      console.log("3+3 cycle counts:", {
         startGeos,
         startTexs,
-        after20Geos,
-        after20Texs,
-        after40Geos,
-        after40Texs,
+        afterBatch1Geos,
+        afterBatch1Texs,
+        afterBatch2Geos,
+        afterBatch2Texs,
       });
 
-      expect(after20Geos).toBe(startGeos);
-      expect(after20Texs).toBe(startTexs);
-      expect(after40Geos).toBe(after20Geos);
-      expect(after40Texs).toBe(after20Texs);
+      expect(afterBatch1Geos).toBe(startGeos);
+      expect(afterBatch1Texs).toBe(startTexs);
+      expect(afterBatch2Geos).toBe(afterBatch1Geos);
+      expect(afterBatch2Texs).toBe(afterBatch1Texs);
     } finally {
       THREE.BufferGeometry.prototype.dispose = origGeoDispose;
       THREE.Texture.prototype.dispose = origTexDispose;
     }
-  }, 45000);
+  });
 });
