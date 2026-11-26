@@ -54,7 +54,8 @@ export interface HudManager {
     delay?: number
   ) => void;
   ring: (key: string) => void;
-  triggerForm: () => void;
+  triggerForm: (offsetMs?: number) => void;
+  getFormT?: () => number;
   render: (
     ctx: CanvasRenderingContext2D,
     time: number,
@@ -62,7 +63,8 @@ export interface HudManager {
     width: number,
     height: number,
     tier: string,
-    company?: string
+    company?: string,
+    cardName?: string
   ) => void;
   dispose: () => void;
 }

@@ -1,3 +1,4 @@
+import { TIERS } from "@/content/tiers";
 import type { Box } from "../layout";
 import type { HudManager } from "./types";
 
@@ -18,6 +19,19 @@ const KIND: Record<string, readonly [string, string]> = {
   loot: ["[Loot]", "#F2B33A"],
   quest: ["[Mission]", "#B8C2FF"],
 };
+
+function resolveFont(cssVar: string, fallback: string): string {
+  if (
+    typeof document === "undefined" ||
+    typeof getComputedStyle !== "function"
+  ) {
+    return fallback;
+  }
+  const v = getComputedStyle(document.documentElement)
+    .getPropertyValue(cssVar)
+    .trim();
+  return v || fallback;
+}
 
 export function createHudManager(): HudManager {
   const calls: ChatCall[] = [];
@@ -45,8 +59,13 @@ export function createHudManager(): HudManager {
     }
   }
 
-  function triggerForm(): void {
-    formT = typeof performance !== "undefined" ? performance.now() : 0;
+  function triggerForm(offsetMs = 0): void {
+    formT =
+      (typeof performance !== "undefined" ? performance.now() : 0) - offsetMs;
+  }
+
+  function getFormT(): number {
+    return formT;
   }
 
   function render(
@@ -56,28 +75,32 @@ export function createHudManager(): HudManager {
     width: number,
     height: number,
     tier: string,
-    company?: string
+    company?: string,
+    cardName?: string
   ): void {
     // 1. Chat log
     const vis = calls
       .filter((c) => time >= c.t0 && time - c.t0 < 5000)
       .slice(width < 900 ? -2 : -5);
 
+    const oy = tier === "squad" ? 62 : 0;
+
     if (vis.length > 0) {
-      ctx.font = '600 11px "JetBrains Mono", monospace';
+      const monoFont = resolveFont("--font-jetbrains-mono", '"JetBrains Mono"');
+      ctx.font = `600 11px ${monoFont}, monospace`;
       ctx.textAlign = "left";
       const lh = 17;
       const bw = Math.min(420, box.w - 16);
 
       ctx.fillStyle = "rgba(12,14,20,.62)";
-      ctx.fillRect(box.x0 + 2, box.y0 + 4, bw, vis.length * lh + 10);
+      ctx.fillRect(box.x0 + 2, box.y0 + 4 + oy, bw, vis.length * lh + 10);
 
       for (let i = 0; i < vis.length; i++) {
         const c = vis[i]!;
         const age = time - c.t0;
         ctx.globalAlpha = age > 4300 ? Math.max(0, 1 - (age - 4300) / 700) : 1;
         const [tag, col] = KIND[c.kind] || KIND.sys!;
-        const y = box.y0 + 20 + i * lh;
+        const y = box.y0 + 20 + oy + i * lh;
 
         ctx.fillStyle = col;
         ctx.fillText(tag, box.x0 + 10, y);
@@ -134,13 +157,19 @@ export function createHudManager(): HudManager {
 
       if (s > 1100 && s < 4300) {
         const a = s < 1350 ? (s - 1100) / 250 : s > 3600 ? (4300 - s) / 700 : 1;
-        const word = tier.toUpperCase();
+        const word =
+          TIERS[tier as keyof typeof TIERS]?.word ?? tier.toUpperCase();
         const fs = Math.min(96, box.w / (word.length * 0.62));
         ctx.save();
         ctx.globalAlpha = Math.max(0, a);
         ctx.translate(box.cx, box.y0 + box.h * 0.86);
         ctx.transform(1, 0, -0.16, 1, 0, 0);
-        ctx.font = `400 ${fs}px "Russo One", sans-serif`;
+        const russoFont = resolveFont("--font-russo-one", '"Russo One"');
+        const monoFont = resolveFont(
+          "--font-jetbrains-mono",
+          '"JetBrains Mono"'
+        );
+        ctx.font = `400 ${fs}px ${russoFont}, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "#8F0030";
         ctx.fillText(word, 5, 5);
@@ -150,10 +179,10 @@ export function createHudManager(): HudManager {
         ctx.strokeText(word, 0, 0);
         ctx.fillStyle = "#F2EDE1";
         ctx.fillText(word, 0, 0);
-        ctx.font = '700 12px "JetBrains Mono", monospace';
+        ctx.font = `700 12px ${monoFont}, monospace`;
         ctx.fillStyle = "#5FD39B";
         ctx.fillText(
-          `${tier.toUpperCase()} · Guild: ${company || "your company"}`,
+          `${cardName || tier.toUpperCase()} · Guild: ${company || "your company"}`,
           0,
           26
         );
@@ -172,6 +201,7 @@ export function createHudManager(): HudManager {
     call,
     ring,
     triggerForm,
+    getFormT,
     render,
     dispose,
   };
