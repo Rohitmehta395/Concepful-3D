@@ -94,28 +94,44 @@ export function registerOverlay(
     };
   }
 
-  // Check if base app stage already exists in cache
+  // Check if any app-mode stages already exist in cache
   const existingApp = manager.getBuiltStage("app");
   if (existingApp) {
     attachEnvbToBaseAppStage(existingApp);
     attachPatchToStage(existingApp);
   }
+  const existingEnc = manager.getBuiltStage("enc");
+  if (existingEnc) {
+    attachPatchToStage(existingEnc);
+  }
+  const existingRaid = manager.getBuiltStage("raid");
+  if (existingRaid) {
+    attachPatchToStage(existingRaid);
+  }
 
-  // Intercept manager.select to attach ENVB only to base createAppStage,
-  // hide ENVB when enc/raid/other stages are active, and hook #patch/#patch2 on all app stages.
+  // Intercept manager.select to attach ENVB only to base createAppStage ("app"),
+  // hide ENVB when enc/raid/other stages are active, and hook #patch/#patch2 on all of "app", "enc", "raid".
   const origSelect = manager.select.bind(manager);
   manager.select = (key: string): Stage | null => {
     const stage = origSelect(key);
     const { tier } = getMissionAndTier();
     const baseAppStage = manager.getBuiltStage("app");
+    const isAppTierKey = key === "app" || key === "enc" || key === "raid";
 
-    if (key === "app" && stage) {
-      if (baseAppStage && stage === baseAppStage && !envbMgr) {
+    if (isAppTierKey && stage) {
+      if (
+        key === "app" &&
+        tier === "solo" &&
+        baseAppStage &&
+        stage === baseAppStage &&
+        !envbMgr
+      ) {
         attachEnvbToBaseAppStage(baseAppStage);
       }
       attachPatchToStage(stage);
       if (envbMgr) {
-        envbMgr.group.visible = stage === baseAppStageRef && tier === "solo";
+        envbMgr.group.visible =
+          key === "app" && stage === baseAppStageRef && tier === "solo";
       }
     } else if (envbMgr) {
       envbMgr.group.visible = false;

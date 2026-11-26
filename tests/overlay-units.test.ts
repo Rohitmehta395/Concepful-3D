@@ -412,23 +412,47 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
     const encStage = makeStage("enc", encGroup, () => encUpdateCount++);
     const raidStage = makeStage("raid", raidGroup, () => raidUpdateCount++);
 
-    let buildState: { mission: string; tier?: string } = {
+    let buildState: {
+      mission: string;
+      tier?: string;
+      objectives?: string[];
+      buffs?: string[];
+    } = {
       mission: "uiux",
       tier: "squad",
+      objectives: ["gtm"],
+      buffs: [],
     };
 
     let builtApp: typeof baseAppStage | undefined;
+    let builtEnc: typeof encStage | undefined;
+    let builtRaid: typeof raidStage | undefined;
     const mockManager = {
       hasBuilder: () => true,
       registerStage: () => {},
-      getBuiltStage: (k: string) => (k === "app" ? builtApp : undefined),
+      getBuiltStage: (k: string) =>
+        k === "app"
+          ? builtApp
+          : k === "enc"
+            ? builtEnc
+            : k === "raid"
+              ? builtRaid
+              : undefined,
       getActiveStage: () => null,
       select: (k: string) => {
-        if (k !== "app") return null;
-        if (buildState.tier === "squad") return encStage;
-        if (buildState.tier === "combine") return raidStage;
-        if (!builtApp) builtApp = baseAppStage;
-        return builtApp;
+        if (k === "enc") {
+          if (!builtEnc) builtEnc = encStage;
+          return builtEnc;
+        }
+        if (k === "raid") {
+          if (!builtRaid) builtRaid = raidStage;
+          return builtRaid;
+        }
+        if (k === "app") {
+          if (!builtApp) builtApp = baseAppStage;
+          return builtApp;
+        }
+        return null;
       },
       clearActive: () => {},
       dispose: () => {},
@@ -450,62 +474,124 @@ describe("Phase 7 Overlay Unit Suite (tests/overlay-*)", () => {
     registerOverlay(mockManager, ctx);
     const handles = getActiveOverlayHandles()!;
 
-    // First visit is squad -> encStage selected, ENVB must NOT attach yet
-    const s1 = mockManager.select("app");
-    expect(s1).toBe(encStage);
-    expect(handles.envb).toBeUndefined();
-    expect(encGroup.children.length).toBe(0);
-    s1!.update({
-      t: 100,
-      dt: 16.6,
-      p: 0.5,
-      kk: 1,
-      box: mockBox,
-      viewportH: 800,
-      reduceMotion: false,
+    // Stub #card and #patch so patchMgr.update renders patchModel on each stage update
+    const mockCard = { getBoundingClientRect: () => ({ width: 200 }) };
+    const mockPatchCanvas = {
+      id: "patch",
+      width: 132,
+      height: 132,
+      getContext: () => ({
+        setTransform: () => {},
+        clearRect: () => {},
+        beginPath: () => {},
+        arc: () => {},
+        fill: () => {},
+        stroke: () => {},
+        save: () => {},
+        clip: () => {},
+        restore: () => {},
+        fillRect: () => {},
+        createLinearGradient: () => ({ addColorStop: () => {} }),
+        createPattern: () => null,
+        drawImage: () => {},
+        translate: () => {},
+        rotate: () => {},
+        fillText: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        closePath: () => {},
+      }),
+    };
+    const origDoc = globalThis.document;
+    vi.stubGlobal("document", {
+      getElementById: (id: string) => {
+        if (id === "card") return mockCard as unknown as HTMLElement;
+        if (id === "patch") return mockPatchCanvas as unknown as HTMLElement;
+        return origDoc ? origDoc.getElementById(id) : null;
+      },
+      createElement: origDoc
+        ? origDoc.createElement.bind(origDoc)
+        : () => ({ width: 7, height: 7, getContext: () => null }),
     });
-    expect(encUpdateCount).toBe(1);
 
-    // Switch to combine -> raidStage selected, ENVB still NOT attached
-    buildState = { mission: "uiux", tier: "combine" };
-    const s2 = mockManager.select("app");
-    expect(s2).toBe(raidStage);
-    expect(handles.envb).toBeUndefined();
-    s2!.update({
-      t: 116.6,
-      dt: 16.6,
-      p: 0.5,
-      kk: 1,
-      box: mockBox,
-      viewportH: 800,
-      reduceMotion: false,
-    });
-    expect(raidUpdateCount).toBe(1);
+    try {
+      // 1. First visit is squad -> createEngine selects "enc", ENVB must NOT attach yet, patchKey = "u:gtm"
+      const s1 = mockManager.select("enc");
+      expect(s1).toBe(encStage);
+      expect(handles.envb).toBeUndefined();
+      expect(encGroup.children.length).toBe(0);
+      s1!.update({
+        t: 100,
+        dt: 16.6,
+        p: 0.5,
+        kk: 1,
+        box: mockBox,
+        viewportH: 800,
+        reduceMotion: false,
+      });
+      expect(encUpdateCount).toBe(1);
+      expect(handles.patch.getDebugInfo?.().key).toBe("u:gtm");
 
-    // Switch to solo -> baseAppStage selected, ENVB attaches and uiux has 15 children (1 moon + 9 mountains + 5 UI planes)
-    buildState = { mission: "uiux", tier: "solo" };
-    const s3 = mockManager.select("app");
-    expect(s3).toBe(baseAppStage);
-    expect(handles.envb).toBeDefined();
-    expect(handles.envb!.group.visible).toBe(true);
-    s3!.update({
-      t: 133.3,
-      dt: 16.6,
-      p: 0.5,
-      kk: 1,
-      box: mockBox,
-      viewportH: 800,
-      reduceMotion: false,
-    });
-    expect(appUpdateCount).toBe(1);
-    const activeUiux = handles.envb!.group.children.find((c) => c.visible);
-    expect(activeUiux).toBeDefined();
-    expect(activeUiux!.children.length).toBe(15);
+      // 2. Switch to combine -> createEngine selects "raid", ENVB still NOT attached, patchKey = "s:local"
+      buildState = {
+        mission: "uiux",
+        tier: "combine",
+        objectives: ["gtm"],
+        buffs: [],
+      };
+      const s2 = mockManager.select("raid");
+      expect(s2).toBe(raidStage);
+      expect(handles.envb).toBeUndefined();
+      s2!.update({
+        t: 116.6,
+        dt: 16.6,
+        p: 0.5,
+        kk: 1,
+        box: mockBox,
+        viewportH: 800,
+        reduceMotion: false,
+      });
+      expect(raidUpdateCount).toBe(1);
+      expect(handles.patch.getDebugInfo?.().key).toBe("s:local");
 
-    // Switch back to squad -> ENVB must hide
-    buildState = { mission: "uiux", tier: "squad" };
-    mockManager.select("app");
-    expect(handles.envb!.group.visible).toBe(false);
+      // 3. Switch to solo -> createEngine selects "app", ENVB attaches with 15 uiux children, patchKey = "h:uiux"
+      buildState = {
+        mission: "uiux",
+        tier: "solo",
+        objectives: ["gtm"],
+        buffs: [],
+      };
+      const s3 = mockManager.select("app");
+      expect(s3).toBe(baseAppStage);
+      expect(handles.envb).toBeDefined();
+      expect(handles.envb!.group.visible).toBe(true);
+      s3!.update({
+        t: 133.3,
+        dt: 16.6,
+        p: 0.5,
+        kk: 1,
+        box: mockBox,
+        viewportH: 800,
+        reduceMotion: false,
+      });
+      expect(appUpdateCount).toBe(1);
+      expect(handles.patch.getDebugInfo?.().key).toBe("h:uiux");
+      const activeUiux = handles.envb!.group.children.find((c) => c.visible);
+      expect(activeUiux).toBeDefined();
+      expect(activeUiux!.children.length).toBe(15);
+
+      // 4. Switch back to squad ("enc") -> ENVB must hide
+      buildState = {
+        mission: "uiux",
+        tier: "squad",
+        objectives: ["gtm"],
+        buffs: [],
+      };
+      mockManager.select("enc");
+      expect(handles.envb!.group.visible).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
 
     mockManager.dispose();
   });

@@ -38,3 +38,14 @@
 - **Target File**: `src/engine/models/sCarriers.ts`
 - **Reason**: `S3` currently only exports `regional: sSky`. `patch.ts` worked around `S3.local` by importing `sSub` from `../models/hVehiclesC`, but `national` (`sTitan`) and `global` (`sCarrier`) await the `raid` lane models.
 - **Requested Change**: Wire `local: sSub`, `national: sTitan`, `global: sCarrier` in `S3` once `raid` merges.
+
+## 6. src/engine/stages/slots/enc.ts — Handle `select("enc")` from `createEngine.ts`
+
+- **Target File**: `src/engine/stages/slots/enc.ts` (line 58)
+- **Reason**: `createEngine.ts:322-326` now passes `"enc"` (not `"app"`) to `stageManager.select(activeSceneKey)` when `buildState.tier === "squad"`. However, `enc.ts:58` only checks `if (key === "app" && buildState?.tier === "squad")`, causing `stageManager.select("enc")` to fall through to `originalSelect("enc")` and return `null`. Because `stage` is `null`, `stage.update(...)` never runs in `squad` mode, leaving `#patch` and `#patch2` blank (`12,651 px` / `16,493 px` diff on `67d1ba8`).
+- **Exact Diff**:
+
+```diff
+-    if (key === "app" && buildState?.tier === "squad") {
++    if (key === "enc" || (key === "app" && buildState?.tier === "squad")) {
+```
