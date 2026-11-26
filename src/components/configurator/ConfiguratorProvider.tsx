@@ -303,6 +303,7 @@ export function ConfiguratorProvider({
       if (eng?.hud) {
         if (!reduce) {
           eng.hud.triggerForm(0);
+          eng.triggerEntry();
         }
         const msg =
           curState.tier === "solo"

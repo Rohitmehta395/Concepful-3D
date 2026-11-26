@@ -64,7 +64,9 @@ export interface HudManager {
     height: number,
     tier: string,
     company?: string,
-    cardName?: string
+    cardName?: string,
+    objectives?: readonly string[],
+    reduceMotion?: boolean
   ) => void;
   dispose: () => void;
 }

@@ -127,6 +127,12 @@ function createDiscTexture(
   );
 }
 
+function backEase(u: number): number {
+  const c1 = 1.5;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2);
+}
+
 export function createAppStage(ctx: StageBuildContext): Stage {
   const {
     three,
@@ -221,9 +227,11 @@ export function createAppStage(ctx: StageBuildContext): Stage {
   const heroes = new Map<string, VehicleHandle>();
   let currentMission: string | null = null;
   let currentHero: VehicleHandle | null = null;
+  let vehT0: number | null = null;
 
-  function setEnv(missionKey: string): void {
+  function setEnv(missionKey: string, t = 0, reduceMotion = true): void {
     if (currentMission === missionKey) return;
+    const isInitial = currentMission === null;
     const env = ENVD[missionKey] || ENVD.brand!;
     activeBg = getBg(env.top, env.bot);
     parentScene.background = activeBg;
@@ -246,6 +254,9 @@ export function createAppStage(ctx: StageBuildContext): Stage {
     currentHero = nextHero;
     group.add(currentHero.g);
     currentMission = missionKey;
+    if (!isInitial && !reduceMotion) {
+      vehT0 = t;
+    }
   }
 
   // Pre-seed default hero
@@ -262,13 +273,18 @@ export function createAppStage(ctx: StageBuildContext): Stage {
     const { t, dt, kk, box, viewportH, reduceMotion } = params;
     const bState = getBuildState ? getBuildState() : DEFAULT_BUILD_STATE;
     if (bState.mission !== currentMission) {
-      setEnv(bState.mission);
+      setEnv(bState.mission, t, reduceMotion);
     }
 
     if (currentHero) {
       const M3 = currentHero;
+      const u =
+        reduceMotion || vehT0 === null
+          ? 1
+          : Math.max(0, Math.min(1, (t - vehT0) / 650));
+      const e = backEase(u);
       M3.g.position.set(
-        reduceMotion ? 0 : Math.sin(t / 1300) * 0.3,
+        (1 - e) * -14 + (reduceMotion ? 0 : Math.sin(t / 1300) * 0.3),
         reduceMotion ? 0 : Math.sin(t / 700) * 0.18,
         0
       );
@@ -350,6 +366,10 @@ export function createAppStage(ctx: StageBuildContext): Stage {
     parentScene.remove(group);
   }
 
+  function triggerEntry(t: number, reduceMotion: boolean): void {
+    vehT0 = reduceMotion ? null : t;
+  }
+
   return {
     key: "app",
     group,
@@ -360,5 +380,6 @@ export function createAppStage(ctx: StageBuildContext): Stage {
     setVisible,
     update,
     dispose,
-  };
+    triggerEntry,
+  } as Stage & { triggerEntry: (t: number, reduceMotion: boolean) => void };
 }

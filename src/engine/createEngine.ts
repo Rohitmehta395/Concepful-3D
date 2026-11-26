@@ -60,6 +60,7 @@ export interface Engine {
   setBuildState: (state: Partial<BuildState>) => void;
   getBuildState: () => BuildState;
   setHudMeta: (meta: { company?: string; cardName?: string }) => void;
+  triggerEntry: (tierKey?: "app" | "enc" | "raid") => void;
 }
 
 let activeEngine: Engine | null = null;
@@ -394,7 +395,9 @@ export function createEngine(
             h,
             buildState.tier,
             hudCompany,
-            hudCardName
+            hudCardName,
+            buildState.objectives,
+            reduceMotion
           );
         } else if (stage && state.activeScene === "stages") {
           const stageIndex = Math.max(
@@ -744,6 +747,21 @@ export function createEngine(
       buildState = { ...buildState, ...state };
       if (state.tier && state.tier !== prevTier) {
         snap = true;
+        const targetKey =
+          state.tier === "combine"
+            ? "raid"
+            : state.tier === "squad"
+              ? "enc"
+              : "app";
+        const targetStage = stageManager.getBuiltStage(targetKey) as
+          | { triggerEntry?: (t: number, reduce: boolean) => void }
+          | null
+          | undefined;
+        const reduce = !!(motionQuery && motionQuery.matches);
+        targetStage?.triggerEntry?.(
+          typeof performance !== "undefined" ? performance.now() : 0,
+          reduce
+        );
       }
       if (motionQuery && motionQuery.matches) {
         renderFrame(performance.now());
@@ -753,6 +771,27 @@ export function createEngine(
     setHudMeta: (meta: { company?: string; cardName?: string }) => {
       if (meta.company !== undefined) hudCompany = meta.company;
       if (meta.cardName !== undefined) hudCardName = meta.cardName;
+    },
+    triggerEntry: (tierKey?: "app" | "enc" | "raid") => {
+      const key =
+        tierKey ??
+        (buildState.tier === "combine"
+          ? "raid"
+          : buildState.tier === "squad"
+            ? "enc"
+            : "app");
+      const targetStage = stageManager.getBuiltStage(key) as
+        | { triggerEntry?: (t: number, reduce: boolean) => void }
+        | null
+        | undefined;
+      const reduce = !!(motionQuery && motionQuery.matches);
+      targetStage?.triggerEntry?.(
+        typeof performance !== "undefined" ? performance.now() : 0,
+        reduce
+      );
+      if (reduce) {
+        renderFrame(performance.now());
+      }
     },
   };
 
