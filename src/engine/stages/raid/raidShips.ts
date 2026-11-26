@@ -16,7 +16,7 @@ import { mJet } from "../../models/hVehiclesC";
 import { mechParts } from "../../models/uUnits";
 import { backEase } from "./raidStage";
 
-const AX = Math.PI / 2;
+const AX = -Math.PI / 2;
 const BR_SLATE3 = 0x4a5262;
 
 const EMB_C =

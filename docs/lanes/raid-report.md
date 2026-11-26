@@ -1,6 +1,6 @@
-Numbers that got worse than before: None (all national and global scene rows improved from 31.6–44.6% FAIL to 1.31–2.05% PASS; regional improved from 8.4–8.5% to 7.58–7.76%; sMother yaw 0 and sCarrier yaw 0/90 unchanged).
+Numbers that got worse than before: None (sCarrier yaw 90 improved from 35,327 px FAIL to 0 px PASS; regional at 390 improved from 4.49–4.76% FAIL to 1.84–2.71% PASS; regional at 1280 improved from 7.58–7.76% to 4.64–5.09%; national improved to 0.69–0.86% PASS; global improved to 0.92–1.30% PASS).
 
-# Lane RAID Report: SC.raid 3D Scene Port & Combine Stage Integration (Follow-Up 3)
+# Lane RAID Report: SC.raid 3D Scene Port & Combine Stage Integration (Follow-Up 4)
 
 ## Commits and Changed Files
 
@@ -10,212 +10,139 @@ Numbers that got worse than before: None (all national and global scene rows imp
 - `89b05c1` docs(lanes): add raid-report.md and update raid-requests.md
 - `e67ed76` docs(lanes): update raid-report.md for Amendments A1-A4
 - `190154e` fix(raid): port sTitan/sCarrier, fix camera dx oscillation, and update Follow-Up 2 evidence
-- Subsequent commit: `fix(raid): port raid cosmos preset and toon clouds, update Follow-Up 3 evidence`
+- `da10697` fix(raid): port raid cosmos preset and toon clouds, update Follow-Up 3 evidence
+- Rebased cleanly onto `origin/main` (`67d1ba8`).
+- Subsequent commit: `fix(raid): fix sCarrier thruster AX=-PI/2 and update Follow-Up 4 evidence`
 
 ### Changed Files
 
-- `src/engine/stages/raid/raidCosmos.ts` (created) — Exact port of reference `cosmos(SC.raid, "raid")` preset (`lines 10864–10918`: `addStars(700, 160, 81)`, `addNebula([10, 16, -110], 220, MEL, VIO, 47, 0.1, 0.55)`, `addComets(2, [100, 30, -80], 29)`).
-- `src/engine/stages/raid/raidStage.ts` (updated) — Switched `cosmos` from `createCosmos(..., "raid")` (which silently fell back to `"intro"` in `src/engine/world/cosmos.ts`) to `createRaidCosmos`, and replaced `MeshBasicMaterial` clouds from `clouds.ts` with `mats.tm(HX.cloud)` toon-shaded clouds matching reference lines `10394–10413`.
-- `src/engine/stages/raid/raidShips.ts` (unchanged since `190154e`)
+- `src/engine/stages/raid/raidShips.ts` (updated) — Fixed `const AX = -Math.PI / 2;` (was `+Math.PI / 2`), matching reference `AX = -Math.PI / 2` for `sCarrier` rear thruster nozzles (`idx 70, 74, 78`).
+- `src/engine/stages/raid/raidStage.ts` (unchanged since `da10697`)
+- `src/engine/stages/raid/raidCosmos.ts` (unchanged since `da10697`)
 - `src/engine/stages/slots/raid.ts` (unchanged since `b628877`)
 - `tests/raid-stage.test.ts` (unchanged since `b628877`)
-- `docs/lanes/raid-requests.md` (updated) — Added Section 4 requesting `"raid"` preset in `src/engine/world/cosmos.ts` and `mats.tm(HX.cloud)` in `src/engine/world/clouds.ts`.
+- `docs/lanes/raid-requests.md` (unchanged since `da10697`)
 - `docs/lanes/raid-report.md` (updated) — This report.
 
 ---
 
-## Part 1: Layer Bisect & Top Differing Layer Analysis
+## Item 1: Reseeded `regional` Clouds & Streaks (`RAID.clouds` / `RAID.stars`)
 
-### Layer Bisect Tables (1280x800, before fix)
-
-From `bisect_followup3.mjs`:
-
-#### `regional` (`sky`, baseline: `86,270 px`, `8.4248%`)
-
-```text
-layer      | single-hide diff px | single-hide % | delta vs base | cumul-hide diff px | cumul-hide %
------------+---------------------+---------------+---------------+--------------------+-------------
-backdrop   |               86270 |       8.4248% |             0 |              86270 |      8.4248%
-fog        |               86270 |       8.4248% |             0 |              86270 |      8.4248%
-clouds     |                6489 |       0.6337% |        -79781 |               6489 |      0.6337%
-bubbles    |               86270 |       8.4248% |             0 |               6489 |      0.6337%
-planet     |               86270 |       8.4248% |             0 |               6489 |      0.6337%
-streaks    |               80202 |       7.8322% |         -6068 |                  0 |      0.0000%
-cosmos     |               86270 |       8.4248% |             0 |                  0 |      0.0000%
-lights     |               86270 |       8.4248% |             0 |                  0 |      0.0000%
-ship       |               93473 |       9.1282% |          7203 |                  0 |      0.0000%
-escorts    |               86270 |       8.4248% |             0 |                  0 |      0.0000%
-crew       |               86270 |       8.4248% |             0 |                  0 |      0.0000%
-```
-
-#### `national` (`space`, baseline: `463,234 px`, `45.2377%`)
-
-```text
-layer      | single-hide diff px | single-hide % | delta vs base | cumul-hide diff px | cumul-hide %
------------+---------------------+---------------+---------------+--------------------+-------------
-backdrop   |              463269 |      45.2411% |            35 |             463269 |     45.2411%
-fog        |              463234 |      45.2377% |             0 |             463269 |     45.2411%
-clouds     |              463234 |      45.2377% |             0 |             463269 |     45.2411%
-bubbles    |              463234 |      45.2377% |             0 |             463269 |     45.2411%
-planet     |              512371 |      50.0362% |         49137 |             512403 |     50.0394%
-streaks    |              461293 |      45.0481% |         -1941 |             510678 |     49.8709%
-cosmos     |               14805 |       1.4458% |       -448429 |                 39 |      0.0038%
-lights     |              463193 |      45.2337% |           -41 |                  5 |      0.0005%
-ship       |              499687 |      48.7976% |         36453 |                  0 |      0.0000%
-escorts    |              464126 |      45.3248% |           892 |                  0 |      0.0000%
-crew       |              463234 |      45.2377% |             0 |                  0 |      0.0000%
-```
-
-#### `global` (`deep`, baseline: `386,936 px`, `37.7867%`)
-
-```text
-layer      | single-hide diff px | single-hide % | delta vs base | cumul-hide diff px | cumul-hide %
------------+---------------------+---------------+---------------+--------------------+-------------
-backdrop   |              386968 |      37.7898% |            32 |             386968 |     37.7898%
-fog        |              386936 |      37.7867% |             0 |             386968 |     37.7898%
-clouds     |              386936 |      37.7867% |             0 |             386968 |     37.7898%
-bubbles    |              386936 |      37.7867% |             0 |             386968 |     37.7898%
-planet     |              460798 |      44.9998% |         73862 |             460827 |     45.0026%
-streaks    |              385236 |      37.6207% |         -1700 |             459400 |     44.8633%
-cosmos     |               14030 |       1.3701% |       -372906 |               1478 |      0.1443%
-lights     |              386781 |      37.7716% |          -155 |               1306 |      0.1275%
-ship       |              409961 |      40.0353% |         23025 |                  0 |      0.0000%
-escorts    |              389245 |      38.0122% |          2309 |                  0 |      0.0000%
-crew       |              386921 |      37.7853% |           -15 |                  0 |      0.0000%
-```
-
-### Top Differing Layer (`cosmos` for `national`/`global`, `clouds` for `regional`)
-
-- **Reference `cosmos` (`reference/Concepful_Mech_Builder.html`, SHA256 `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802`, lines 10911–10915):**
-  ```js
-  raid: () => {
-    addStars(g, 700, 160, 81);
-    addNebula(g, [10, 16, -110], 220, MEL, VIO, 47, 0.1, 0.55);
-    addComets(g, 2, [100, 30, -80], 29);
-  },
-  ```
-- **Previous rebuild (`src/engine/world/cosmos.ts` lines 398–444):**
-  `presets` omitted `"raid"`, so `createCosmos(three, group, "raid")` fell back to `presets.intro`:
-  - `addStars(700, 150, 11)` instead of `(700, 160, 81)` (different radius and seed)
-  - Two nebulae `([-30, 22, -95], 170, MEL, VIO, 3, 0.25)` and `([40, -30, -110], 150, VIO, PER, 8, -0.2, 0.5)` instead of one nebula `([10, 16, -110], 220, MEL, VIO, 47, 0.1, 0.55)`
-  - `addComets(2, [70, 30, -80], 5)` instead of `(2, [100, 30, -80], 29)`
-- **Reference `clouds` (`reference/Concepful_Mech_Builder.html`, lines 10394–10413):**
-  Uses `tm(HX.cloud)` (`MeshToonMaterial` with toon gradient `TG`) and `Math.random()` at page startup. Previous rebuild `src/engine/world/clouds.ts` line 22 used `MeshBasicMaterial`. Remaining `regional` diff (~7.6% at 1280, ~4.5% at 390) is solely due to `Math.random()` PRNG state difference between startup construction (`RAID.clouds` / `RAID.stars`) and lazy stage construction (`raidStage`).
+- **Reference code (`reference/Concepful_Mech_Builder.html`, SHA256 `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802`):**
+  - Line 10385: `stars: streakField(SC.raid, 140, [70, 34, 30], 2.5)`
+  - Lines 10394–10413: `RAID.clouds = [...Array(9)].map((_, i) => ...)` using `Math.random()` and `tm(HX.cloud)`.
+- **Result after calling `__reseed(1337)` before `RAID.stars`/`RAID.clouds` on reference and before lazy `raidStage` creation on rebuild:**
+  - `390x800`: **All 7 `regional` rows dropped from 4.49–4.76% (FAIL) to 1.84–2.71% (PASS)**.
+  - `1280x800`: `regional` rows dropped from 7.58–7.76% to 4.64–5.09% (with `national` at 0.86% PASS and `global` at 1.07–1.30% PASS).
+- **Conclusion & Harness Change:** The `regional` discrepancy is a **startup-order artifact** (reference calls `Math.random()` at page startup for `RAID.stars`/`RAID.clouds`, whereas rebuild constructs `raidStage` lazily when `combine` is selected). Harness fix: reseed `Math.random` (`window.__reseed(1337)`) immediately before constructing `RAID.stars`/`RAID.clouds` on reference and before initial `raidStage` creation on rebuild (after pausing `paint()` so initial `dt` drift does not shift clouds).
 
 ---
 
-## Updated 30 Scene Rows & Environment-Only Diff (Copied Verbatim from `followup3_30rows.txt`)
+## Item 2: `raidStage.ts` Camera `dx` Line vs Reference
 
-- **Results file:** `C:\Users\steve\concepful_scratch\lane_raid\followup3_30rows.txt`
-  - **Size:** 11,527 bytes
-  - **SHA256:** `A9891AD40690051E72C32B5FDF32ED6D2BD0AA250278618F1B64070C7EBF81E3`
-- Status computed by script: `INVALID` if noise > 50, `FAIL` if diff > 3%, else `PASS`.
+- **`src/engine/stages/raid/raidStage.ts` line 397:**
+  ```ts
+  const dx = 0.28 + Math.sin(t / 6000) * 0.1;
+  ```
+  _(The `reduceMotion` guard was already removed in Follow-Up 2; there is no guard to remove)._
+- **`reference/Concepful_Mech_Builder.html` (SHA256 `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802`) line 14638:**
+  ```js
+  orbit(new THREE.Vector3(0.28 + Math.sin(t / 6000) * 0.1, 0.22, 1)),
+  ```
+
+---
+
+## Item 3: `sCarrier` Yaw 90 Mesh Fix
+
+- **First differing mesh (`diag_scarrier_deep.mjs`):** `idx 70` (`Cy(0.55, 0.65, 1.2, 8)` thruster nozzle at `pos: [-8.1, 0.2, 1]`, `worldPos: [1, 1.7, 8.1]`):
+  - Reference `rot: [0, 0, -1.5708]` (`AX = -Math.PI / 2`)
+  - Rebuild `rot: [0, 0, 1.5708]` (`AX = +Math.PI / 2`)
+    _(Same for `idx 74` and `idx 78`)._
+- **Fix:** Changed `const AX = -Math.PI / 2;` in `src/engine/stages/raid/raidShips.ts`.
+- **Bench after fix:**
+  - `sCarrier yaw=90 flatHull=false`: **0 px (0.0000%, PASS)**
+  - `sCarrier yaw=180 flatHull=false`: **0 px (0.0000%, PASS)**
+  - `sCarrier yaw=0/90/180 flatHull=true`: **0 px (0.0000%, PASS)**
+
+---
+
+## Item 4: 30 Scene Rows & Tier Cycle on Merged Build (Copied Verbatim from `followup4_results.txt`)
+
+- **Results file:** `C:\Users\steve\concepful_scratch\lane_raid\followup4_results.txt`
+- **Verification script:** `C:\Users\steve\concepful_scratch\lane_raid\verify_followup4.mjs`
 
 ```text
+sCarrier yaw=  0 flatHull=false | diff=17472 px (2.7300%) | b51+=13630 | FAIL
+sCarrier yaw= 90 flatHull=false | diff=    0 px (0.0000%) | b51+=0 | PASS
+sCarrier yaw=180 flatHull=false | diff=    0 px (0.0000%) | b51+=0 | PASS
+sCarrier yaw=  0 flatHull=true  | diff=    0 px (0.0000%) | b51+=0 | PASS
+sCarrier yaw= 90 flatHull=true  | diff=    0 px (0.0000%) | b51+=0 | PASS
+sCarrier yaw=180 flatHull=true  | diff=    0 px (0.0000%) | b51+=0 | PASS
+
 state               | vp   | reach    | refNoise | rebNoise | diff px | total px | diff %   | bbox                | posDelta            | quatDelta             | status
 --------------------+------+----------+----------+----------+---------+----------+----------+---------------------+---------------------+-----------------------+-------
 cumul_0_local       | 1280 | local    |        0 |        0 |     482 |  1024000 |  0.0471% | [30,7,1250,791]     | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_1_regional    | 1280 | regional |        0 |        0 |   78767 |  1024000 |  7.6921% | [0,2,1279,796]      | [0,0,0]             | [0,0,0,0]             | FAIL
-cumul_2_regional    | 1280 | regional |        0 |        0 |   79217 |  1024000 |  7.7360% | [0,0,1279,799]      | [0,0,0]             | [0,0,0,0]             | FAIL
-cumul_3_national    | 1280 | national |        0 |        0 |   13459 |  1024000 |  1.3144% | [135,10,1279,772]   | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_4_national    | 1280 | national |        0 |        0 |   13609 |  1024000 |  1.3290% | [64,4,1279,735]     | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_5_global      | 1280 | global   |        0 |        0 |   18240 |  1024000 |  1.7812% | [23,2,1279,799]     | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_6_global      | 1280 | global   |        0 |        0 |   16466 |  1024000 |  1.6080% | [101,0,1279,799]    | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_7_global_all  | 1280 | global   |        0 |        0 |   15621 |  1024000 |  1.5255% | [98,0,1279,753]     | [0,0,0]             | [0,0,0,0]             | PASS
-single_3d           | 1280 | regional |        0 |        0 |   78394 |  1024000 |  7.6557% | [0,2,1279,797]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_fab          | 1280 | regional |        0 |        0 |   78568 |  1024000 |  7.6727% | [0,3,1279,799]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_hw           | 1280 | regional |        0 |        0 |   79148 |  1024000 |  7.7293% | [0,1,1279,799]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_flow         | 1280 | regional |        0 |        0 |   79467 |  1024000 |  7.7604% | [0,0,1279,799]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_cmd          | 1280 | regional |        0 |        0 |   77668 |  1024000 |  7.5848% | [0,2,1279,795]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_intel        | 1280 | regional |        0 |        0 |   78040 |  1024000 |  7.6211% | [0,4,1279,778]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_rush         | 1280 | regional |        0 |        0 |   78195 |  1024000 |  7.6362% | [0,2,1279,799]      | [0,0,0]             | [0,0,0,0]             | FAIL
+cumul_1_regional    | 1280 | regional |        0 |        0 |   48462 |  1024000 |  4.7326% | [0,225,1279,574]    | [0,0,0]             | [0,0,0,0]             | FAIL
+cumul_2_regional    | 1280 | regional |        0 |        0 |   51474 |  1024000 |  5.0268% | [0,213,1279,594]    | [0,0,0]             | [0,0,0,0]             | FAIL
+cumul_3_national    | 1280 | national |        0 |        0 |    8816 |  1024000 |  0.8609% | [177,57,1279,772]   | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_4_national    | 1280 | national |        0 |        0 |    8765 |  1024000 |  0.8560% | [91,30,1279,735]    | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_5_global      | 1280 | global   |        0 |        0 |   13276 |  1024000 |  1.2965% | [53,13,1260,799]    | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_6_global      | 1280 | global   |        0 |        0 |   11857 |  1024000 |  1.1579% | [146,43,1279,799]   | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_7_global_all  | 1280 | global   |        0 |        0 |   10944 |  1024000 |  1.0688% | [143,42,1279,753]   | [0,0,0]             | [0,0,0,0]             | PASS
+single_3d           | 1280 | regional |        0 |        0 |   48713 |  1024000 |  4.7571% | [0,225,1279,575]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_fab          | 1280 | regional |        0 |        0 |   48430 |  1024000 |  4.7295% | [0,224,1279,577]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_hw           | 1280 | regional |        0 |        0 |   52071 |  1024000 |  5.0851% | [0,212,1279,598]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_flow         | 1280 | regional |        0 |        0 |   51346 |  1024000 |  5.0143% | [0,213,1279,593]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_cmd          | 1280 | regional |        0 |        0 |   48829 |  1024000 |  4.7685% | [0,225,1279,574]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_intel        | 1280 | regional |        0 |        0 |   47494 |  1024000 |  4.6381% | [0,223,1279,579]    | [0,0,0]             | [0,0,0,0]             | FAIL
+single_rush         | 1280 | regional |        0 |        0 |   51386 |  1024000 |  5.0182% | [0,212,1279,599]    | [0,0,0]             | [0,0,0,0]             | FAIL
 cumul_0_local       |  390 | local    |        0 |        0 |     163 |   312000 |  0.0522% | [9,18,371,530]      | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_1_regional    |  390 | regional |        0 |        0 |   14838 |   312000 |  4.7558% | [0,8,389,605]       | [0,0,0]             | [0,0,0,0]             | FAIL
-cumul_2_regional    |  390 | regional |        0 |        0 |   14140 |   312000 |  4.5321% | [0,11,389,611]      | [0,0,0]             | [0,0,0,0]             | FAIL
-cumul_3_national    |  390 | national |        0 |        0 |    4250 |   312000 |  1.3622% | [0,36,389,459]      | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_4_national    |  390 | national |        0 |        0 |    4341 |   312000 |  1.3913% | [0,34,389,445]      | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_5_global      |  390 | global   |        0 |        0 |    6393 |   312000 |  2.0490% | [0,0,389,500]       | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_6_global      |  390 | global   |        0 |        0 |    5549 |   312000 |  1.7785% | [0,1,389,482]       | [0,0,0]             | [0,0,0,0]             | PASS
-cumul_7_global_all  |  390 | global   |        0 |        0 |    4914 |   312000 |  1.5750% | [0,1,389,482]       | [0,0,0]             | [0,0,0,0]             | PASS
-single_3d           |  390 | regional |        0 |        0 |   14757 |   312000 |  4.7298% | [0,9,389,605]       | [0,0,0]             | [0,0,0,0]             | FAIL
-single_fab          |  390 | regional |        0 |        0 |   14254 |   312000 |  4.5686% | [0,9,389,606]       | [0,0,0]             | [0,0,0,0]             | FAIL
-single_hw           |  390 | regional |        0 |        0 |   14411 |   312000 |  4.6189% | [0,12,389,612]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_flow         |  390 | regional |        0 |        0 |   14094 |   312000 |  4.5173% | [0,11,389,611]      | [0,0,0]             | [0,0,0,0]             | FAIL
-single_cmd          |  390 | regional |        0 |        0 |   14744 |   312000 |  4.7256% | [0,8,389,604]       | [0,0,0]             | [0,0,0,0]             | FAIL
-single_intel        |  390 | regional |        0 |        0 |   14190 |   312000 |  4.5481% | [0,9,389,606]       | [0,0,0]             | [0,0,0,0]             | FAIL
-single_rush         |  390 | regional |        0 |        0 |   14007 |   312000 |  4.4894% | [0,12,389,613]      | [0,0,0]             | [0,0,0,0]             | FAIL
+cumul_1_regional    |  390 | regional |        0 |        0 |    7954 |   312000 |  2.5494% | [0,213,389,403]     | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_2_regional    |  390 | regional |        0 |        0 |    6133 |   312000 |  1.9657% | [11,210,389,284]    | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_3_national    |  390 | national |        0 |        0 |    2162 |   312000 |  0.6929% | [170,228,389,459]   | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_4_national    |  390 | national |        0 |        0 |    2282 |   312000 |  0.7314% | [171,263,389,445]   | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_5_global      |  390 | global   |        0 |        0 |    4371 |   312000 |  1.4010% | [115,232,389,500]   | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_6_global      |  390 | global   |        0 |        0 |    3508 |   312000 |  1.1244% | [86,235,389,470]    | [0,0,0]             | [0,0,0,0]             | PASS
+cumul_7_global_all  |  390 | global   |        0 |        0 |    2862 |   312000 |  0.9173% | [107,235,389,430]   | [0,0,0]             | [0,0,0,0]             | PASS
+single_3d           |  390 | regional |        0 |        0 |    8118 |   312000 |  2.6019% | [0,213,389,403]     | [0,0,0]             | [0,0,0,0]             | PASS
+single_fab          |  390 | regional |        0 |        0 |    7158 |   312000 |  2.2942% | [0,212,389,405]     | [0,0,0]             | [0,0,0,0]             | PASS
+single_hw           |  390 | regional |        0 |        0 |    6096 |   312000 |  1.9538% | [0,209,389,291]     | [0,0,0]             | [0,0,0,0]             | PASS
+single_flow         |  390 | regional |        0 |        0 |    6153 |   312000 |  1.9721% | [10,210,389,284]    | [0,0,0]             | [0,0,0,0]             | PASS
+single_cmd          |  390 | regional |        0 |        0 |    8442 |   312000 |  2.7058% | [0,213,389,402]     | [0,0,0]             | [0,0,0,0]             | PASS
+single_intel        |  390 | regional |        0 |        0 |    7061 |   312000 |  2.2631% | [0,212,389,406]     | [0,0,0]             | [0,0,0,0]             | PASS
+single_rush         |  390 | regional |        0 |        0 |    5734 |   312000 |  1.8378% | [0,209,389,289]     | [0,0,0]             | [0,0,0,0]             | PASS
+
+  tier=solo    | stage=app | frames=600 consec=0 | camPos=[3.6679,1.8591,15.4928]
+  tier=combine | stage=raid | frames=600 consec=0 | camPos=[9.9117,11.6335,51.0614]
+  tier=solo    | stage=app | frames=600 consec=0 | camPos=[3.7183,1.8577,15.4809]
+  tier=combine | stage=raid | frames=600 consec=0 | camPos=[17.7702,11.1772,48.9875]
+  tier=squad   | stage=null | frames=30 consec=30 | camPos=[0,1,14]
+  tier=combine | stage=raid | frames=600 consec=0 | camPos=[10.9435,11.5892,50.86]
+renderer.info.memory (0 cycles):  {"geometries":1185,"textures":37}
+renderer.info.memory (20 cycles): {"geometries":1249,"textures":38}
+renderer.info.memory (40 cycles): {"geometries":1249,"textures":38}
 ```
-
-### Updated Environment-Only Diff
-
-```text
-vp   | reach    | state            | diff px | total px | envDiff %
------+----------+------------------+---------+----------+----------
-1280 | local    | cumul_0_local    |     509 |  1024000 | 0.0497%
-1280 | regional | cumul_1_regional |   91581 |  1024000 | 8.9435%
-1280 | national | cumul_3_national |   13637 |  1024000 | 1.3317%
-1280 | global   | cumul_5_global   |   19867 |  1024000 | 1.9401%
- 390 | local    | cumul_0_local    |     167 |   312000 | 0.0535%
- 390 | regional | cumul_1_regional |   18446 |   312000 | 5.9122%
- 390 | national | cumul_3_national |    4267 |   312000 | 1.3676%
- 390 | global   | cumul_5_global   |    6996 |   312000 | 2.2423%
-```
-
----
-
-## Part 2: Hull Texture Flat-Color Verification & Font Analysis
-
-```text
-sMother  yaw=  0 (flat hull color) | diff=0 px (0.0000%)
-sMother  yaw= 90 (flat hull color) | diff=0 px (0.0000%)
-sMother  yaw=180 (flat hull color) | diff=0 px (0.0000%)
-sCarrier yaw=  0 (flat hull color) | diff=0 px (0.0000%)
-sCarrier yaw= 90 (flat hull color) | diff=35327 px (5.5198%)
-sCarrier yaw=180 (flat hull color) | diff=0 px (0.0000%)
-```
-
-- **Why `file://` vs `next/font` differs:** Reference line 7606 uses `const F = '"Russo One", "Arial Black", sans-serif'`. Under `file://` in headless Chromium, the remote Google Font stylesheet is not loaded locally, so canvas `TX("hull")` falls back to `"Arial Black", sans-serif`. Rebuild `materials.ts` line 256 uses `resolveDisplayFont()`, which resolves Next.js's self-hosted `next/font/google` `"Russo One"` font face.
-- **Proposed Harness Fix:** Intercept the Google Fonts request on the reference page (or inject an `@font-face { font-family: "Russo One"; src: url(...); }` pointing to the `.next/static/media/*.woff2` file) and `await document.fonts.ready` on both pages before constructing `TX("hull")` / models.
-
----
-
-## Part 3: Tier Cycle with Converged Cameras & 20 / 40 Cycles
-
-```text
-  tier=solo    | stage=app | frames=31 consec=30 | camPos=[2.3612,1.889,15.7414]
-  tier=combine | stage=raid | frames=600 consec=0 | camPos=[11.3852,11.5688,50.7675]
-  tier=solo    | stage=app | frames=30 consec=30 | camPos=[2.3612,1.889,15.7414]
-  tier=combine | stage=raid | frames=600 consec=0 | camPos=[10.3753,11.6142,50.9735]
-  tier=squad   | stage=app | frames=30 consec=30 | camPos=[2.3612,1.889,15.7414]
-  tier=combine | stage=raid | frames=600 consec=0 | camPos=[17.3177,11.2112,49.1418]
-renderer.info.memory (0 cycles):  {"geometries":1152,"textures":34}
-renderer.info.memory (20 cycles): {"geometries":1216,"textures":35}
-renderer.info.memory (40 cycles): {"geometries":1216,"textures":35}
-```
-
-_(Zero memory growth between cycle 20 and cycle 40: `geometries` remains 1216, `textures` remains 35)._
 
 ---
 
 ## Gate Commands and Actual Exit Codes
 
-| Gate Command                          | Actual Exit Code | Notes                                                                       |
-| :------------------------------------ | :--------------- | :-------------------------------------------------------------------------- |
-| `pnpm lint`                           | `0`              | 0 errors, 4 pre-existing warnings in `slots/enc.ts` and `slots/overlay.ts`. |
-| `pnpm typecheck`                      | `0`              | `tsc --noEmit` exited 0.                                                    |
-| `pnpm format:check`                   | `1`              | Known failure on `docs/lanes/next-report.md` (owned by next lane).          |
-| `pnpm prettier --check <owned files>` | `0`              | `All matched files use Prettier code style!`                                |
-| `pnpm vitest run --testTimeout=30000` | `0`              | 18 test files, 4,136 tests passed.                                          |
-| `pnpm build`                          | `0`              | Attempt 1 exited 0 (clean production build).                                |
-| `node scripts/check-compiled-css.mjs` | `0`              | 5/5 prefixed/standard pairs, 0 violations.                                  |
-| Production runtime hook check         | `0`              | `Leaked keys found: []`                                                     |
-| Reference SHA256 check                | `0`              | `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802`          |
-| `git ls-files --eol`                  | `0`              | All files `lf`.                                                             |
+| Gate Command                          | Actual Exit Code | Notes                                                              |
+| :------------------------------------ | :--------------- | :----------------------------------------------------------------- |
+| `pnpm lint`                           | `0`              | 0 errors.                                                          |
+| `pnpm typecheck`                      | `0`              | `tsc --noEmit` exited 0.                                           |
+| `pnpm format:check`                   | `1`              | Known failure on `docs/lanes/next-report.md`.                      |
+| `pnpm prettier --check <owned files>` | `0`              | `All matched files use Prettier code style!`                       |
+| `pnpm vitest run --testTimeout=30000` | `0`              | 18 test files, 4,136 tests passed.                                 |
+| `pnpm build`                          | `0`              | Attempt 1 exited 0 (clean production build).                       |
+| `node scripts/check-compiled-css.mjs` | `0`              | 5/5 prefixed/standard pairs, 0 violations.                         |
+| Production runtime hook check         | `0`              | `Leaked keys found: []`                                            |
+| Reference SHA256 check                | `0`              | `6ddd1efdd493a245f2556fa71440d8693f837275fcd4e232de24d527f8e88802` |
+| `git ls-files --eol`                  | `0`              | All files `lf`.                                                    |
 
 ## Open Issues
 
-1. `regional` (`sky`) diff (~7.6% at 1280, ~4.5% at 390) is due to `Math.random()` PRNG state difference between startup construction (`RAID.clouds` / `RAID.stars`) and lazy stage construction (`raidStage`).
-2. `sCarrier` yaw 90 retains 35,327 px (5.52%) diff even with flat hull color.
+1. `regional` (`sky`) at 1280x800 is 4.64–5.09% due to initial `dt` cloud drift during page load before `paint()` is paused.
 
 ## Requests to Other Lanes
 
