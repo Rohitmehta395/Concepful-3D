@@ -55,7 +55,7 @@ export function registerEncStage(
 
   manager.select = (key: string): Stage | null => {
     const buildState = ctx.getBuildState ? ctx.getBuildState() : undefined;
-    if (key === "app" && buildState?.tier === "squad") {
+    if (key === "enc" || (key === "app" && buildState?.tier === "squad")) {
       if (!encStage) {
         if (
           process.env.NEXT_PUBLIC_E2E === "1" &&
@@ -72,9 +72,11 @@ export function registerEncStage(
         encStage.setVisible(false);
       }
 
-      originalClearActive();
-      encActive = true;
-      encStage.setVisible(true);
+      if (!encActive) {
+        originalClearActive();
+        encActive = true;
+        encStage.setVisible(true);
+      }
       ctx.scene.background = encStage.backgroundTexture;
       ctx.scene.fog = encStage.fog;
       return encStage;

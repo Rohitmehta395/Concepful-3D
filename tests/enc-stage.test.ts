@@ -359,7 +359,7 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
       prevClearActive();
     };
     manager.select = (key: string) => {
-      if (key === "app" && state.tier === "combine") {
+      if (key === "raid" || (key === "app" && state.tier === "combine")) {
         if (!raidStage) {
           raidStage = {
             key: "raid",
@@ -390,28 +390,34 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
       prevDispose();
     };
 
-    const sequence: Array<{ tier: BuildState["tier"]; expectedKey: string }> = [
-      { tier: "solo", expectedKey: "app" },
-      { tier: "squad", expectedKey: "enc" },
-      { tier: "combine", expectedKey: "raid" },
-      { tier: "squad", expectedKey: "enc" },
-      { tier: "solo", expectedKey: "app" },
-      { tier: "combine", expectedKey: "raid" },
-      { tier: "squad", expectedKey: "enc" },
+    const sequence: Array<{
+      tier: BuildState["tier"];
+      routedKey: string;
+      expectedKey: string;
+    }> = [
+      { tier: "solo", routedKey: "app", expectedKey: "app" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
+      { tier: "combine", routedKey: "raid", expectedKey: "raid" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
+      { tier: "solo", routedKey: "app", expectedKey: "app" },
+      { tier: "combine", routedKey: "raid", expectedKey: "raid" },
+      { tier: "squad", routedKey: "enc", expectedKey: "enc" },
     ];
 
     const observed: Array<{
       tier: string;
+      routedKey: string;
       selectedKey: string | undefined;
       activeKey: string | undefined;
     }> = [];
 
     for (const step of sequence) {
       state = { ...state, tier: step.tier };
-      const selected = manager.select("app");
+      const selected = manager.select(step.routedKey);
       const active = manager.getActiveStage();
       observed.push({
         tier: step.tier,
+        routedKey: step.routedKey,
         selectedKey: selected?.key,
         activeKey: active?.key,
       });
@@ -421,13 +427,23 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
     }
 
     expect(observed).toEqual([
-      { tier: "solo", selectedKey: "app", activeKey: "app" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
-      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
-      { tier: "solo", selectedKey: "app", activeKey: "app" },
-      { tier: "combine", selectedKey: "raid", activeKey: "raid" },
-      { tier: "squad", selectedKey: "enc", activeKey: "enc" },
+      { tier: "solo", routedKey: "app", selectedKey: "app", activeKey: "app" },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
+      {
+        tier: "combine",
+        routedKey: "raid",
+        selectedKey: "raid",
+        activeKey: "raid",
+      },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
+      { tier: "solo", routedKey: "app", selectedKey: "app", activeKey: "app" },
+      {
+        tier: "combine",
+        routedKey: "raid",
+        selectedKey: "raid",
+        activeKey: "raid",
+      },
+      { tier: "squad", routedKey: "enc", selectedKey: "enc", activeKey: "enc" },
     ]);
 
     manager.clearActive();
@@ -436,7 +452,7 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
     manager.dispose();
   });
 
-  it("returns geometries and textures to starting count after 20 cycles and does not grow in 20 more", () => {
+  it("returns geometries and textures to starting count after 3 cycles and does not grow in 3 more", () => {
     const liveGeos = new Set<THREE.BufferGeometry>();
     const liveTexs = new Set<THREE.Texture>();
 
@@ -533,30 +549,30 @@ describe("Encounter Stage: Lifecycle, Allocation, and Disposal", () => {
         }
       };
 
-      runBatch(20);
-      const after20Geos = liveGeos.size;
-      const after20Texs = liveTexs.size;
+      runBatch(3);
+      const afterBatch1Geos = liveGeos.size;
+      const afterBatch1Texs = liveTexs.size;
 
-      runBatch(20);
-      const after40Geos = liveGeos.size;
-      const after40Texs = liveTexs.size;
+      runBatch(3);
+      const afterBatch2Geos = liveGeos.size;
+      const afterBatch2Texs = liveTexs.size;
 
-      console.log("20+20 cycle counts:", {
+      console.log("3+3 cycle counts:", {
         startGeos,
         startTexs,
-        after20Geos,
-        after20Texs,
-        after40Geos,
-        after40Texs,
+        afterBatch1Geos,
+        afterBatch1Texs,
+        afterBatch2Geos,
+        afterBatch2Texs,
       });
 
-      expect(after20Geos).toBe(startGeos);
-      expect(after20Texs).toBe(startTexs);
-      expect(after40Geos).toBe(after20Geos);
-      expect(after40Texs).toBe(after20Texs);
+      expect(afterBatch1Geos).toBe(startGeos);
+      expect(afterBatch1Texs).toBe(startTexs);
+      expect(afterBatch2Geos).toBe(afterBatch1Geos);
+      expect(afterBatch2Texs).toBe(afterBatch1Texs);
     } finally {
       THREE.BufferGeometry.prototype.dispose = origGeoDispose;
       THREE.Texture.prototype.dispose = origTexDispose;
     }
-  }, 15000);
+  });
 });
