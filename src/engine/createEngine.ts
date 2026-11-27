@@ -59,6 +59,25 @@ export interface Engine {
   getBox: () => Box;
   setBuildState: (state: Partial<BuildState>) => void;
   getBuildState: () => BuildState;
+  setHudMeta: (meta: { company?: string; cardName?: string }) => void;
+  triggerEntry: (tierKey?: "app" | "enc" | "raid") => void;
+}
+
+let activeEngine: Engine | null = null;
+const engineReadyListeners = new Set<(eng: Engine) => void>();
+
+export function getActiveEngine(): Engine | null {
+  return activeEngine;
+}
+
+export function onEngineReady(cb: (eng: Engine) => void): () => void {
+  engineReadyListeners.add(cb);
+  if (activeEngine) {
+    cb(activeEngine);
+  }
+  return () => {
+    engineReadyListeners.delete(cb);
+  };
 }
 
 export function createEngine(
@@ -115,6 +134,8 @@ export function createEngine(
       : null;
 
   let buildState: BuildState = { ...DEFAULT_BUILD_STATE };
+  let hudCompany = "";
+  let hudCardName = "";
 
   // Material registry + Background Manager + Orbit controller + Stage Manager
   const materials = createMaterialRegistry(three);
@@ -349,13 +370,35 @@ export function createEngine(
       backgroundManager.update(state, dtMs, time);
     }
 
+    const ov = getActiveOverlayHandles();
+    if (stage && state.activeScene === "app") {
+      const formT = ov?.hud.getFormT?.() ?? 0;
+      const punch =
+        formT > 0 && time - formT < 1200
+          ? Math.sin(Math.min(1, (time - formT) / 1200) * Math.PI) * 0.12
+          : 0;
+      if (punch > 0) {
+        camera.position.multiplyScalar(1 - punch);
+      }
+    }
+
     renderer.render(scene, camera);
     if (overlay) {
       overlay.render(time, fadeT);
       if (overlay.ctx) {
-        const ov = getActiveOverlayHandles();
         if (ov && state.activeScene === "app") {
-          ov.hud.render(overlay.ctx, time, currentBox, w, h, buildState.tier);
+          ov.hud.render(
+            overlay.ctx,
+            time,
+            currentBox,
+            w,
+            h,
+            buildState.tier,
+            hudCompany,
+            hudCardName,
+            buildState.objectives,
+            reduceMotion
+          );
         } else if (stage && state.activeScene === "stages") {
           const stageIndex = Math.max(
             0,
@@ -674,9 +717,12 @@ export function createEngine(
 
     renderer.dispose();
     renderer.forceContextLoss();
+    if (activeEngine === engineInstance) {
+      activeEngine = null;
+    }
   }
 
-  return {
+  const engineInstance: Engine = {
     scene,
     camera,
     renderer,
@@ -701,13 +747,63 @@ export function createEngine(
       buildState = { ...buildState, ...state };
       if (state.tier && state.tier !== prevTier) {
         snap = true;
+        const targetKey =
+          state.tier === "combine"
+            ? "raid"
+            : state.tier === "squad"
+              ? "enc"
+              : "app";
+        const targetStage = stageManager.getBuiltStage(targetKey) as
+          | { triggerEntry?: (t: number, reduce: boolean) => void }
+          | null
+          | undefined;
+        const reduce = !!(motionQuery && motionQuery.matches);
+        targetStage?.triggerEntry?.(
+          typeof performance !== "undefined" ? performance.now() : 0,
+          reduce
+        );
       }
       if (motionQuery && motionQuery.matches) {
         renderFrame(performance.now());
       }
     },
     getBuildState: () => buildState,
+    setHudMeta: (meta: { company?: string; cardName?: string }) => {
+      if (meta.company !== undefined) hudCompany = meta.company;
+      if (meta.cardName !== undefined) hudCardName = meta.cardName;
+    },
+    triggerEntry: (tierKey?: "app" | "enc" | "raid") => {
+      const key =
+        tierKey ??
+        (buildState.tier === "combine"
+          ? "raid"
+          : buildState.tier === "squad"
+            ? "enc"
+            : "app");
+      const targetStage = stageManager.getBuiltStage(key) as
+        | { triggerEntry?: (t: number, reduce: boolean) => void }
+        | null
+        | undefined;
+      const reduce = !!(motionQuery && motionQuery.matches);
+      targetStage?.triggerEntry?.(
+        typeof performance !== "undefined" ? performance.now() : 0,
+        reduce
+      );
+      if (reduce) {
+        renderFrame(performance.now());
+      }
+    },
   };
+
+  activeEngine = engineInstance;
+  queueMicrotask(() => {
+    if (activeEngine !== engineInstance) return;
+    for (const listener of engineReadyListeners) {
+      listener(engineInstance);
+    }
+  });
+
+  return engineInstance;
 }
 
 export { type BuildState, DEFAULT_BUILD_STATE } from "./buildState";

@@ -1,0 +1,108 @@
+{
+  "flagshipChanged": {
+    "template": "Flagship ${up ? \"upgraded\" : \"resized\"}: ${c.ship} ${c.code}.",
+    "kind": "sys",
+    "delayExpr": "",
+    "lines": "14769-14772"
+  },
+  "partyJoined": {
+    "template": "${UNITS[id].name} (${ROLE[TEAMOF[id]][0]}) has joined the party.",
+    "kind": "party",
+    "delayExpr": "k * 120 + 400,",
+    "lines": "14889-14893"
+  },
+  "partyLeft": {
+    "template": "${UNITS[id].name} has left the party.",
+    "kind": "party",
+    "delayExpr": "0",
+    "lines": "14898-14900"
+  },
+  "tierChanged": {
+    "template": "Game mode: ${TIERS[id].name} (${TIERS[id].sub.split(\" · \")[0]}).",
+    "kind": "sys",
+    "delayExpr": "",
+    "lines": "14915-14918"
+  },
+  "combineUnderway": {
+    "template": "${c.ship} ${c.code} is underway. ${units().length} units aboard.",
+    "kind": "sys",
+    "delayExpr": "400,",
+    "lines": "14921-14925"
+  },
+  "missionAccepted": {
+    "template": "Mission accepted: ${q.name}. ${q.hero} answers the call.",
+    "kind": "quest",
+    "delayExpr": "",
+    "lines": "14964-14967"
+  },
+  "extraReceived": {
+    "template": "You received: ${x.name} (${x.fx}).",
+    "kind": "loot",
+    "delayExpr": "0",
+    "lines": "14975-14975"
+  },
+  "objectiveMinOne": {
+    "template": "Keep at least one objective in play.",
+    "lines": "14983"
+  },
+  "objectiveSet": {
+    "template": "Objective set: ${o.name}.",
+    "kind": "quest",
+    "delayExpr": "0",
+    "lines": "14988-14988"
+  },
+  "encounterStarted": {
+    "template": "Encounter: ${d.team} vs ${d.boss}.",
+    "kind": "party",
+    "delayExpr": "300",
+    "lines": "14992-14992"
+  },
+  "buffActive": {
+    "template": "Raid buff active: ${x.name}. ${x.fx}.",
+    "kind": "loot",
+    "delayExpr": "0",
+    "lines": "15002-15002"
+  },
+  "reachChanged": {
+    "template": "Flagship: ${c.ship} ${c.code}. Entering ${c.zone.toLowerCase()}.",
+    "kind": "sys",
+    "delayExpr": "",
+    "lines": "15017-15020"
+  },
+  "formUpSolo": {
+    "template": "Mission start. Good hunting.",
+    "lines": "15039",
+    "kind": "sys",
+    "delayExpr": "0"
+  },
+  "formUpSquad": {
+    "template": "Ready check passed. Everyone is ready.",
+    "lines": "15041",
+    "kind": "sys",
+    "delayExpr": "0"
+  },
+  "formUpCombine": {
+    "template": "Raid launched. All units aboard.",
+    "lines": "15042",
+    "kind": "sys",
+    "delayExpr": "0"
+  },
+  "submitWorld": {
+    "template": "${company || \"Your guild\"} has entered the world.",
+    "kind": "sys",
+    "delayExpr": "0",
+    "lines": "15085-15085"
+  },
+  "bootWelcome": {
+    "template": "Welcome to Concepful. Choose a game mode to begin.",
+    "kind": "sys",
+    "delayExpr": "0",
+    "lines": "15136-15136"
+  },
+  "bootMission": {
+    "template": "Mission accepted: Brand identity. Laser Dolphin answers the call.",
+    "kind": "quest",
+    "delayExpr": "300,",
+    "lines": "15137-15141"
+  }
+}

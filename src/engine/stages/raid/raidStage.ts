@@ -507,6 +507,10 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
     parentScene.remove(group);
   }
 
+  function triggerEntry(t: number, reduceMotion: boolean): void {
+    shipT0 = reduceMotion ? -1 : t;
+  }
+
   return {
     key: "raid",
     group,
@@ -519,7 +523,8 @@ export function createRaidStage(ctx: StageBuildContext): Stage {
     setVisible,
     update,
     dispose,
-  };
+    triggerEntry,
+  } as Stage & { triggerEntry: (t: number, reduceMotion: boolean) => void };
 }
 
 /**

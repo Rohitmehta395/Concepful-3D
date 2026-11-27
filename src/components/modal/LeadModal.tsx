@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { MODAL_CONTENT } from "@/content/modal";
 import { validateLeadSubmission } from "@/domain/lead";
+import { getActiveEngine } from "@/engine/createEngine";
+import wiringMessages from "../../../tests/wiring-messages.json";
 import { useLeadModal } from "./LeadModalProvider";
 
 /**
@@ -36,15 +38,12 @@ export function LeadModal() {
   // Focus #co on open matching reference openModal() ($("co").focus())
   useEffect(() => {
     if (isOpen) {
-      const timer = requestAnimationFrame(() => {
-        if (coInputRef.current) {
-          coInputRef.current.focus();
-        } else {
-          const co = document.getElementById("co");
-          if (co) co.focus();
-        }
-      });
-      return () => cancelAnimationFrame(timer);
+      if (coInputRef.current) {
+        coInputRef.current.focus();
+      } else {
+        const co = document.getElementById("co");
+        if (co) co.focus();
+      }
     }
   }, [isOpen]);
 
@@ -65,9 +64,28 @@ export function LeadModal() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const coVal = coInputRef.current?.value ?? "";
+    const trimmed = coVal.trim();
     const result = validateLeadSubmission({ company: coVal });
     setWelcomeHeading(result.welcomeHeading);
     setIsSubmitted(true);
+
+    const eng = getActiveEngine();
+    if (eng) {
+      eng.setHudMeta({ company: trimmed });
+      const msg = wiringMessages.submitWorld.template.replace(
+        /\$\{[^}]+\}/,
+        trimmed || "Your guild"
+      );
+      eng.hud?.call(msg, "sys");
+      const reduce =
+        typeof window !== "undefined" &&
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (!reduce) {
+        eng.hud?.triggerForm(900);
+      } else {
+        eng.render();
+      }
+    }
   };
 
   return (
@@ -114,6 +132,12 @@ export function LeadModal() {
                   maxLength={fields.company.maxLength}
                   placeholder={fields.company.placeholder}
                   autoComplete={fields.company.autoComplete}
+                  onChange={(e) => {
+                    const eng = getActiveEngine();
+                    if (eng) {
+                      eng.setHudMeta({ company: e.target.value.trim() });
+                    }
+                  }}
                 />
               </div>
               <div className="fld">

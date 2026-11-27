@@ -479,6 +479,13 @@ export function createEncStage(ctx: StageBuildContext): Stage {
     parentScene.remove(group);
   }
 
+  function triggerEntry(t: number, reduceMotion: boolean): void {
+    if (!reduceMotion) {
+      drop = t;
+      t0 = t;
+    }
+  }
+
   return {
     key: "enc",
     group,
@@ -489,5 +496,6 @@ export function createEncStage(ctx: StageBuildContext): Stage {
     setVisible,
     update,
     dispose,
-  };
+    triggerEntry,
+  } as Stage & { triggerEntry: (t: number, reduceMotion: boolean) => void };
 }
