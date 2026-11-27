@@ -117,11 +117,11 @@ export function ConfiguratorShell() {
       {/* Boxart Visual Branding */}
       <div className="boxart" id="boxart">
         <div>
-          <h1 className="title">
+          <h2 className="title">
             Assemble your
             <br />
             <span>creative</span> department.
-          </h1>
+          </h2>
           <div className="fp">
             Server: Concepful · Senior lead on every build · Four encounters to
             clear
