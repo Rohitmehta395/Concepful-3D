@@ -6,34 +6,16 @@
  */
 
 /*
- * Part 3.3c — Hero card width fix.
+ * Hero card width fix.
  *
- * Problem: .sc.hero's heading (Russo One, skewX(-8deg)) overflows the
- * shared .sc max-width: 460px at large viewports. The longest unbreakable
- * token is "DEPARTMENT," whose rendered width K per 1px of font-size was
- * measured via Playwright getClientRects() across 9 viewports:
- *
- *   deptWordWidth / fontSize:
- *     @66px → 477.33 / 66 = 7.2322
- *     @64px → 462.86 / 64 = 7.2322   (identical ratio)
- *   K = ceil(7.2322 × 100) / 100 = 7.24  (rounded up)
- *
- * card max-width = K × h1-font-size + 2 × 22px(padding) + 10px(breathing)
- *               = 7.24 × var(--hero-h1) + 54px
- *
- * Verification at worst widths (overflowRight must be ≤ 0):
- *   @66px (1920/1440): 7.24×66 + 54 = 531.84px → overflow = 817.23 − 829.84 = −12.6 ✓
- *   @64px (1280):      7.24×64 + 54 = 517.36px → overflow = 494.67 − 511.36 = −16.7 ✓
- *   @900px and below:  max-width: none (mobile rule, unchanged)
- *
- * Note: this is an ORIGINAL prototype defect — the reference HTML also
- * overflows at ≥901px. The fix is applied only to the rebuild.
- * Scope: .sc.hero only; the shared .sc rule is unchanged.
+ * .big (Russo One, skewX(-8deg)) overflows the shared .sc max-width: 460px at
+ * large viewports because "DEPARTMENT," measures ~7.2322× font-size. Sizing
+ * .sc.hero's max-width dynamically from --hero-h1 keeps the original heading
+ * scale intact while ensuring "DEPARTMENT," fits inside the 22px card padding.
  */
 #intro .sc.hero {
-  /* --hero-h1 defined once: card width matches .sc standard 460px */
   --hero-h1: clamp(36px, 5vw, 66px);
-  max-width: 460px;
+  max-width: calc(7.24 * var(--hero-h1) + 56px);
 }
 
 /* Lines 190-200, 1680-1683: Display heading with skewed styling and active drop shadow */
